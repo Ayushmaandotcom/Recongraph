@@ -1,0 +1,6 @@
+purchase_record_id,gst_record_id,relationship
+PR001,GST001,same_financial_event
+PR002,GST002,same_financial_event
+PR003,GST003,same_financial_event
+PR004,GST004,same_financial_event
+PR005,GST005,same_financial_event

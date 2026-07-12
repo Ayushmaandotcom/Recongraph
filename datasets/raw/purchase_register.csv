@@ -1,0 +1,6 @@
+record_id,vendor_name,invoice_number,invoice_date,amount,gstin
+PR001,ABC Steel Private Limited,INV-1042,2026-06-12,118000.00,07ABCDE1234F1Z5
+PR002,Shree Balaji Enterprises,SB-8891,2026-06-14,245500.00,07FGHIJ5678K1Z3
+PR003,Northstar Components Pvt Ltd,NC-2204,2026-06-17,87500.00,06KLMNO9012P1Z7
+PR004,Metro Office Solutions,MOS-781,2026-06-19,32000.00,07QRSTU3456V1Z1
+PR005,Apex Industrial Supplies Pvt Ltd,AIS-5510,2026-06-21,410000.00,09WXYZA7890B1Z4
