@@ -7,7 +7,9 @@ name = "recongraph"
 version = "0.1.0"
 description = "An explainable financial exception investigation and reconciliation engine."
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "rapidfuzz>=3.14,<4.0",
+]
 
 [project.optional-dependencies]
 dev = [
