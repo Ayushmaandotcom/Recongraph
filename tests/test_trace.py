@@ -4,7 +4,7 @@ from dataclasses import FrozenInstanceError
 from recongraph.graph.trace import TraceBuilder, TraceStage
 
 def test_trace_builder_chronology():
-    builder = TraceBuilder(trace_id="TRC-001")
+    builder = TraceBuilder(trace_id="TRC-001", engine_version="1.0.0", config_hash="abcd")
     
     # Simulate a pipeline execution
     builder.record_event(TraceStage.CANDIDATE_GENERATION, {"edge": "P1-G1"})
@@ -34,7 +34,7 @@ def test_trace_builder_chronology():
     assert len(trace.get_events_for_stage(TraceStage.HYPOTHESIS_SEARCH)) == 0
 
 def test_trace_immutability():
-    builder = TraceBuilder(trace_id="TRC-002")
+    builder = TraceBuilder(trace_id="TRC-002", engine_version="1.0.0", config_hash="abcd")
     builder.record_event(TraceStage.COMPONENT_EXTRACTION, "Component A")
     
     trace = builder.build()

@@ -4,7 +4,7 @@ from enum import StrEnum
 from math import isfinite
 
 
-class SignalName(StrEnum):
+class SignalName:
     """Names of primitive compatibility signals."""
 
     ENTITY = "entity"
@@ -18,8 +18,8 @@ class SignalName(StrEnum):
 class RelationshipPolicy:
     """Define how a financial relationship interprets primitive signals."""
 
-    weights: Mapping[SignalName, float]
-    contradiction_penalties: Mapping[SignalName, float] = field(
+    weights: Mapping[str, float]
+    contradiction_penalties: Mapping[str, float] = field(
         default_factory=dict
     )
 
@@ -58,11 +58,11 @@ class RelationshipScore:
     base_score: float | None
     coverage: float
     contradiction_penalty: float
-    active_contradictions: tuple[SignalName, ...]
+    active_contradictions: tuple[str, ...]
 
 
 def calculate_relationship_score(
-    signals: Mapping[SignalName, float | None],
+    signals: Mapping[str, float | None],
     policy: RelationshipPolicy,
 ) -> RelationshipScore:
     """Aggregate primitive evidence under a relationship policy."""
@@ -86,14 +86,14 @@ def calculate_relationship_score(
     available_weight = 0.0
     weighted_numerator = 0.0
 
-    for signal_name, score in signals.items():
-        if score is None:
+    for signal_name, signal_score in signals.items():
+        if signal_score is None:
             continue
 
         weight = policy.weights[signal_name]
 
         available_weight += weight
-        weighted_numerator += weight * score
+        weighted_numerator += weight * signal_score
 
     coverage = available_weight / total_weight
 

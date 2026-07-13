@@ -6,6 +6,8 @@ from recongraph.domain.records import PurchaseRecord, GSTRecord
 from recongraph.matching.reference_evidence import ReferenceEvidenceContext, ReferenceEvidencePolicy, ReferenceCorpusProfile
 from recongraph.matching.scoring import SignalName
 from recongraph.graph.evaluator import HypothesisEvaluator
+from recongraph.plugins.core_providers import FinancialEvidenceProvider, TemporalEvidenceProvider, TaxEvidenceProvider, VendorEvidenceProvider, ReferenceEvidenceProvider
+from recongraph.matching.pair_scorers import PURCHASE_TO_GST_POLICY
 
 @pytest.fixture
 def empty_reference_context():
@@ -33,7 +35,14 @@ def test_evaluator_case_1(empty_reference_context):
         proposed_edges=frozenset([frozenset([u1, u2])])
     )
     
-    evaluator = HypothesisEvaluator(empty_reference_context)
+    providers = [
+        FinancialEvidenceProvider(),
+        TemporalEvidenceProvider(),
+        TaxEvidenceProvider(),
+        VendorEvidenceProvider(),
+        ReferenceEvidenceProvider(empty_reference_context)
+    ]
+    evaluator = HypothesisEvaluator(providers, PURCHASE_TO_GST_POLICY)
     result = evaluator.evaluate(builder.build(), hypothesis)
     
     assert result.eligibility == EligibilityStatus.ELIGIBLE
@@ -57,7 +66,14 @@ def test_evaluator_case_2(empty_reference_context):
         proposed_edges=frozenset([frozenset([u1, u2]), frozenset([u1, u3])])
     )
     
-    evaluator = HypothesisEvaluator(empty_reference_context)
+    providers = [
+        FinancialEvidenceProvider(),
+        TemporalEvidenceProvider(),
+        TaxEvidenceProvider(),
+        VendorEvidenceProvider(),
+        ReferenceEvidenceProvider(empty_reference_context)
+    ]
+    evaluator = HypothesisEvaluator(providers, PURCHASE_TO_GST_POLICY)
     result = evaluator.evaluate(builder.build(), hypothesis)
     
     assert result.eligibility == EligibilityStatus.ELIGIBLE
@@ -81,7 +97,14 @@ def test_evaluator_case_3(empty_reference_context):
         proposed_edges=frozenset([frozenset([u1, u2]), frozenset([u1, u3])])
     )
     
-    evaluator = HypothesisEvaluator(empty_reference_context)
+    providers = [
+        FinancialEvidenceProvider(),
+        TemporalEvidenceProvider(),
+        TaxEvidenceProvider(),
+        VendorEvidenceProvider(),
+        ReferenceEvidenceProvider(empty_reference_context)
+    ]
+    evaluator = HypothesisEvaluator(providers, PURCHASE_TO_GST_POLICY)
     result = evaluator.evaluate(builder.build(), hypothesis)
     
     assert result.supporting_evidence["signals"][SignalName.AMOUNT] < 1.0
@@ -102,7 +125,14 @@ def test_evaluator_case_4(empty_reference_context):
         proposed_edges=frozenset([frozenset([u1, u2])])
     )
     
-    evaluator = HypothesisEvaluator(empty_reference_context)
+    providers = [
+        FinancialEvidenceProvider(),
+        TemporalEvidenceProvider(),
+        TaxEvidenceProvider(),
+        VendorEvidenceProvider(),
+        ReferenceEvidenceProvider(empty_reference_context)
+    ]
+    evaluator = HypothesisEvaluator(providers, PURCHASE_TO_GST_POLICY)
     result = evaluator.evaluate(builder.build(), hypothesis)
     
     assert result.eligibility == EligibilityStatus.INELIGIBLE

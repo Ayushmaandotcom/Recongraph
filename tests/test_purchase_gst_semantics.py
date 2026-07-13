@@ -334,7 +334,7 @@ def test_does_not_detect_distinct_event_identity_when_tax_identity_is_unknown():
 # Missing Evidence Keys
 @pytest.mark.parametrize(
     "missing_signal",
-    list(SignalName),
+    [SignalName.ENTITY, SignalName.REFERENCE, SignalName.AMOUNT, SignalName.TEMPORAL, SignalName.TAX_IDENTITY],
 )
 def test_analyze_purchase_gst_semantics_rejects_missing_evidence_keys(
     missing_signal: SignalName,

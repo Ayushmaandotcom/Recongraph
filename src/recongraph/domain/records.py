@@ -13,6 +13,11 @@ class PurchaseRecord:
     amount: float
     record_date: date
     tax_identity: str | None
+    net_amount: float | None = None
+    tax_amount: float | None = None
+    tax_rate: float | None = None
+    currency: str = "USD"
+    sign: int = 1
 
 
 @dataclass(frozen=True)
@@ -26,3 +31,8 @@ class GSTRecord:
     amount: float
     record_date: date
     tax_identity: str | None
+    net_amount: float | None = None
+    tax_amount: float | None = None
+    tax_rate: float | None = None
+    currency: str = "USD"
+    sign: int = -1

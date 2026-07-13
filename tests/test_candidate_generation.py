@@ -5,9 +5,10 @@ from recongraph.candidate_generation.blockers import (
     TaxIdentityBlocker,
     ReferenceTokenBlocker,
 )
+from recongraph.plugins.core_providers import FinancialEvidenceProvider, TaxEvidenceProvider, ReferenceEvidenceProvider
 from recongraph.candidate_generation.index import InvertedIndex
 from recongraph.candidate_generation.generator import CandidateGenerator
-from recongraph.matching.reference_evidence import ReferenceCorpusProfile
+from recongraph.matching.reference_evidence import ReferenceCorpusProfile, ReferenceEvidenceContext, ReferenceEvidencePolicy
 
 def test_exact_amount_blocker():
     blocker = ExactAmountBlocker()
@@ -51,12 +52,12 @@ def test_candidate_generator_reduction():
         normalized_reference_frequency={"inv123": 1, "inv999": 1, "dummy": 998},
         numeric_token_document_frequency={"123": 1, "999": 1}
     )
-    blockers = [
-        ExactAmountBlocker(),
-        TaxIdentityBlocker(),
-        ReferenceTokenBlocker(prof, rarity_threshold=0.8)
+    providers = [
+        FinancialEvidenceProvider(), 
+        TaxEvidenceProvider(),
+        ReferenceEvidenceProvider(ReferenceEvidenceContext(prof, ReferenceEvidencePolicy()))
     ]
-    generator = CandidateGenerator(blockers)
+    generator = CandidateGenerator(providers)
     
     # 1 Purchase
     purchases = [
