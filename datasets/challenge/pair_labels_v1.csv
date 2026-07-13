@@ -1,0 +1,7 @@
+case_id,purchase_record_id,gst_record_id,expected_label
+HN001,CP001,CG001,negative
+HN002,CP001,CG002,negative
+HN003,CP002,CG003,negative
+HN004,CP003,CG004,negative
+HN005,CP004,CG005,group_component
+HN005,CP004,CG006,group_component

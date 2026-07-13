@@ -1,0 +1,5 @@
+record_id,vendor_name,invoice_number,invoice_date,amount,gstin
+CP001,ABC Steel Private Limited,INV-1042,2026-06-12,118000.00,07ABCDE1234F1Z5
+CP002,CloudLedger Software Private Limited,CL-JUN-2026,2026-06-05,25000.00,07CLOUD1234A1Z1
+CP003,Orion Medical Devices Private Limited,OMD-001,2026-06-20,75000.00,07ORION5678B1Z2
+CP004,Apex Industrial Supplies,AIS-9001,2026-06-25,100000.00,07APEXS1234C1Z3

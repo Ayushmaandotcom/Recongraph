@@ -3,6 +3,7 @@ import pytest
 
 from recongraph.matching.signals import (
     amount_score,
+    entity_score,
     reference_score,
     tax_identity_score,
     temporal_score,
@@ -248,3 +249,67 @@ def test_reference_score_rejects_non_positive_token_length() -> None:
             "AB/1042",
             min_numeric_token_length=0,
         )
+
+
+def test_entity_score_returns_one_for_canonicalized_match() -> None:
+    score = entity_score(
+        "ABC Steel Private Limited",
+        "ABC STEELS PVT. LTD.",
+    )
+
+    assert score == 1.0
+
+
+def test_entity_score_handles_known_vendor_abbreviation() -> None:
+    score = entity_score(
+        "Shree Balaji Enterprises",
+        "SHREE BALAJI ENT.",
+    )
+
+    assert score == 1.0
+
+
+def test_entity_score_preserves_continuous_similarity() -> None:
+    score = entity_score(
+        "ABC Steel",
+        "ABC Steel Trading",
+    )
+
+    assert score is not None
+    assert 0.0 < score < 1.0
+
+
+def test_entity_score_scores_unrelated_entities_lower() -> None:
+    related_score = entity_score(
+        "ABC Steel",
+        "ABC Steel Trading",
+    )
+    unrelated_score = entity_score(
+        "ABC Steel",
+        "Metro Office Solutions",
+    )
+
+    assert related_score is not None
+    assert unrelated_score is not None
+    assert related_score > unrelated_score
+
+
+def test_entity_score_returns_none_for_missing_entity() -> None:
+    assert entity_score("ABC Steel", None) is None
+
+
+def test_entity_score_returns_none_for_blank_entity() -> None:
+    assert entity_score("", "   ") is None
+
+
+def test_entity_score_is_symmetric() -> None:
+    forward_score = entity_score(
+        "ABC Steel",
+        "ABC Steel Trading",
+    )
+    backward_score = entity_score(
+        "ABC Steel Trading",
+        "ABC Steel",
+    )
+
+    assert forward_score == backward_score

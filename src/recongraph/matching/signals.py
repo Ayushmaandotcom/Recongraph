@@ -1,9 +1,12 @@
 from datetime import date
 
+from rapidfuzz import fuzz
+
 from recongraph.normalization.text import (
     extract_numeric_reference_tokens,
     normalize_reference,
     normalize_tax_identity,
+    normalize_vendor_name,
 )
 
 
@@ -133,3 +136,25 @@ def reference_score(
         return shared_numeric_score
 
     return 0.0
+
+
+def entity_score(
+    entity_a: str | None,
+    entity_b: str | None,
+) -> float | None:
+    """Calculate normalized textual similarity between vendor entities."""
+    if entity_a is None or entity_b is None:
+        return None
+
+    normalized_a = normalize_vendor_name(entity_a)
+    normalized_b = normalize_vendor_name(entity_b)
+
+    if not normalized_a or not normalized_b:
+        return None
+
+    similarity = fuzz.ratio(
+        normalized_a,
+        normalized_b,
+    )
+
+    return similarity / 100.0
