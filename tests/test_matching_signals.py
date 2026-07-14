@@ -2,72 +2,13 @@ from datetime import date
 import pytest
 
 from recongraph.matching.signals import (
-    amount_score,
     entity_score,
     tax_identity_score,
     temporal_score,
 )
 
 
-def test_amount_score_returns_one_for_exact_match() -> None:
-    assert amount_score(118000.0, 118000.0) == 1.0
 
-
-def test_amount_score_is_scale_aware() -> None:
-    small_scale_score = amount_score(
-        2000.0,
-        1000.0,
-    )
-    large_scale_score = amount_score(
-        10_000_000.0,
-        9_999_000.0,
-    )
-
-    assert small_scale_score == 0.0
-    assert large_scale_score > small_scale_score
-
-
-def test_amount_score_decays_within_tolerance() -> None:
-    score = amount_score(
-        100_000.0,
-        99_500.0,
-    )
-
-    assert score == pytest.approx(0.5)
-
-
-def test_amount_score_returns_zero_at_tolerance_boundary() -> None:
-    score = amount_score(
-        100_000.0,
-        99_000.0,
-    )
-
-    assert score == 0.0
-
-
-def test_amount_score_returns_zero_beyond_tolerance() -> None:
-    score = amount_score(
-        100_000.0,
-        90_000.0,
-    )
-
-    assert score == 0.0
-
-
-def test_amount_score_handles_two_zero_amounts() -> None:
-    assert amount_score(0.0, 0.0) == 1.0
-
-
-def test_amount_score_rejects_non_positive_tolerance() -> None:
-    with pytest.raises(
-        ValueError,
-        match="tolerance must be greater than zero",
-    ):
-        amount_score(
-            100_000.0,
-            99_500.0,
-            tolerance=0.0,
-        )
 
 
 def test_tax_identity_score_returns_one_for_matching_identities() -> None:

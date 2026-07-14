@@ -2,11 +2,15 @@ from dataclasses import dataclass
 from recongraph.graph.decision import ReconciliationDecision, DecisionAction
 from recongraph.matching.scoring import SignalName
 
+from recongraph.domain.financial.pipeline import AmountInterpretation
+from recongraph.domain.financial.amount_projection import ProjectedAmountSimilarity
+
 @dataclass(frozen=True)
 class EvidenceSummary:
     """A snapshot of the core signals that drove the score."""
     reference_score: float | None
-    amount_score: float | None
+    amount_interpretation: AmountInterpretation | None
+    amount_projection: ProjectedAmountSimilarity | None
     temporal_score: float | None
     entity_score: float | None
     tax_identity_score: float | None
@@ -56,18 +60,27 @@ class ExplanationBuilder:
             )
 
         signals = hypothesis.supporting_evidence.get("signals", {})
+        metadata = hypothesis.supporting_evidence.get("metadata", {})
+        amount_meta = metadata.get(SignalName.AMOUNT, {})
         
         summary = EvidenceSummary(
             reference_score=signals.get(SignalName.REFERENCE),
-            amount_score=signals.get(SignalName.AMOUNT),
+            amount_interpretation=amount_meta.get("interpretation"),
+            amount_projection=amount_meta.get("projection"),
             temporal_score=signals.get(SignalName.TEMPORAL),
             entity_score=signals.get(SignalName.ENTITY),
             tax_identity_score=signals.get(SignalName.TAX_IDENTITY)
         )
         
         positives = []
-        if summary.amount_score is not None and summary.amount_score == 1.0:
-            positives.append("Amounts match perfectly.")
+        if summary.amount_interpretation:
+            interp = summary.amount_interpretation
+            proj = summary.amount_projection
+            reason = f"Relationship: {interp.relationship.value}. Absolute Difference: {interp.absolute_difference}. "
+            reason += " ".join(interp.notes)
+            if proj:
+                reason += f" Projected similarity: {proj.similarity}."
+            positives.append(reason)
         if summary.reference_score is not None and summary.reference_score >= 0.8:
             positives.append("Strong reference match on a distinct identifier.")
         if summary.entity_score is not None and summary.entity_score >= 0.8:
@@ -80,9 +93,7 @@ class ExplanationBuilder:
             for v in sorted(list(hypothesis.violations)):
                 limits.append(f"Semantic violation: {v}")
                 
-        if summary.amount_score is not None and summary.amount_score < 0.9:
-            limits.append("Amounts differ significantly.")
-        elif summary.amount_score is None:
+        if summary.amount_interpretation is None:
             limits.append("Amount evidence unavailable.")
             
         if summary.temporal_score is not None and summary.temporal_score < 0.5:

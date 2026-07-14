@@ -1,74 +1,94 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from decimal import Decimal
 from typing import Sequence
-import math
+from enum import StrEnum
 
 from recongraph.domain.records import PurchaseRecord, GSTRecord
 from recongraph.plugins.provider_v2 import EvidencePipeline, EvidenceContributionV2
 
+
+class AmountRelationship(StrEnum):
+    EXACT_MATCH = "EXACT_MATCH"
+    ROUNDING_MATCH = "ROUNDING_MATCH"
+    FEE_DETECTED = "FEE_DETECTED"
+    PARTIAL_SETTLEMENT = "PARTIAL_SETTLEMENT"
+    OVERPAYMENT = "OVERPAYMENT"
+    CURRENCY_MISMATCH = "CURRENCY_MISMATCH"
+    UNINTERPRETABLE = "UNINTERPRETABLE"
+
+
 @dataclass(frozen=True)
 class FinancialObservation:
-    purchase_gross: tuple[float, ...]
-    purchase_net: tuple[float | None, ...]
-    purchase_tax: tuple[float | None, ...]
+    purchase_gross: tuple[Decimal, ...]
+    purchase_net: tuple[Decimal | None, ...]
+    purchase_tax: tuple[Decimal | None, ...]
     purchase_currencies: tuple[str, ...]
     purchase_signs: tuple[int, ...]
     
-    gst_gross: tuple[float, ...]
-    gst_net: tuple[float | None, ...]
-    gst_tax: tuple[float | None, ...]
+    gst_gross: tuple[Decimal, ...]
+    gst_net: tuple[Decimal | None, ...]
+    gst_tax: tuple[Decimal | None, ...]
     gst_currencies: tuple[str, ...]
     gst_signs: tuple[int, ...]
     
     @property
-    def total_purchase_gross(self) -> float:
-        return sum(self.purchase_gross)
+    def total_purchase_gross(self) -> Decimal:
+        return sum(self.purchase_gross, Decimal("0"))
         
     @property
-    def total_gst_gross(self) -> float:
-        return sum(self.gst_gross)
+    def total_gst_gross(self) -> Decimal:
+        return sum(self.gst_gross, Decimal("0"))
         
     @property
-    def total_purchase_net(self) -> float:
-        return sum(n for n in self.purchase_net if n is not None)
+    def total_purchase_net(self) -> Decimal:
+        return sum((n for n in self.purchase_net if n is not None), Decimal("0"))
         
     @property
-    def total_gst_tax(self) -> float:
-        return sum(t for t in self.gst_tax if t is not None)
+    def total_gst_tax(self) -> Decimal:
+        return sum((t for t in self.gst_tax if t is not None), Decimal("0"))
+
 
 @dataclass(frozen=True)
-class EvaluatedFinancialEvidence:
-    sum_purchases: float
-    sum_payments: float
-    currency: str
-    amount_score: float
-    is_exact_match: bool
-    is_partial: bool
-    is_overpayment: bool
-    residual: float
-    currency_mismatch: bool
-    notes: list[str]
+class AmountInterpretation:
+    """The authoritative semantic model of financial amount relationships."""
+    relationship: AmountRelationship
+    
+    amount_a: Decimal
+    amount_b: Decimal
+    
+    absolute_difference: Decimal
+    relative_difference: Decimal
+    residual: Decimal
+    
+    currency_status: str
+    comparison_basis: str
+    
+    notes: tuple[str, ...] = field(default_factory=tuple)
+    assumptions: tuple[str, ...] = field(default_factory=tuple)
+    provenance: str = "FinancialEvidencePipeline"
 
-class FinancialEvidencePipeline(EvidencePipeline[FinancialObservation, EvaluatedFinancialEvidence]):
-    def __init__(self, tolerance: float = 0.05, fee_tolerance: float = 2.00):
+
+class FinancialEvidencePipeline(EvidencePipeline[FinancialObservation, AmountInterpretation]):
+    def __init__(self, tolerance: Decimal = Decimal("0.05"), fee_tolerance: Decimal = Decimal("2.00")):
         self.tolerance = tolerance
         self.fee_tolerance = fee_tolerance
 
     def extract(self, purchases: Sequence[PurchaseRecord], gsts: Sequence[GSTRecord]) -> FinancialObservation:
         return FinancialObservation(
-            purchase_gross=tuple(p.amount for p in purchases),
-            purchase_net=tuple(p.net_amount for p in purchases),
-            purchase_tax=tuple(p.tax_amount for p in purchases),
+            purchase_gross=tuple(Decimal(str(p.amount)) for p in purchases),
+            purchase_net=tuple(Decimal(str(p.net_amount)) if p.net_amount is not None else None for p in purchases),
+            purchase_tax=tuple(Decimal(str(p.tax_amount)) if p.tax_amount is not None else None for p in purchases),
             purchase_currencies=tuple(p.currency for p in purchases),
             purchase_signs=tuple(p.sign for p in purchases),
             
-            gst_gross=tuple(g.amount for g in gsts),
-            gst_net=tuple(g.net_amount for g in gsts),
-            gst_tax=tuple(g.tax_amount for g in gsts),
+            gst_gross=tuple(Decimal(str(g.amount)) for g in gsts),
+            gst_net=tuple(Decimal(str(g.net_amount)) if g.net_amount is not None else None for g in gsts),
+            gst_tax=tuple(Decimal(str(g.tax_amount)) if g.tax_amount is not None else None for g in gsts),
             gst_currencies=tuple(g.currency for g in gsts),
             gst_signs=tuple(g.sign for g in gsts)
         )
         
-    def interpret(self, observation: FinancialObservation) -> EvaluatedFinancialEvidence:
+    def interpret(self, observation: FinancialObservation) -> AmountInterpretation:
         tp = observation.total_purchase_gross
         tg = observation.total_gst_gross
         delta = abs(tp - tg)
@@ -83,72 +103,57 @@ class FinancialEvidencePipeline(EvidencePipeline[FinancialObservation, Evaluated
         is_split = (num_p > 1 or num_g > 1)
         
         notes = []
-        is_exact = False
-        is_partial = False
-        is_over = False
-        score = 0.0
+        assumptions = []
+        relationship = AmountRelationship.UNINTERPRETABLE
         
         if currency_mismatch:
-            notes.append("CURRENCY_MISMATCH")
-            score = 0.0
+            relationship = AmountRelationship.CURRENCY_MISMATCH
+            notes.append("Currency mismatch detected.")
         else:
-            if delta <= 1e-9:
-                is_exact = True
-                score = 1.0
+            if delta <= Decimal("0"):
+                relationship = AmountRelationship.EXACT_MATCH
                 if is_split:
-                    notes.append("SPLIT_PAYMENT")
+                    notes.append("Split payment perfectly matches.")
                 else:
-                    notes.append("EXACT_TOTAL_MATCH")
+                    notes.append("Exact total match.")
             elif delta <= self.tolerance:
-                is_exact = True
-                score = 0.99
-                notes.append("ROUNDING_MATCH")
+                relationship = AmountRelationship.ROUNDING_MATCH
+                notes.append("Difference is within rounding tolerance.")
             elif delta <= self.fee_tolerance and residual > 0:
-                # Small underpayment modeled as a fee
-                is_exact = True
-                score = 0.95
-                notes.append("FEE_DETECTED")
+                relationship = AmountRelationship.FEE_DETECTED
+                notes.append("Small underpayment modeled as a fee.")
+                assumptions.append(f"Difference <= {self.fee_tolerance} is a bank fee.")
             else:
                 if residual > 0:
-                    is_partial = True
-                    notes.append("UNDERPAYMENT")
+                    relationship = AmountRelationship.PARTIAL_SETTLEMENT
+                    notes.append("Underpayment detected.")
                 else:
-                    is_over = True
-                    notes.append("OVERPAYMENT")
+                    relationship = AmountRelationship.OVERPAYMENT
+                    notes.append("Overpayment detected.")
                 
-                max_val = max(tp, tg, 1.0)
-                score = max(0.0, 1.0 - (delta / max_val))
-                
-                # Rough net/gross heuristic checking if Gross ≈ Payment + Tax
-                # The user noted: If (GrossInvoice == Sum(Payments) + Sum(Tax)) -> NET_TO_GROSS_MATCH
-                if observation.total_gst_tax > 0:
+                # Net to Gross check
+                if observation.total_gst_tax > Decimal("0"):
                     if abs(tp - (tg + observation.total_gst_tax)) <= self.tolerance:
-                        notes.append("GROSS_NET_MATCH")
+                        notes.append("Gross amount equals Net + Tax.")
+                        assumptions.append("One record is Net and the other is Gross.")
                         
-        return EvaluatedFinancialEvidence(
-            sum_purchases=tp,
-            sum_payments=tg,
-            currency=primary_currency,
-            amount_score=score,
-            is_exact_match=is_exact,
-            is_partial=is_partial,
-            is_overpayment=is_over,
-            residual=residual,
-            currency_mismatch=currency_mismatch,
-            notes=notes
-        )
-        
-    def contribute(self, interpretation: EvaluatedFinancialEvidence) -> EvidenceContributionV2[EvaluatedFinancialEvidence]:
-        violations = set()
-        
-        if interpretation.currency_mismatch:
-            violations.add("CURRENCY_MISMATCH")
-        elif not interpretation.is_exact_match and interpretation.amount_score < 0.5:
-            violations.add("SEVERE_AMOUNT_CONFLICT")
+        max_val = max(abs(tp), abs(tg))
+        if max_val == Decimal("0"):
+            relative_difference = Decimal("0")
+        else:
+            relative_difference = delta / max_val
             
-        return EvidenceContributionV2(
-            provider_name="FinancialEvidenceProvider",
-            score=interpretation.amount_score,
-            violations=frozenset(violations),
-            interpretation=interpretation
+        return AmountInterpretation(
+            relationship=relationship,
+            amount_a=tp,
+            amount_b=tg,
+            absolute_difference=delta,
+            relative_difference=relative_difference,
+            residual=residual,
+            currency_status="MISMATCH" if currency_mismatch else primary_currency,
+            comparison_basis="Gross Amount",
+            notes=tuple(notes),
+            assumptions=tuple(assumptions)
         )
+        
+

@@ -18,30 +18,6 @@ def _is_year_like_token(token: str) -> bool:
     return 1900 <= year <= 2100
 
 
-def amount_score(
-    amount_a: float,
-    amount_b: float,
-    tolerance: float = 0.01,
-) -> float:
-    """Calculate scale-aware compatibility between two monetary amounts."""
-    if tolerance <= 0:
-        raise ValueError("tolerance must be greater than zero")
-
-    maximum_amount = max(abs(amount_a), abs(amount_b))
-
-    if maximum_amount == 0:
-        return 1.0
-
-    relative_difference = (
-        abs(amount_a - amount_b) / maximum_amount
-    )
-
-    return max(
-        0.0,
-        1.0 - (relative_difference / tolerance),
-    )
-
-
 def tax_identity_score(
     tax_identity_a: str | None,
     tax_identity_b: str | None,

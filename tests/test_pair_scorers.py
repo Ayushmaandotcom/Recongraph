@@ -1,7 +1,9 @@
 from datetime import date
 
 import pytest
-
+from decimal import Decimal
+from recongraph.domain.financial.pipeline import AmountInterpretation, AmountRelationship
+from recongraph.domain.financial.amount_projection import ProjectedAmountSimilarity
 from recongraph.domain.records import GSTRecord, PurchaseRecord
 from recongraph.matching.pair_scorers import (
     PURCHASE_TO_GST_MAX_DAYS,
@@ -98,6 +100,7 @@ def test_pair_scoring_result_preserves_signal_explanation() -> None:
 
     from recongraph.matching.reference_evidence import ReferenceEvidenceInterpretation
     
+
     result = PairScoringResult(
         signals={
             SignalName.ENTITY: 0.9,
@@ -129,7 +132,18 @@ def test_pair_scoring_result_preserves_signal_explanation() -> None:
                     statistics_available=True,
                 ),
             )
-        )
+        ),
+        amount_interpretation=AmountInterpretation(
+            relationship=AmountRelationship.EXACT_MATCH,
+            amount_a=Decimal("100"),
+            amount_b=Decimal("100"),
+            absolute_difference=Decimal("0"),
+            relative_difference=Decimal("0"),
+            residual=Decimal("0"),
+            currency_status="USD",
+            comparison_basis="Gross"
+        ),
+        amount_projection=ProjectedAmountSimilarity(1.0)
     )
 
     assert result.signals[SignalName.ENTITY] == 0.9
@@ -153,7 +167,18 @@ def test_pair_scoring_result_is_immutable() -> None:
             contradiction_penalty=1.0,
             active_contradictions=(),
         ),
-        reference_interpretation=ReferenceEvidenceInterpretation(0.0, 0.0, ())
+        reference_interpretation=ReferenceEvidenceInterpretation(0.0, 0.0, ()),
+        amount_interpretation=AmountInterpretation(
+            relationship=AmountRelationship.EXACT_MATCH,
+            amount_a=Decimal("100"),
+            amount_b=Decimal("100"),
+            absolute_difference=Decimal("0"),
+            relative_difference=Decimal("0"),
+            residual=Decimal("0"),
+            currency_status="USD",
+            comparison_basis="Gross"
+        ),
+        amount_projection=ProjectedAmountSimilarity(1.0)
     )
 
     with pytest.raises(AttributeError):

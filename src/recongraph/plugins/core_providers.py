@@ -40,15 +40,26 @@ class FinancialEvidenceProvider:
         return [ExactAmountBlocker()]
         
     def evaluate(self, purchases: Sequence[PurchaseRecord], gsts: Sequence[GSTRecord]) -> EvidenceContribution:
+        from recongraph.domain.financial.amount_projection import project_amount_similarity
+        
         observation = self.pipeline.extract(purchases, gsts)
         interpretation = self.pipeline.interpret(observation)
-        contrib_v2 = self.pipeline.contribute(interpretation)
+        projection = project_amount_similarity(interpretation)
         
+        violations = set(projection.warnings)
+        if interpretation.currency_status == "MISMATCH":
+            violations.add("CURRENCY_MISMATCH")
+        elif projection.similarity < 0.5 and interpretation.relationship not in ("EXACT_MATCH", "ROUNDING_MATCH", "FEE_DETECTED"):
+            violations.add("SEVERE_AMOUNT_CONFLICT")
+            
         return EvidenceContribution(
             provider_name=self.get_name(),
-            score=contrib_v2.score,
-            violations=contrib_v2.violations,
-            metadata={"interpretation": contrib_v2.interpretation}
+            score=projection.similarity,
+            violations=frozenset(violations),
+            metadata={
+                "interpretation": interpretation,
+                "projection": projection
+            }
         )
 
 class TemporalEvidenceProvider:

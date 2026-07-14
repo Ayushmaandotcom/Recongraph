@@ -1,7 +1,7 @@
 from typing import Iterable
 from recongraph.graph.candidate import CandidateGraph
 from recongraph.graph.hypotheses import Hypothesis, EvaluatedHypothesis, EligibilityStatus
-from recongraph.matching.signals import amount_score, tax_identity_score, entity_score
+from recongraph.matching.signals import tax_identity_score, entity_score
 from recongraph.matching.scoring import SignalName, calculate_relationship_score
 from recongraph.matching.purchase_gst_semantics import (
     analyze_purchase_gst_semantics, 

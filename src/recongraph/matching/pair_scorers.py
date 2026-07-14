@@ -9,7 +9,6 @@ from recongraph.matching.scoring import (
     calculate_relationship_score,
 )
 from recongraph.matching.signals import (
-    amount_score,
     entity_score,
     tax_identity_score,
     temporal_score,
@@ -25,6 +24,9 @@ from recongraph.matching.reference_evidence import (
     ReferenceEvidenceInterpretation,
     compute_reference_interpretation,
 )
+from recongraph.domain.financial.pipeline import FinancialEvidencePipeline, AmountInterpretation
+from recongraph.domain.financial.amount_projection import project_amount_similarity, ProjectedAmountSimilarity
+
 
 
 PURCHASE_TO_GST_MAX_DAYS = 7
@@ -51,6 +53,8 @@ class PairScoringResult:
     eligibility: EligibilityResult
     relationship: RelationshipScore
     reference_interpretation: ReferenceEvidenceInterpretation
+    amount_interpretation: AmountInterpretation
+    amount_projection: ProjectedAmountSimilarity
 
 
 def score_purchase_to_gst(
@@ -69,6 +73,11 @@ def score_purchase_to_gst(
         ref_signal = None
     else:
         ref_signal = reference_interpretation.score
+        
+    pipeline = FinancialEvidencePipeline()
+    amount_observation = pipeline.extract([purchase], [gst_record])
+    amount_interpretation = pipeline.interpret(amount_observation)
+    amount_projection = project_amount_similarity(amount_interpretation)
 
     signals = {
         SignalName.ENTITY: entity_score(
@@ -76,10 +85,7 @@ def score_purchase_to_gst(
             gst_record.vendor_name,
         ),
         SignalName.REFERENCE: ref_signal,
-        SignalName.AMOUNT: amount_score(
-            purchase.amount,
-            gst_record.amount,
-        ),
+        SignalName.AMOUNT: amount_projection.similarity,
         SignalName.TEMPORAL: temporal_score(
             purchase.record_date,
             gst_record.record_date,
@@ -108,4 +114,6 @@ def score_purchase_to_gst(
         eligibility=eligibility,
         relationship=relationship,
         reference_interpretation=reference_interpretation,
+        amount_interpretation=amount_interpretation,
+        amount_projection=amount_projection,
     )
