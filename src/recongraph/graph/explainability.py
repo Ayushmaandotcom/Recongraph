@@ -76,11 +76,45 @@ class ExplanationBuilder:
         if summary.amount_interpretation:
             interp = summary.amount_interpretation
             proj = summary.amount_projection
-            reason = f"Relationship: {interp.relationship.value}. Absolute Difference: {interp.absolute_difference}. "
-            reason += " ".join(interp.notes)
+            
+            # OBSERVED
+            obs = f"OBSERVED: Left amount: {interp.amount_a}. Right amount: {interp.amount_b}. "
+            obs += f"Absolute residual: {interp.absolute_difference}. Relative residual: {interp.relative_difference:.2%}. "
+            
+            if interp.magnitude_relation.value == "LEFT_GREATER":
+                obs += "Right amount is lower than left amount. "
+            elif interp.magnitude_relation.value == "RIGHT_GREATER":
+                obs += "Right amount is higher than left amount. "
+            elif interp.magnitude_relation.value == "EQUAL":
+                obs += "Amounts are numerically equal. "
+                
+            obs += f"Currencies are {interp.currency_relation.value}. "
+            obs += f"Signs are {interp.sign_relation.value}."
+            
+            # COMPATIBILITY
+            compat = []
+            if interp.compatibility_flags:
+                compat.append("COMPATIBILITY: The numeric relationship is compatible with: " + 
+                              ", ".join(f.value for f in interp.compatibility_flags) + ".")
+                              
+            # NOT ESTABLISHED
+            not_est = "NOT ESTABLISHED: Amount evidence alone does not establish financial causality or settlement."
+            
+            # LEGACY PROJECTION
+            legacy = ""
             if proj:
-                reason += f" Projected similarity: {proj.similarity}."
-            positives.append(reason)
+                legacy = f"LEGACY PROJECTION: Projected amount similarity: {proj.similarity}. Projection policy: {proj.projection_version}."
+                if proj.warnings:
+                    legacy += f" Warnings: {', '.join(proj.warnings)}."
+            
+            reason_parts = [obs]
+            if compat:
+                reason_parts.extend(compat)
+            reason_parts.append(not_est)
+            if legacy:
+                reason_parts.append(legacy)
+                
+            positives.append("\n".join(reason_parts))
         if summary.reference_score is not None and summary.reference_score >= 0.8:
             positives.append("Strong reference match on a distinct identifier.")
         if summary.entity_score is not None and summary.entity_score >= 0.8:

@@ -2,13 +2,27 @@ import pytest
 from decimal import Decimal
 from datetime import date
 from recongraph.domain.records import PurchaseRecord, GSTRecord
-from recongraph.domain.financial.pipeline import FinancialEvidencePipeline, AmountInterpretation, AmountRelationship
+from recongraph.domain.financial.pipeline import (
+    FinancialEvidencePipeline, 
+    AmountInterpretation, 
+    EqualityRelation,
+    MagnitudeRelation,
+    CurrencyRelation,
+    SignRelation,
+    CompatibilityFlag
+)
 from recongraph.domain.financial.amount_projection import project_amount_similarity
 
-def base_purchase(amount: float, curr="USD", net=None, tax=None) -> PurchaseRecord:
+def base_purchase(amount: float | Decimal, curr="USD", net=None, tax=None) -> PurchaseRecord:
+    amount = Decimal(str(amount)) if isinstance(amount, float) else amount
+    net = Decimal(str(net)) if isinstance(net, float) else net
+    tax = Decimal(str(tax)) if isinstance(tax, float) else tax
     return PurchaseRecord(record_id="p", amount=amount, record_date=date(2023,1,1), reference="R", vendor_name="V", tax_identity="T", currency=curr, net_amount=net, tax_amount=tax)
 
-def base_gst(amount: float, curr="USD", net=None, tax=None) -> GSTRecord:
+def base_gst(amount: float | Decimal, curr="USD", net=None, tax=None) -> GSTRecord:
+    amount = Decimal(str(amount)) if isinstance(amount, float) else amount
+    net = Decimal(str(net)) if isinstance(net, float) else net
+    tax = Decimal(str(tax)) if isinstance(tax, float) else tax
     return GSTRecord(record_id="g", amount=amount, record_date=date(2023,1,1), reference="R", vendor_name="V", tax_identity="T", currency=curr, net_amount=net, tax_amount=tax)
 
 # --- Synthetic Mutation Operators ---
@@ -46,44 +60,44 @@ def gross_net_scenario(net: float, tax: float):
 def test_exact_match():
     purchases, gsts = exact_match_scenario(100.0)
     interp = FinancialEvidencePipeline().interpret(FinancialEvidencePipeline().extract(purchases, gsts))
-    assert interp.relationship == AmountRelationship.EXACT_MATCH
+    assert interp.equality == EqualityRelation.EQUAL
     
 def test_split_payment():
     purchases, gsts = split_payment_scenario(100.0, [60.0, 40.0])
     interp = FinancialEvidencePipeline().interpret(FinancialEvidencePipeline().extract(purchases, gsts))
-    assert interp.relationship == AmountRelationship.EXACT_MATCH
+    assert interp.equality == EqualityRelation.EQUAL
     
 def test_partial_payment():
     purchases, gsts = partial_payment_scenario(100.0, 90.0)
     interp = FinancialEvidencePipeline().interpret(FinancialEvidencePipeline().extract(purchases, gsts))
-    assert interp.relationship == AmountRelationship.PARTIAL_SETTLEMENT
+    assert CompatibilityFlag.PARTIAL_SETTLEMENT_MAGNITUDE_COMPATIBLE in interp.compatibility_flags
     assert interp.residual == Decimal("10.0")
     
 def test_over_payment():
     purchases, gsts = over_payment_scenario(100.0, 105.0)
     interp = FinancialEvidencePipeline().interpret(FinancialEvidencePipeline().extract(purchases, gsts))
-    assert interp.relationship == AmountRelationship.OVERPAYMENT
+    assert CompatibilityFlag.OVERPAYMENT_MAGNITUDE_COMPATIBLE in interp.compatibility_flags
     assert interp.residual == Decimal("-5.0")
     
 def test_rounding():
     purchases, gsts = rounding_scenario(100.0, 0.04) # within 0.05 tolerance
     interp = FinancialEvidencePipeline().interpret(FinancialEvidencePipeline().extract(purchases, gsts))
-    assert interp.relationship == AmountRelationship.ROUNDING_MATCH
+    assert CompatibilityFlag.ROUNDING_COMPATIBLE in interp.compatibility_flags
     
 def test_fee_detected():
     purchases, gsts = fee_scenario(100.0, 1.50) # within 2.00 fee tolerance
     interp = FinancialEvidencePipeline().interpret(FinancialEvidencePipeline().extract(purchases, gsts))
-    assert interp.relationship == AmountRelationship.FEE_DETECTED
+    assert CompatibilityFlag.FEE_COMPATIBLE in interp.compatibility_flags
     
 def test_currency_mismatch():
     purchases, gsts = currency_mismatch_scenario(100.0)
     interp = FinancialEvidencePipeline().interpret(FinancialEvidencePipeline().extract(purchases, gsts))
-    assert interp.relationship == AmountRelationship.CURRENCY_MISMATCH
+    assert interp.currency_relation == CurrencyRelation.DIFFERENT
     
 def test_gross_net_match():
     purchases, gsts = gross_net_scenario(100.0, 18.0)
     interp = FinancialEvidencePipeline().interpret(FinancialEvidencePipeline().extract(purchases, gsts))
-    assert interp.relationship == AmountRelationship.PARTIAL_SETTLEMENT
+    assert CompatibilityFlag.PARTIAL_SETTLEMENT_MAGNITUDE_COMPATIBLE in interp.compatibility_flags
     
 def test_contribution_mapping():
     pipeline = FinancialEvidencePipeline()

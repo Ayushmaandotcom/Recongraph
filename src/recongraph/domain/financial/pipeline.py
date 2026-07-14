@@ -7,14 +7,34 @@ from recongraph.domain.records import PurchaseRecord, GSTRecord
 from recongraph.plugins.provider_v2 import EvidencePipeline, EvidenceContributionV2
 
 
-class AmountRelationship(StrEnum):
-    EXACT_MATCH = "EXACT_MATCH"
-    ROUNDING_MATCH = "ROUNDING_MATCH"
-    FEE_DETECTED = "FEE_DETECTED"
-    PARTIAL_SETTLEMENT = "PARTIAL_SETTLEMENT"
-    OVERPAYMENT = "OVERPAYMENT"
-    CURRENCY_MISMATCH = "CURRENCY_MISMATCH"
-    UNINTERPRETABLE = "UNINTERPRETABLE"
+class EqualityRelation(StrEnum):
+    EQUAL = "EQUAL"
+    UNEQUAL = "UNEQUAL"
+
+class MagnitudeRelation(StrEnum):
+    LEFT_GREATER = "LEFT_GREATER"
+    EQUAL = "EQUAL"
+    RIGHT_GREATER = "RIGHT_GREATER"
+
+class CurrencyRelation(StrEnum):
+    SAME = "SAME"
+    DIFFERENT = "DIFFERENT"
+    LEFT_MISSING = "LEFT_MISSING"
+    RIGHT_MISSING = "RIGHT_MISSING"
+    BOTH_MISSING = "BOTH_MISSING"
+
+class SignRelation(StrEnum):
+    SAME_POSITIVE = "SAME_POSITIVE"
+    SAME_NEGATIVE = "SAME_NEGATIVE"
+    OPPOSITE = "OPPOSITE"
+    ZERO_ZERO = "ZERO_ZERO"
+    ZERO_NONZERO = "ZERO_NONZERO"
+
+class CompatibilityFlag(StrEnum):
+    ROUNDING_COMPATIBLE = "ROUNDING_COMPATIBLE"
+    FEE_COMPATIBLE = "FEE_COMPATIBLE"
+    PARTIAL_SETTLEMENT_MAGNITUDE_COMPATIBLE = "PARTIAL_SETTLEMENT_MAGNITUDE_COMPATIBLE"
+    OVERPAYMENT_MAGNITUDE_COMPATIBLE = "OVERPAYMENT_MAGNITUDE_COMPATIBLE"
 
 
 @dataclass(frozen=True)
@@ -51,7 +71,10 @@ class FinancialObservation:
 @dataclass(frozen=True)
 class AmountInterpretation:
     """The authoritative semantic model of financial amount relationships."""
-    relationship: AmountRelationship
+    equality: EqualityRelation
+    magnitude_relation: MagnitudeRelation
+    currency_relation: CurrencyRelation
+    sign_relation: SignRelation
     
     amount_a: Decimal
     amount_b: Decimal
@@ -60,9 +83,9 @@ class AmountInterpretation:
     relative_difference: Decimal
     residual: Decimal
     
-    currency_status: str
-    comparison_basis: str
+    compatibility_flags: tuple[CompatibilityFlag, ...] = field(default_factory=tuple)
     
+    comparison_basis: str = "Gross Amount"
     notes: tuple[str, ...] = field(default_factory=tuple)
     assumptions: tuple[str, ...] = field(default_factory=tuple)
     provenance: str = "FinancialEvidencePipeline"
@@ -91,69 +114,88 @@ class FinancialEvidencePipeline(EvidencePipeline[FinancialObservation, AmountInt
     def interpret(self, observation: FinancialObservation) -> AmountInterpretation:
         tp = observation.total_purchase_gross
         tg = observation.total_gst_gross
-        delta = abs(tp - tg)
-        residual = tp - tg # Positive means underpayment (invoice > payment)
         
-        all_currencies = set(observation.purchase_currencies) | set(observation.gst_currencies)
-        currency_mismatch = len(all_currencies) > 1
-        primary_currency = next(iter(all_currencies)) if all_currencies else "USD"
-        
-        num_p = len(observation.purchase_gross)
-        num_g = len(observation.gst_gross)
-        is_split = (num_p > 1 or num_g > 1)
-        
-        notes = []
-        assumptions = []
-        relationship = AmountRelationship.UNINTERPRETABLE
-        
-        if currency_mismatch:
-            relationship = AmountRelationship.CURRENCY_MISMATCH
-            notes.append("Currency mismatch detected.")
-        else:
-            if delta <= Decimal("0"):
-                relationship = AmountRelationship.EXACT_MATCH
-                if is_split:
-                    notes.append("Split payment perfectly matches.")
-                else:
-                    notes.append("Exact total match.")
-            elif delta <= self.tolerance:
-                relationship = AmountRelationship.ROUNDING_MATCH
-                notes.append("Difference is within rounding tolerance.")
-            elif delta <= self.fee_tolerance and residual > 0:
-                relationship = AmountRelationship.FEE_DETECTED
-                notes.append("Small underpayment modeled as a fee.")
-                assumptions.append(f"Difference <= {self.fee_tolerance} is a bank fee.")
-            else:
-                if residual > 0:
-                    relationship = AmountRelationship.PARTIAL_SETTLEMENT
-                    notes.append("Underpayment detected.")
-                else:
-                    relationship = AmountRelationship.OVERPAYMENT
-                    notes.append("Overpayment detected.")
-                
-                # Net to Gross check
-                if observation.total_gst_tax > Decimal("0"):
-                    if abs(tp - (tg + observation.total_gst_tax)) <= self.tolerance:
-                        notes.append("Gross amount equals Net + Tax.")
-                        assumptions.append("One record is Net and the other is Gross.")
-                        
-        max_val = max(abs(tp), abs(tg))
-        if max_val == Decimal("0"):
-            relative_difference = Decimal("0")
-        else:
-            relative_difference = delta / max_val
+        # Determine signs based on total amounts if aggregated, or the single sign.
+        # If there are mixed signs in a group, we simplify by looking at the net total sign.
+        def get_sign(amounts: tuple[Decimal, ...], signs: tuple[int, ...]) -> int:
+            if not amounts:
+                return 1
+            total = sum(a * Decimal(s) for a, s in zip(amounts, signs))
+            if total > 0: return 1
+            if total < 0: return -1
+            return 0
             
+        sign_p = get_sign(observation.purchase_gross, observation.purchase_signs)
+        sign_g = get_sign(observation.gst_gross, observation.gst_signs)
+        
+        if sign_p == 0 and sign_g == 0:
+            sign_relation = SignRelation.ZERO_ZERO
+        elif sign_p == 0 or sign_g == 0:
+            sign_relation = SignRelation.ZERO_NONZERO
+        elif sign_p == sign_g:
+            sign_relation = SignRelation.SAME_POSITIVE if sign_p > 0 else SignRelation.SAME_NEGATIVE
+        else:
+            sign_relation = SignRelation.OPPOSITE
+            
+        # Currency relation
+        p_curr = set(c for c in observation.purchase_currencies if c)
+        g_curr = set(c for c in observation.gst_currencies if c)
+        
+        if not p_curr and not g_curr:
+            currency_relation = CurrencyRelation.BOTH_MISSING
+        elif not p_curr:
+            currency_relation = CurrencyRelation.LEFT_MISSING
+        elif not g_curr:
+            currency_relation = CurrencyRelation.RIGHT_MISSING
+        else:
+            if len(p_curr | g_curr) == 1:
+                currency_relation = CurrencyRelation.SAME
+            else:
+                currency_relation = CurrencyRelation.DIFFERENT
+                
+        # Magnitude relation (absolute values)
+        mag_p = abs(tp)
+        mag_g = abs(tg)
+        delta = abs(mag_p - mag_g)
+        residual = mag_p - mag_g
+        
+        if delta == Decimal("0"):
+            equality = EqualityRelation.EQUAL
+            magnitude_relation = MagnitudeRelation.EQUAL
+        else:
+            equality = EqualityRelation.UNEQUAL
+            if residual > 0:
+                magnitude_relation = MagnitudeRelation.LEFT_GREATER
+            else:
+                magnitude_relation = MagnitudeRelation.RIGHT_GREATER
+                
+        flags = []
+        if equality == EqualityRelation.UNEQUAL:
+            if delta <= self.tolerance:
+                flags.append(CompatibilityFlag.ROUNDING_COMPATIBLE)
+            if self.tolerance < delta <= self.fee_tolerance and residual > 0:
+                flags.append(CompatibilityFlag.FEE_COMPATIBLE)
+            if residual > 0:
+                flags.append(CompatibilityFlag.PARTIAL_SETTLEMENT_MAGNITUDE_COMPATIBLE)
+            elif residual < 0:
+                flags.append(CompatibilityFlag.OVERPAYMENT_MAGNITUDE_COMPATIBLE)
+                
+        max_val = max(mag_p, mag_g)
+        relative_difference = Decimal("0") if max_val == Decimal("0") else delta / max_val
+        
         return AmountInterpretation(
-            relationship=relationship,
-            amount_a=tp,
-            amount_b=tg,
+            equality=equality,
+            magnitude_relation=magnitude_relation,
+            currency_relation=currency_relation,
+            sign_relation=sign_relation,
+            amount_a=mag_p,
+            amount_b=mag_g,
             absolute_difference=delta,
             relative_difference=relative_difference,
             residual=residual,
-            currency_status="MISMATCH" if currency_mismatch else primary_currency,
-            comparison_basis="Gross Amount",
-            notes=tuple(notes),
-            assumptions=tuple(assumptions)
+            compatibility_flags=tuple(flags),
+            notes=(),
+            assumptions=()
         )
         
 

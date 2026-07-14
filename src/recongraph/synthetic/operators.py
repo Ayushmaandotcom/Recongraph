@@ -1,5 +1,6 @@
 from typing import Protocol, TypeVar
 import dataclasses
+from decimal import Decimal
 from recongraph.domain.records import PurchaseRecord, GSTRecord
 
 TRecord = TypeVar('TRecord', PurchaseRecord, GSTRecord)
@@ -25,10 +26,9 @@ class ReferenceMutationOperator:
     def apply(self, record: TRecord) -> TRecord:
         return dataclasses.replace(record, reference=self.new_reference)
 
-class AmountMutationOperator:
-    """Modifies the financial amount (e.g., for split payments or errors)."""
-    def __init__(self, new_amount: float):
-        self.new_amount = new_amount
+@dataclasses.dataclass
+class AmountMutationOperator(MutationOperator):
+    new_amount: Decimal
 
-    def apply(self, record: TRecord) -> TRecord:
-        return dataclasses.replace(record, amount=self.new_amount)
+    def apply(self, record: GSTRecord) -> GSTRecord:
+        return dataclasses.replace(record, amount=Decimal(str(self.new_amount)))

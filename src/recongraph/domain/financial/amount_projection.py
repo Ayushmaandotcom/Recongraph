@@ -1,12 +1,18 @@
 from dataclasses import dataclass, field
 from decimal import Decimal
-from recongraph.domain.financial.pipeline import AmountInterpretation, AmountRelationship
+from recongraph.domain.financial.pipeline import (
+    AmountInterpretation,
+    EqualityRelation,
+    CurrencyRelation,
+    SignRelation,
+    CompatibilityFlag
+)
 
 @dataclass(frozen=True)
 class ProjectedAmountSimilarity:
     """Explicit mapping from semantic truth to legacy math scalar."""
     similarity: float
-    projection_version: str = "v1"
+    projection_version: str = "v2"
     assumptions: tuple[str, ...] = field(default_factory=tuple)
     warnings: tuple[str, ...] = field(default_factory=tuple)
 
@@ -19,33 +25,34 @@ def project_amount_similarity(interpretation: AmountInterpretation) -> Projected
     similarity = 0.0
     warnings = []
     
-    if interpretation.relationship == AmountRelationship.EXACT_MATCH:
-        similarity = 1.0
-    elif interpretation.relationship == AmountRelationship.ROUNDING_MATCH:
-        similarity = 0.99
-    elif interpretation.relationship == AmountRelationship.FEE_DETECTED:
-        similarity = 0.95
-    elif interpretation.relationship in (AmountRelationship.PARTIAL_SETTLEMENT, AmountRelationship.OVERPAYMENT):
-        # Scale-aware decay based on relative difference
-        relative_diff = float(interpretation.relative_difference)
-        
-        # In V1, tolerance was typically 0.05.
-        # It decayed from 1.0 to 0.0 within tolerance, and was 0.0 outside.
-        # We will use 0.05 as the strict bound.
-        tolerance = 0.05
-        if relative_diff > tolerance:
-            similarity = 0.0
-        else:
-            similarity = max(0.0, 1.0 - (relative_diff / tolerance))
-            
-    elif interpretation.relationship == AmountRelationship.CURRENCY_MISMATCH:
+    if interpretation.currency_relation == CurrencyRelation.DIFFERENT:
+        # Hard conflict for explicit different currencies
         similarity = 0.0
         warnings.append("CURRENCY_MISMATCH")
     else:
-        similarity = 0.0
+        # Let's assess magnitude similarity
+        if interpretation.equality == EqualityRelation.EQUAL:
+            similarity = 1.0
+        elif CompatibilityFlag.ROUNDING_COMPATIBLE in interpretation.compatibility_flags:
+            similarity = 0.99
+        elif CompatibilityFlag.FEE_COMPATIBLE in interpretation.compatibility_flags:
+            similarity = 0.95
+        elif (CompatibilityFlag.PARTIAL_SETTLEMENT_MAGNITUDE_COMPATIBLE in interpretation.compatibility_flags or
+              CompatibilityFlag.OVERPAYMENT_MAGNITUDE_COMPATIBLE in interpretation.compatibility_flags):
+            relative_diff = float(interpretation.relative_difference)
+            tolerance = 0.05
+            if relative_diff > tolerance:
+                similarity = 0.0
+            else:
+                similarity = max(0.0, 1.0 - (relative_diff / tolerance))
+        else:
+            similarity = 0.0
+            
+    if interpretation.currency_relation in (CurrencyRelation.LEFT_MISSING, CurrencyRelation.RIGHT_MISSING, CurrencyRelation.BOTH_MISSING):
+        warnings.append("MISSING_CURRENCY")
         
     return ProjectedAmountSimilarity(
         similarity=similarity,
-        assumptions=("Projected using AmountSimilarityProjection.V1",),
+        assumptions=("Projected using AmountSimilarityProjection.V2",),
         warnings=tuple(warnings)
     )

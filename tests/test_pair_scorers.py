@@ -2,7 +2,7 @@ from datetime import date
 
 import pytest
 from decimal import Decimal
-from recongraph.domain.financial.pipeline import AmountInterpretation, AmountRelationship
+from recongraph.domain.financial.pipeline import AmountInterpretation, EqualityRelation, MagnitudeRelation, CurrencyRelation, SignRelation, CompatibilityFlag
 from recongraph.domain.financial.amount_projection import ProjectedAmountSimilarity
 from recongraph.domain.records import GSTRecord, PurchaseRecord
 from recongraph.matching.pair_scorers import (
@@ -43,7 +43,7 @@ def test_purchase_record_preserves_financial_fields() -> None:
     record = PurchaseRecord(record_id="dummy_p", 
         vendor_name="ABC Steel Private Limited",
         reference="INV-1042",
-        amount=118000.0,
+        amount=Decimal("118000.0"),
         record_date=date(2026, 6, 12),
         tax_identity="07ABCDE1234F1Z5",
     )
@@ -59,7 +59,7 @@ def test_gst_record_preserves_financial_fields() -> None:
     record = GSTRecord(record_id="dummy_g", 
         vendor_name="ABC STEELS PVT. LTD.",
         reference="AB/1042",
-        amount=118000.0,
+        amount=Decimal("118000.0"),
         record_date=date(2026, 6, 13),
         tax_identity="07ABCDE1234F1Z5",
     )
@@ -134,15 +134,16 @@ def test_pair_scoring_result_preserves_signal_explanation() -> None:
             )
         ),
         amount_interpretation=AmountInterpretation(
-            relationship=AmountRelationship.EXACT_MATCH,
-            amount_a=Decimal("100"),
-            amount_b=Decimal("100"),
-            absolute_difference=Decimal("0"),
-            relative_difference=Decimal("0"),
-            residual=Decimal("0"),
-            currency_status="USD",
-            comparison_basis="Gross"
-        ),
+                equality=EqualityRelation.UNEQUAL,
+                magnitude_relation=MagnitudeRelation.EQUAL,
+                currency_relation=CurrencyRelation.DIFFERENT,
+                sign_relation=SignRelation.SAME_POSITIVE,
+                amount_a=Decimal("118000.0"),
+                amount_b=Decimal("118000.0"),
+                absolute_difference=Decimal("0.0"),
+                relative_difference=Decimal("0.0"),
+                residual=Decimal("0.0")
+            ),
         amount_projection=ProjectedAmountSimilarity(1.0)
     )
 
@@ -169,13 +170,16 @@ def test_pair_scoring_result_is_immutable() -> None:
         ),
         reference_interpretation=ReferenceEvidenceInterpretation(0.0, 0.0, ()),
         amount_interpretation=AmountInterpretation(
-            relationship=AmountRelationship.EXACT_MATCH,
+            equality=EqualityRelation.EQUAL,
+                magnitude_relation=MagnitudeRelation.EQUAL,
+                currency_relation=CurrencyRelation.SAME,
+                sign_relation=SignRelation.SAME_POSITIVE,
             amount_a=Decimal("100"),
             amount_b=Decimal("100"),
             absolute_difference=Decimal("0"),
             relative_difference=Decimal("0"),
             residual=Decimal("0"),
-            currency_status="USD",
+            
             comparison_basis="Gross"
         ),
         amount_projection=ProjectedAmountSimilarity(1.0)
@@ -195,7 +199,7 @@ def test_score_purchase_to_gst_scores_controlled_positive_pair() -> None:
     purchase = PurchaseRecord(record_id="dummy_p", 
         vendor_name="ABC Steel Private Limited",
         reference="INV-1042",
-        amount=118000.0,
+        amount=Decimal("118000.0"),
         record_date=date(2026, 6, 12),
         tax_identity="07ABCDE1234F1Z5",
     )
@@ -203,7 +207,7 @@ def test_score_purchase_to_gst_scores_controlled_positive_pair() -> None:
     gst_record = GSTRecord(record_id="dummy_g", 
         vendor_name="ABC STEELS PVT. LTD.",
         reference="AB/1042",
-        amount=118000.0,
+        amount=Decimal("118000.0"),
         record_date=date(2026, 6, 13),
         tax_identity="07ABCDE1234F1Z5",
     )
@@ -249,7 +253,7 @@ def test_score_purchase_to_gst_exposes_severe_amount_conflict() -> None:
     purchase = PurchaseRecord(record_id="dummy_p", 
         vendor_name="ABC Steel Private Limited",
         reference="INV-1042",
-        amount=118000.0,
+        amount=Decimal("118000.0"),
         record_date=date(2026, 6, 12),
         tax_identity="07ABCDE1234F1Z5",
     )
@@ -257,7 +261,7 @@ def test_score_purchase_to_gst_exposes_severe_amount_conflict() -> None:
     gst_record = GSTRecord(record_id="dummy_g", 
         vendor_name="ABC STEELS PVT. LTD.",
         reference="AB/1042",
-        amount=236000.0,
+        amount=Decimal("236000.0"),
         record_date=date(2026, 6, 13),
         tax_identity="07ABCDE1234F1Z5",
     )
@@ -289,7 +293,7 @@ def test_score_purchase_to_gst_exposes_tax_identity_conflict() -> None:
     purchase = PurchaseRecord(record_id="dummy_p", 
         vendor_name="ABC Steel Private Limited",
         reference="INV-1042",
-        amount=118000.0,
+        amount=Decimal("118000.0"),
         record_date=date(2026, 6, 12),
         tax_identity="07ABCDE1234F1Z5",
     )
@@ -297,7 +301,7 @@ def test_score_purchase_to_gst_exposes_tax_identity_conflict() -> None:
     gst_record = GSTRecord(record_id="dummy_g", 
         vendor_name="ABC STEELS PVT. LTD.",
         reference="AB/1042",
-        amount=118000.0,
+        amount=Decimal("118000.0"),
         record_date=date(2026, 6, 13),
         tax_identity="27ZZZZZ9999Z9Z9",
     )
@@ -329,7 +333,7 @@ def test_score_purchase_to_gst_exposes_distinct_event_identity_evidence() -> Non
     purchase = PurchaseRecord(record_id="dummy_p", 
         vendor_name="CloudLedger Software Private Limited",
         reference="CL-JUN-123",
-        amount=25000.0,
+        amount=Decimal("25000.0"),
         record_date=date(2026, 6, 5),
         tax_identity="07CLOUD1234A1Z1",
     )
@@ -337,7 +341,7 @@ def test_score_purchase_to_gst_exposes_distinct_event_identity_evidence() -> Non
     gst_record = GSTRecord(record_id="dummy_g", 
         vendor_name="CLOUDLEDGER SOFTWARE PVT LTD",
         reference="CL-JUL-456",
-        amount=25000.0,
+        amount=Decimal("25000.0"),
         record_date=date(2026, 7, 5),
         tax_identity="07CLOUD1234A1Z1",
     )
@@ -369,7 +373,7 @@ def test_score_purchase_to_gst_preserves_missing_tax_evidence() -> None:
     purchase = PurchaseRecord(record_id="dummy_p", 
         vendor_name="ABC Steel Private Limited",
         reference="INV-1042",
-        amount=118000.0,
+        amount=Decimal("118000.0"),
         record_date=date(2026, 6, 12),
         tax_identity=None,
     )
@@ -377,7 +381,7 @@ def test_score_purchase_to_gst_preserves_missing_tax_evidence() -> None:
     gst_record = GSTRecord(record_id="dummy_g", 
         vendor_name="ABC STEELS PVT. LTD.",
         reference="AB/1042",
-        amount=118000.0,
+        amount=Decimal("118000.0"),
         record_date=date(2026, 6, 13),
         tax_identity="07ABCDE1234F1Z5",
     )
@@ -407,7 +411,7 @@ def test_score_purchase_to_gst_applies_tax_contradiction() -> None:
     purchase = PurchaseRecord(record_id="dummy_p", 
         vendor_name="ABC Steel Private Limited",
         reference="INV-1042",
-        amount=118000.0,
+        amount=Decimal("118000.0"),
         record_date=date(2026, 6, 12),
         tax_identity="07ABCDE1234F1Z5",
     )
@@ -415,7 +419,7 @@ def test_score_purchase_to_gst_applies_tax_contradiction() -> None:
     gst_record = GSTRecord(record_id="dummy_g", 
         vendor_name="ABC STEELS PVT. LTD.",
         reference="AB/1042",
-        amount=118000.0,
+        amount=Decimal("118000.0"),
         record_date=date(2026, 6, 13),
         tax_identity="27ZZZZZ9999Z9Z9",
     )
@@ -446,7 +450,7 @@ def test_score_purchase_to_gst_uses_purchase_to_gst_temporal_window() -> None:
     purchase = PurchaseRecord(record_id="dummy_p", 
         vendor_name="Vendor",
         reference="INV-1",
-        amount=1000.0,
+        amount=Decimal("1000.0"),
         record_date=date(2026, 6, 1),
         tax_identity=None,
     )
@@ -454,7 +458,7 @@ def test_score_purchase_to_gst_uses_purchase_to_gst_temporal_window() -> None:
     gst_record = GSTRecord(record_id="dummy_g", 
         vendor_name="Vendor",
         reference="INV-1",
-        amount=1000.0,
+        amount=Decimal("1000.0"),
         record_date=date(2026, 6, 8),
         tax_identity=None,
     )
@@ -472,7 +476,7 @@ def test_score_purchase_to_gst_returns_pair_scoring_result() -> None:
     purchase = PurchaseRecord(record_id="dummy_p", 
         vendor_name="Vendor",
         reference="INV-1",
-        amount=1000.0,
+        amount=Decimal("1000.0"),
         record_date=date(2026, 6, 1),
         tax_identity=None,
     )
@@ -480,7 +484,7 @@ def test_score_purchase_to_gst_returns_pair_scoring_result() -> None:
     gst_record = GSTRecord(record_id="dummy_g", 
         vendor_name="Vendor",
         reference="INV-1",
-        amount=1000.0,
+        amount=Decimal("1000.0"),
         record_date=date(2026, 6, 1),
         tax_identity=None,
     )
@@ -499,7 +503,7 @@ def test_low_compatibility_pair_can_remain_one_to_one_eligible() -> None:
     purchase = PurchaseRecord(record_id="dummy_p", 
         vendor_name="ABC",
         reference="INV-1",
-        amount=100.0,
+        amount=Decimal("100.0"),
         record_date=date(2026, 6, 1),
         tax_identity=None,
     )
@@ -507,7 +511,7 @@ def test_low_compatibility_pair_can_remain_one_to_one_eligible() -> None:
     gst_record = GSTRecord(record_id="dummy_g", 
         vendor_name="XYZ",
         reference="INV-999",
-        amount=500.0,
+        amount=Decimal("500.0"),
         record_date=date(2026, 6, 1),
         tax_identity=None,
     )
@@ -530,7 +534,7 @@ def test_high_compatibility_pair_can_be_ineligible() -> None:
     purchase = PurchaseRecord(record_id="dummy_p", 
         vendor_name="CloudLedger Software Private Limited",
         reference="CL-JUN-123",
-        amount=25000.0,
+        amount=Decimal("25000.0"),
         record_date=date(2026, 6, 5),
         tax_identity="07CLOUD1234A1Z1",
     )
@@ -538,7 +542,7 @@ def test_high_compatibility_pair_can_be_ineligible() -> None:
     gst_record = GSTRecord(record_id="dummy_g", 
         vendor_name="CLOUDLEDGER SOFTWARE PVT LTD",
         reference="CL-JUL-456",
-        amount=25000.0,
+        amount=Decimal("25000.0"),
         record_date=date(2026, 7, 5),
         tax_identity="07CLOUD1234A1Z1",
     )
@@ -563,14 +567,14 @@ def test_purchase_gst_tax_conflict_does_not_apply_compatibility_penalty() -> Non
     purchase = PurchaseRecord(record_id="dummy_p", 
         vendor_name="ABC Steel Private Limited",
         reference="INV-1042",
-        amount=118000.0,
+        amount=Decimal("118000.0"),
         record_date=date(2026, 6, 12),
         tax_identity="07ABCDE1234F1Z5",
     )
     gst_record = GSTRecord(record_id="dummy_g", 
         vendor_name="ABC Steel Private Limited",
         reference="AB/1042",
-        amount=118000.0,
+        amount=Decimal("118000.0"),
         record_date=date(2026, 6, 13),
         tax_identity="29XYZAB5678C1Z2",
     )

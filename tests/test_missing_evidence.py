@@ -47,15 +47,18 @@ def test_missing_evidence_reduces_coverage_without_zeroing_the_score():
     # The explanation builder should reflect this.
     builder = ExplanationBuilder()
     
-    from recongraph.domain.financial.pipeline import AmountInterpretation, AmountRelationship
+    from recongraph.domain.financial.pipeline import AmountInterpretation, EqualityRelation, MagnitudeRelation, CurrencyRelation, SignRelation
     from recongraph.domain.financial.amount_projection import ProjectedAmountSimilarity
     from decimal import Decimal
     
     interp = AmountInterpretation(
-        relationship=AmountRelationship.EXACT_MATCH,
+        equality=EqualityRelation.EQUAL,
+        magnitude_relation=MagnitudeRelation.EQUAL,
+        currency_relation=CurrencyRelation.SAME,
+        sign_relation=SignRelation.SAME_POSITIVE,
         amount_a=Decimal("100"), amount_b=Decimal("100"),
         absolute_difference=Decimal("0"), relative_difference=Decimal("0"), residual=Decimal("0"),
-        currency_status="USD", comparison_basis="Gross", notes=("Amounts match perfectly.",)
+        notes=("Amounts match perfectly.",)
     )
     
     # Simulate missing tax identity but matching amount
@@ -79,6 +82,6 @@ def test_missing_evidence_reduces_coverage_without_zeroing_the_score():
     
     explanation = builder.build(decision)
     
-    assert "Relationship: EXACT_MATCH" in explanation.positive_reasons[0]
+    assert "Amounts are numerically equal" in explanation.positive_reasons[0]
     assert "Dates match perfectly." in explanation.positive_reasons
     assert "No reference provided to match." in explanation.limiting_factors

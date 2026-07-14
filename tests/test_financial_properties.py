@@ -6,7 +6,10 @@ from recongraph.domain.records import PurchaseRecord, GSTRecord
 from datetime import date
 from recongraph.domain.financial.pipeline import (
     FinancialEvidencePipeline,
-    AmountRelationship,
+    EqualityRelation,
+    CurrencyRelation,
+    SignRelation,
+    CompatibilityFlag
 )
 from recongraph.domain.financial.amount_projection import project_amount_similarity
 
@@ -15,7 +18,7 @@ def create_mock_records(purchase_amount: str, gst_amount: str):
         record_id="p1",
         vendor_name="V",
         reference="REF",
-        amount=float(purchase_amount),
+        amount=Decimal(purchase_amount),
         record_date=date(2025, 1, 1),
         tax_identity="T"
     )
@@ -23,7 +26,7 @@ def create_mock_records(purchase_amount: str, gst_amount: str):
         record_id="g1",
         vendor_name="V",
         reference="REF",
-        amount=float(gst_amount),
+        amount=Decimal(gst_amount),
         record_date=date(2025, 1, 1),
         tax_identity="T"
     )
@@ -40,7 +43,7 @@ def test_identity_always_exact_match(amount: Decimal):
     obs = pipeline.extract(p, g)
     interpretation = pipeline.interpret(obs)
     
-    assert interpretation.relationship == AmountRelationship.EXACT_MATCH
+    assert interpretation.equality == EqualityRelation.EQUAL
     assert interpretation.absolute_difference == Decimal("0")
     
     projection = project_amount_similarity(interpretation)
@@ -105,8 +108,7 @@ def test_missing_values_do_not_synthesize_contradiction():
     obs = pipeline.extract(p, g)
     interp = pipeline.interpret(obs)
     
-    assert interp.relationship == AmountRelationship.CURRENCY_MISMATCH
-    assert interp.currency_status == "MISMATCH"
+    assert interp.currency_relation == CurrencyRelation.DIFFERENT
     
     proj = project_amount_similarity(interp)
     assert proj.similarity == 0.0

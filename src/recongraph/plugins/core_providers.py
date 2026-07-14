@@ -47,9 +47,9 @@ class FinancialEvidenceProvider:
         projection = project_amount_similarity(interpretation)
         
         violations = set(projection.warnings)
-        if interpretation.currency_status == "MISMATCH":
+        if interpretation.currency_relation.value == "DIFFERENT":
             violations.add("CURRENCY_MISMATCH")
-        elif projection.similarity < 0.5 and interpretation.relationship not in ("EXACT_MATCH", "ROUNDING_MATCH", "FEE_DETECTED"):
+        elif projection.similarity < 0.5 and interpretation.equality.value != "EQUAL":
             violations.add("SEVERE_AMOUNT_CONFLICT")
             
         return EvidenceContribution(

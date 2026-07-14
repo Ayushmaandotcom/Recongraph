@@ -19,7 +19,11 @@ class PurchaseRecord:
     tax_rate: Decimal | None = None
     currency: str = "USD"
     sign: int = 1
-
+    def __post_init__(self):
+        for field in ("amount", "net_amount", "tax_amount", "tax_rate"):
+            val = getattr(self, field, None)
+            if val is not None and isinstance(val, float):
+                raise TypeError(f"Financial field '{field}' must be initialized as Decimal, not float.")
 
 @dataclass(frozen=True)
 class GSTRecord:
@@ -37,7 +41,11 @@ class GSTRecord:
     tax_rate: Decimal | None = None
     currency: str = "USD"
     sign: int = -1
-
+    def __post_init__(self):
+        for field in ("amount", "net_amount", "tax_amount", "tax_rate"):
+            val = getattr(self, field, None)
+            if val is not None and isinstance(val, float):
+                raise TypeError(f"Financial field '{field}' must be initialized as Decimal, not float.")
 
 @dataclass(frozen=True)
 class InvoiceRecord:
@@ -55,7 +63,11 @@ class InvoiceRecord:
     tax_rate: Decimal | None = None
     currency: str = "USD"
     sign: int = 1
-
+    def __post_init__(self):
+        for field in ("amount", "net_amount", "tax_amount", "tax_rate"):
+            val = getattr(self, field, None)
+            if val is not None and isinstance(val, float):
+                raise TypeError(f"Financial field '{field}' must be initialized as Decimal, not float.")
 
 @dataclass(frozen=True)
 class BankRecord:
@@ -69,3 +81,8 @@ class BankRecord:
     record_date: date
     currency: str = "USD"
     sign: int = -1
+    def __post_init__(self):
+        for field in ("amount",):
+            val = getattr(self, field, None)
+            if val is not None and isinstance(val, float):
+                raise TypeError(f"Financial field '{field}' must be initialized as Decimal, not float.")
