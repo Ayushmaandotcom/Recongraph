@@ -84,6 +84,15 @@ class ObservationIdentity:
             "fingerprint": self.fingerprint.to_dict()
         }
 
+    def to_kernel_identity_ref(self) -> 'KernelIdentityRef':
+        from .identity import KernelIdentityRef, IdentityDomainId, IdentitySchemaId, IdentityDigest
+        return KernelIdentityRef(
+            domain=IdentityDomainId("recongraph.observation_identity"),
+            schema=IdentitySchemaId("recongraph.observation_identity.v1"),
+            # K3 fingerprint digest did not have the sha256: prefix, we add it for KernelIdentityRef 
+            digest=IdentityDigest(f"sha256:{self.fingerprint.digest}")
+        )
+
 
 def _canonicalize_value(value: Any) -> tuple[str, Any]:
     """
@@ -175,3 +184,65 @@ class Observation:
                 "value": canonical_val
             }
         }
+
+
+from .lineage import StructuredSourceLineage
+from .identity import KernelIdentityRef, IdentityDomainId, IdentitySchemaId, IdentityDigest
+
+@dataclass(frozen=True, slots=True, order=True)
+class ObservationOccurrenceIdentity:
+    """
+    Deterministic identity for an observation occurrence.
+    H(observation_identity_ref, source_lineage_canonical_identity).
+    """
+    digest: str
+
+    @classmethod
+    def compute(
+        cls,
+        observation_identity: ObservationIdentity,
+        lineage: StructuredSourceLineage
+    ) -> 'ObservationOccurrenceIdentity':
+        
+        payload = {
+            "schema": "recongraph.observation_occurrence_identity.v1",
+            "observation_identity": observation_identity.to_kernel_identity_ref().digest.value,
+            "lineage": hashlib.sha256(lineage.canonicalize_for_serialization()).hexdigest()
+        }
+        
+        canonical_bytes = json.dumps(
+            payload,
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False
+        ).encode("utf-8")
+
+        domain_separated_bytes = b"recongraph:observation-occurrence:v1\x00" + canonical_bytes
+        digest_hex = hashlib.sha256(domain_separated_bytes).hexdigest()
+        return cls(f"sha256:{digest_hex}")
+
+    def to_kernel_identity_ref(self) -> KernelIdentityRef:
+        return KernelIdentityRef(
+            domain=IdentityDomainId("recongraph.observation_occurrence"),
+            schema=IdentitySchemaId("recongraph.observation_occurrence_identity.v1"),
+            digest=IdentityDigest(self.digest)
+        )
+
+
+@dataclass(frozen=True, slots=True, order=True)
+class ObservationOccurrence:
+    """
+    Binds an observation fact (what content state exists) to a source occurrence (where it came from).
+    """
+    observation_identity: ObservationIdentity
+    lineage: StructuredSourceLineage
+    identity: ObservationOccurrenceIdentity
+
+    @classmethod
+    def create(
+        cls,
+        observation_identity: ObservationIdentity,
+        lineage: StructuredSourceLineage
+    ) -> 'ObservationOccurrence':
+        identity = ObservationOccurrenceIdentity.compute(observation_identity, lineage)
+        return cls(observation_identity=observation_identity, lineage=lineage, identity=identity)

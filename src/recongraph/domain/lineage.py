@@ -1,82 +1,99 @@
 import re
 from dataclasses import dataclass
 from typing import Optional
-import json
-
-from .observations import ObservationIdentity
 
 
-@dataclass(frozen=True, order=True)
+@dataclass(frozen=True, slots=True, order=True)
 class SourceSystemId:
     """
-    Identifies the semantic source system (e.g. 'erp.sap', 'document.invoice').
-    Must be a namespaced grammar: <namespace>.<system>
+    Identifies a logical source system namespace (e.g., 'sap.production', 'gst.portal').
+    It does not identify specific files or rows.
     """
     value: str
 
-    _PATTERN = re.compile(r"^[a-z][a-z0-9_]*\.[a-z][a-z0-9_]*$")
+    _PATTERN = re.compile(r"^[a-z][a-z0-9_-]*(?:\.[a-z][a-z0-9_-]*)+$")
 
     def __post_init__(self):
         if not self._PATTERN.match(self.value):
-            raise ValueError(f"Invalid SourceSystemId format: '{self.value}'. Must be namespaced like 'erp.sap'.")
+            raise ValueError(
+                f"Invalid SourceSystemId format: '{self.value}'. "
+                "Must be lowercased, namespaced (e.g., 'sap.production'), and contain only a-z, 0-9, -, _"
+            )
 
-    def to_dict(self) -> str:
-        return self.value
 
-
-@dataclass(frozen=True, order=True)
-class SourceNodeRef:
+@dataclass(frozen=True, slots=True, order=True)
+class SourceArtifactId:
     """
-    Opaque extensible coordinates for a source artifact (record, document, page, block, etc).
-    """
-    kind: str
-    ref: str
-
-    def to_dict(self) -> dict:
-        return {
-            "kind": self.kind,
-            "ref": self.ref
-        }
-
-
-@dataclass(frozen=True, order=True)
-class SourceVersionRef:
-    """
-    Literal opaque source version identity.
+    SourceArtifactId is an opaque identifier within a SourceSystemId namespace. 
+    It does not independently claim global uniqueness, immutability, or content identity.
     """
     value: str
 
-    def to_dict(self) -> str:
-        return self.value
+    def __post_init__(self):
+        if not self.value:
+            raise ValueError("SourceArtifactId cannot be empty.")
+        if self.value != self.value.strip():
+            raise ValueError("SourceArtifactId cannot contain surrounding whitespace.")
+        # Reject control characters (0x00-0x1F and 0x7F)
+        if any(ord(c) < 32 or ord(c) == 127 for c in self.value):
+            raise ValueError("SourceArtifactId cannot contain control characters.")
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True, order=True)
+class SourceLocator:
+    """
+    Identifies the semantic or structural location inside an artifact (e.g., 'field:vendor_name').
+    The kernel preserves the supplied canonical coordinate but does not parse it.
+    """
+    value: str
+
+    def __post_init__(self):
+        if not self.value:
+            raise ValueError("SourceLocator cannot be empty.")
+        if self.value != self.value.strip():
+            raise ValueError("SourceLocator cannot contain surrounding whitespace.")
+
+
+@dataclass(frozen=True, slots=True, order=True)
+class SourceVersionRef:
+    """
+    Literal opaque source version identity. Acts as a state qualifier over the logical artifact.
+    """
+    value: str
+
+    def __post_init__(self):
+        if not self.value:
+            raise ValueError("SourceVersionRef cannot be empty.")
+
+
+@dataclass(frozen=True, slots=True, order=True)
 class StructuredSourceLineage:
     """
     Minimal immutable lineage coordinates answering where a fact came from.
+    Preserves exact temporal source occurrence identity.
     """
     source_system: SourceSystemId
-    source_node: SourceNodeRef
-    source_version: Optional[SourceVersionRef] = None
+    source_artifact: SourceArtifactId
+    source_locator: SourceLocator
+    source_version: SourceVersionRef | None = None
 
-    def to_dict(self) -> dict:
-        return {
-            "source_system": self.source_system.to_dict(),
-            "source_node": self.source_node.to_dict(),
-            "source_version": self.source_version.to_dict() if self.source_version else None
+    def canonicalize_for_serialization(self) -> bytes:
+        """
+        Explicit canonical representation for identity hashing.
+        Uses Canonical JSON bytes with sorted keys, explicit schema identifier, 
+        UTF-8, and compact separators.
+        """
+        import json
+        payload = {
+            "schema": "recongraph.source_lineage.v1",
+            "source_system": self.source_system.value,
+            "source_artifact": self.source_artifact.value,
+            "source_locator": self.source_locator.value,
+            "source_version": self.source_version.value if self.source_version else None
         }
-
-
-@dataclass(frozen=True)
-class ObservationProvenance:
-    """
-    Relational wrapper attaching lineage to a specific observation content state.
-    """
-    observation_identity: ObservationIdentity
-    lineage: StructuredSourceLineage
-
-    def to_dict(self) -> dict:
-        return {
-            "observation_identity": self.observation_identity.to_dict(),
-            "lineage": self.lineage.to_dict()
-        }
+        return json.dumps(
+            payload,
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False
+        ).encode("utf-8")

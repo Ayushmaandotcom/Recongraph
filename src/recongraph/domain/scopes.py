@@ -31,18 +31,15 @@ class SubjectRef:
 class PropositionSubject:
     """
     Represents the canonicalized subject arguments for an EvidenceAssertion.
-    This replaces EvidenceScope to clarify that it represents the *arguments* 
-    to a semantic claim predicate.
-    
-    Must be constructed via `PropositionSubject.create(...)` to guarantee
-    claim-aware canonicalization (e.g. A <-> B == B <-> A for symmetric claims).
+    Retains the claim identity and semantic version to prove it was canonically constructed.
     """
+    claim_id: str
+    claim_semantic_version: int
     kind: ScopeKind
     left: tuple[SubjectRef, ...]
     right: tuple[SubjectRef, ...]
 
     def __post_init__(self):
-        # Basic cardinality invariants independent of claim
         left_len = len(self.left)
         right_len = len(self.right)
 
@@ -61,7 +58,6 @@ class PropositionSubject:
             if left_len == 1 and right_len == 1:
                 raise ValueError("SC-002 Violation: GROUP_PAIR requires multiple subjects on at least one side.")
 
-        # Duplicate subjects within a side check
         if len(set(self.left)) != left_len:
             raise ValueError("SC-003 Violation: Duplicate subjects in left side.")
         if len(set(self.right)) != right_len:
@@ -76,26 +72,52 @@ class PropositionSubject:
         right: Optional[frozenset[SubjectRef] | set[SubjectRef] | list[SubjectRef]] = None
     ) -> 'PropositionSubject':
         if not claim_descriptor.validates_scope_kind(kind):
-            raise ValueError(f"SC-008 Violation: Claim {claim_descriptor.claim_id} does not allow scope kind {kind.value}.")
+            raise ValueError(f"SC-008 Violation: Claim {claim_descriptor.claim_id.value} does not allow scope kind {kind.value}.")
 
         if right is None:
             right = frozenset()
 
-        # Canonicalize intra-side ordering
         canon_left = tuple(sorted(left))
         canon_right = tuple(sorted(right))
 
-        # Handle symmetric canonicalization
-        if claim_descriptor.symmetry == "symmetric": # ClaimSymmetry.SYMMETRIC
-            # Lexicographical comparison of the entire tuple
+        if claim_descriptor.symmetry == "symmetric": 
             if canon_right < canon_left:
                 canon_left, canon_right = canon_right, canon_left
 
-        return cls(kind=kind, left=canon_left, right=canon_right)
+        return cls(
+            claim_id=claim_descriptor.claim_id.value,
+            claim_semantic_version=claim_descriptor.semantic_version.value,
+            kind=kind,
+            left=canon_left,
+            right=canon_right
+        )
 
     def to_dict(self) -> dict:
         return {
+            "claim_id": self.claim_id,
+            "claim_semantic_version": self.claim_semantic_version,
             "kind": self.kind.value,
             "left": [s.to_dict() for s in self.left],
             "right": [s.to_dict() for s in self.right]
         }
+
+
+@dataclass(frozen=True, slots=True)
+class Proposition:
+    """
+    A specific claim applied to a specific subject.
+    Mechanically guarantees that the subject was canonically built for this exact claim.
+    """
+    claim: 'ClaimDescriptor'
+    subject: PropositionSubject
+
+    def __post_init__(self):
+        if self.subject.claim_id != self.claim.claim_id.value:
+            raise ValueError("Proposition construction rejected: claim mismatch.")
+        if self.subject.claim_semantic_version != self.claim.semantic_version.value:
+            raise ValueError("Proposition construction rejected: claim semantic version mismatch.")
+
+    @classmethod
+    def create(cls, claim: 'ClaimDescriptor', kind: ScopeKind, left: frozenset[SubjectRef] | set[SubjectRef] | list[SubjectRef], right: Optional[frozenset[SubjectRef] | set[SubjectRef] | list[SubjectRef]] = None) -> 'Proposition':
+        subject = PropositionSubject.create(claim, kind, left, right)
+        return cls(claim=claim, subject=subject)
