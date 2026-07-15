@@ -70,24 +70,24 @@ def test_split_payment():
 def test_partial_payment():
     purchases, gsts = partial_payment_scenario(100.0, 90.0)
     interp = FinancialEvidencePipeline().interpret(FinancialEvidencePipeline().extract(purchases, gsts))
-    assert CompatibilityFlag.PARTIAL_SETTLEMENT_MAGNITUDE_COMPATIBLE in interp.compatibility_flags
+    assert CompatibilityFlag.OUTSIDE_TOLERANCE_LEFT_GREATER in interp.compatibility_flags
     assert interp.residual == Decimal("10.0")
     
 def test_over_payment():
     purchases, gsts = over_payment_scenario(100.0, 105.0)
     interp = FinancialEvidencePipeline().interpret(FinancialEvidencePipeline().extract(purchases, gsts))
-    assert CompatibilityFlag.OVERPAYMENT_MAGNITUDE_COMPATIBLE in interp.compatibility_flags
+    assert CompatibilityFlag.OUTSIDE_TOLERANCE_RIGHT_GREATER in interp.compatibility_flags
     assert interp.residual == Decimal("-5.0")
     
 def test_rounding():
     purchases, gsts = rounding_scenario(100.0, 0.04) # within 0.05 tolerance
     interp = FinancialEvidencePipeline().interpret(FinancialEvidencePipeline().extract(purchases, gsts))
-    assert CompatibilityFlag.ROUNDING_COMPATIBLE in interp.compatibility_flags
+    assert CompatibilityFlag.WITHIN_STRICT_TOLERANCE in interp.compatibility_flags
     
 def test_fee_detected():
     purchases, gsts = fee_scenario(100.0, 1.50) # within 2.00 fee tolerance
     interp = FinancialEvidencePipeline().interpret(FinancialEvidencePipeline().extract(purchases, gsts))
-    assert CompatibilityFlag.FEE_COMPATIBLE in interp.compatibility_flags
+    assert CompatibilityFlag.WITHIN_RELAXED_TOLERANCE in interp.compatibility_flags
     
 def test_currency_mismatch():
     purchases, gsts = currency_mismatch_scenario(100.0)
@@ -97,7 +97,7 @@ def test_currency_mismatch():
 def test_gross_net_match():
     purchases, gsts = gross_net_scenario(100.0, 18.0)
     interp = FinancialEvidencePipeline().interpret(FinancialEvidencePipeline().extract(purchases, gsts))
-    assert CompatibilityFlag.PARTIAL_SETTLEMENT_MAGNITUDE_COMPATIBLE in interp.compatibility_flags
+    assert CompatibilityFlag.OUTSIDE_TOLERANCE_LEFT_GREATER in interp.compatibility_flags
     
 def test_contribution_mapping():
     pipeline = FinancialEvidencePipeline()

@@ -33,12 +33,12 @@ def project_amount_similarity(interpretation: AmountInterpretation) -> Projected
         # Let's assess magnitude similarity
         if interpretation.equality == EqualityRelation.EQUAL:
             similarity = 1.0
-        elif CompatibilityFlag.ROUNDING_COMPATIBLE in interpretation.compatibility_flags:
+        elif CompatibilityFlag.WITHIN_STRICT_TOLERANCE in interpretation.compatibility_flags:
             similarity = 0.99
-        elif CompatibilityFlag.FEE_COMPATIBLE in interpretation.compatibility_flags:
+        elif CompatibilityFlag.WITHIN_RELAXED_TOLERANCE in interpretation.compatibility_flags:
             similarity = 0.95
-        elif (CompatibilityFlag.PARTIAL_SETTLEMENT_MAGNITUDE_COMPATIBLE in interpretation.compatibility_flags or
-              CompatibilityFlag.OVERPAYMENT_MAGNITUDE_COMPATIBLE in interpretation.compatibility_flags):
+        elif (CompatibilityFlag.OUTSIDE_TOLERANCE_LEFT_GREATER in interpretation.compatibility_flags or
+              CompatibilityFlag.OUTSIDE_TOLERANCE_RIGHT_GREATER in interpretation.compatibility_flags):
             relative_diff = float(interpretation.relative_difference)
             tolerance = 0.05
             if relative_diff > tolerance:

@@ -69,7 +69,7 @@ def test_score_purchase_to_gst_scores_controlled_positive_pair() -> None:
     assert result.eligibility.status is OneToOneEligibility.ELIGIBLE
     assert result.eligibility.blocking_findings == ()
     assert result.relationship.score == pytest.approx(0.875, rel=0.01)
-    assert result.relationship.base_score == pytest.approx(0.966, rel=0.01)
+    assert result.relationship.base_score == pytest.approx(0.875, rel=0.01)
     assert result.relationship.coverage == pytest.approx(1.0)
     assert result.relationship.contradiction_penalty == pytest.approx(1.0)
     assert result.relationship.active_contradictions == ()

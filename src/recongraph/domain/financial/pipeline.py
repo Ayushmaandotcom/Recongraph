@@ -31,10 +31,10 @@ class SignRelation(StrEnum):
     ZERO_NONZERO = "ZERO_NONZERO"
 
 class CompatibilityFlag(StrEnum):
-    ROUNDING_COMPATIBLE = "ROUNDING_COMPATIBLE"
-    FEE_COMPATIBLE = "FEE_COMPATIBLE"
-    PARTIAL_SETTLEMENT_MAGNITUDE_COMPATIBLE = "PARTIAL_SETTLEMENT_MAGNITUDE_COMPATIBLE"
-    OVERPAYMENT_MAGNITUDE_COMPATIBLE = "OVERPAYMENT_MAGNITUDE_COMPATIBLE"
+    WITHIN_STRICT_TOLERANCE = "WITHIN_STRICT_TOLERANCE"
+    WITHIN_RELAXED_TOLERANCE = "WITHIN_RELAXED_TOLERANCE"
+    OUTSIDE_TOLERANCE_LEFT_GREATER = "OUTSIDE_TOLERANCE_LEFT_GREATER"
+    OUTSIDE_TOLERANCE_RIGHT_GREATER = "OUTSIDE_TOLERANCE_RIGHT_GREATER"
 
 
 @dataclass(frozen=True)
@@ -172,13 +172,13 @@ class FinancialEvidencePipeline(EvidencePipeline[FinancialObservation, AmountInt
         flags = []
         if equality == EqualityRelation.UNEQUAL:
             if delta <= self.tolerance:
-                flags.append(CompatibilityFlag.ROUNDING_COMPATIBLE)
+                flags.append(CompatibilityFlag.WITHIN_STRICT_TOLERANCE)
             if self.tolerance < delta <= self.fee_tolerance and residual > 0:
-                flags.append(CompatibilityFlag.FEE_COMPATIBLE)
+                flags.append(CompatibilityFlag.WITHIN_RELAXED_TOLERANCE)
             if residual > 0:
-                flags.append(CompatibilityFlag.PARTIAL_SETTLEMENT_MAGNITUDE_COMPATIBLE)
+                flags.append(CompatibilityFlag.OUTSIDE_TOLERANCE_LEFT_GREATER)
             elif residual < 0:
-                flags.append(CompatibilityFlag.OVERPAYMENT_MAGNITUDE_COMPATIBLE)
+                flags.append(CompatibilityFlag.OUTSIDE_TOLERANCE_RIGHT_GREATER)
                 
         max_val = max(mag_p, mag_g)
         relative_difference = Decimal("0") if max_val == Decimal("0") else delta / max_val
