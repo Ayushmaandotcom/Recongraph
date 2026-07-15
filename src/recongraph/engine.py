@@ -80,9 +80,13 @@ class ReconGraphEngine:
                         review_packets.append(packet)
                         
                 # 7E: Trace Versioning
-                import uuid
+                trace_id = DecisionTrace.compute_identity(
+                    engine_version=self.VERSION,
+                    config_hash=hashlib.md5(str(self.config).encode()).hexdigest(),
+                    component_nodes=frozenset(comp.graph.nodes.keys())
+                )
                 trace = DecisionTrace(
-                    trace_id=str(uuid.uuid4()),
+                    trace_id=trace_id,
                     engine_version=self.VERSION,
                     config_hash=hashlib.md5(str(self.config).encode()).hexdigest(),
                     events=tuple([

@@ -2,6 +2,8 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Any
 from datetime import datetime, timezone
+import hashlib
+from recongraph.domain.identity import canonical_encode
 
 class TraceStage(StrEnum):
     CANDIDATE_GENERATION = "candidate_generation"
@@ -26,6 +28,23 @@ class DecisionTrace:
     engine_version: str
     config_hash: str
     events: tuple[TraceEvent, ...]
+    
+    @classmethod
+    def compute_identity(cls, engine_version: str, config_hash: str, component_nodes: frozenset[str]) -> str:
+        """
+        Computes a deterministic, canonical identity for a reconciliation trace.
+        Follows the K6 domain-separated hashing philosophy.
+        """
+        payload = {
+            "schema": "recongraph.decision_trace_identity.v1",
+            "engine_version": engine_version,
+            "config_hash": config_hash,
+            "component_nodes": sorted(list(component_nodes))
+        }
+        canonical_bytes = canonical_encode(payload)
+        domain_separated_bytes = b"recongraph:decision_trace:v1\x00" + canonical_bytes
+        digest_hex = hashlib.sha256(domain_separated_bytes).hexdigest()
+        return f"sha256:{digest_hex}"
     
     def get_events_for_stage(self, stage: TraceStage) -> tuple[TraceEvent, ...]:
         return tuple(e for e in self.events if e.stage == stage)
