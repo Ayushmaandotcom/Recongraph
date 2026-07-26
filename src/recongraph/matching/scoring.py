@@ -15,6 +15,8 @@ class SignalName:
     SEMANTICS = "semantics"
 
 
+from recongraph.domain.reliability import AttenuationPolicy
+
 @dataclass(frozen=True)
 class RelationshipPolicy:
     """Define how a financial relationship interprets primitive signals."""
@@ -22,6 +24,9 @@ class RelationshipPolicy:
     weights: Mapping[str, float]
     contradiction_penalties: Mapping[str, float] = field(
         default_factory=dict
+    )
+    attenuation_policy: AttenuationPolicy = field(
+        default_factory=AttenuationPolicy.default
     )
 
     def __post_init__(self) -> None:

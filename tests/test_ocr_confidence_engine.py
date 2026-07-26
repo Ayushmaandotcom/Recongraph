@@ -169,131 +169,135 @@ class TestOcrConfidenceReport:
 
 
 # ---------------------------------------------------------------------------
-# 4–6. FinancialEvidenceProvider OCR behaviour
+# 4–6. FinancialEvidenceProvider OCR behaviour (via HypothesisEvaluator)
 # ---------------------------------------------------------------------------
+
+from recongraph.graph.candidate import CandidateGraphBuilder, build_purchase_urn, build_gst_urn
+from recongraph.graph.hypotheses import Hypothesis, EvaluatedHypothesis
+from recongraph.graph.evaluator import HypothesisEvaluator
+from recongraph.matching.pair_scorers import PURCHASE_TO_GST_POLICY
+from recongraph.domain.reliability import ExtractionQuality, AttenuationAction, AttenuationPolicy
+
+from recongraph.matching.scoring import RelationshipPolicy
+
+from recongraph.matching.scoring import RelationshipPolicy, SignalName
+from recongraph.plugins.provider import EvidenceContribution
+
+class MockProvider:
+    def __init__(self, name: str, score: float = 1.0):
+        self.name = name
+        self.score = score
+        
+    def get_name(self):
+        return self.name
+        
+    def get_blockers(self):
+        return []
+        
+    def evaluate(self, p, g):
+        return EvidenceContribution(self.name, self.score, frozenset(), {})
+
+def evaluate_with_engine(p: PurchaseRecord, g: GSTRecord, providers: list) -> EvaluatedHypothesis:
+    builder = CandidateGraphBuilder()
+    u1, u2 = build_purchase_urn(p.record_id), build_gst_urn(g.record_id)
+    builder.add_node(u1, p)
+    builder.add_node(u2, g)
+    
+    hypothesis = Hypothesis(
+        component_nodes=frozenset([u1, u2]),
+        proposed_edges=frozenset([frozenset([u1, u2])])
+    )
+    
+    # Ensure all 5 signals are present
+    provided_names = {prov.get_name() for prov in providers}
+    all_names = {SignalName.AMOUNT, SignalName.TEMPORAL, SignalName.ENTITY, SignalName.REFERENCE, SignalName.TAX_IDENTITY}
+    
+    for missing in all_names - provided_names:
+        providers.append(MockProvider(missing))
+        
+    # Use the real default policy which contains all 5 weights
+    evaluator = HypothesisEvaluator(providers, PURCHASE_TO_GST_POLICY)
+    return evaluator.evaluate(builder.build(), hypothesis)
+
 
 class TestFinancialEvidenceProviderOcr:
     def test_no_ocr_data_returns_unattenuated_score(self):
-        provider = FinancialEvidenceProvider()
         p = make_purchase("100.00")
         g = make_gst("100.00")
-        contrib = provider.evaluate([p], [g])
-        # Perfect match, no OCR → score should be 1.0 (or close)
-        assert contrib.score is not None
-        assert contrib.score >= 0.99
+        result = evaluate_with_engine(p, g, [FinancialEvidenceProvider()])
+        amount_score = result.supporting_evidence["signals"]["amount"]
+        assert amount_score is not None
+        assert amount_score >= 0.99
 
     def test_high_confidence_does_not_attenuate(self):
         ocr = make_ocr_report(amount=0.95)
-        provider = FinancialEvidenceProvider()
         p = make_purchase("100.00", ocr_report=ocr)
         g = make_gst("100.00")
-        contrib = provider.evaluate([p], [g])
-        # HIGH confidence → multiplier = 1.0 → score unaffected
-        assert contrib.score is not None
-        assert contrib.score >= 0.99
+        result = evaluate_with_engine(p, g, [FinancialEvidenceProvider()])
+        amount_score = result.supporting_evidence["signals"]["amount"]
+        assert amount_score is not None
+        assert amount_score >= 0.99
 
     def test_medium_confidence_attenuates_score(self):
-        ocr = make_ocr_report(amount=0.80)  # MEDIUM → multiplier 0.85
-        provider = FinancialEvidenceProvider()
+        ocr = make_ocr_report(amount=0.80)  # DEGRADED → multiplier 0.85
         p = make_purchase("100.00", ocr_report=ocr)
         g = make_gst("100.00")
-        contrib = provider.evaluate([p], [g])
-        # Perfect amounts, but MEDIUM OCR → score ≈ 0.85
-        assert contrib.score is not None
-        assert abs(contrib.score - 0.85) < 1e-6
+        result = evaluate_with_engine(p, g, [FinancialEvidenceProvider()])
+        amount_score = result.supporting_evidence["signals"]["amount"]
+        assert amount_score is not None
+        assert abs(amount_score - 0.85) < 1e-6
 
     def test_low_confidence_attenuates_and_emits_violation(self):
         ocr = make_ocr_report(amount=0.60)  # LOW → multiplier 0.60
-        provider = FinancialEvidenceProvider()
         p = make_purchase("100.00", ocr_report=ocr)
         g = make_gst("100.00")
-        contrib = provider.evaluate([p], [g])
-        assert contrib.score is not None
-        assert abs(contrib.score - 0.60) < 1e-6
-        assert FinancialEvidenceProvider.OCR_LOW_CONFIDENCE_VIOLATION in contrib.violations
+        result = evaluate_with_engine(p, g, [FinancialEvidenceProvider()])
+        amount_score = result.supporting_evidence["signals"]["amount"]
+        assert amount_score is not None
+        assert abs(amount_score - 0.60) < 1e-6
+        assert "OCR_AMOUNT_LOW_CONFIDENCE" in result.violations
 
     def test_unreadable_zeroes_score_and_emits_violation(self):
-        ocr = make_ocr_report(amount=0.30)  # UNREADABLE → multiplier 0.0
-        provider = FinancialEvidenceProvider()
+        ocr = make_ocr_report(amount=0.30)  # UNREADABLE (FAILED) → multiplier 0.0
         p = make_purchase("100.00", ocr_report=ocr)
         g = make_gst("100.00")
-        contrib = provider.evaluate([p], [g])
-        assert contrib.score == 0.0
-        assert FinancialEvidenceProvider.OCR_UNREADABLE_VIOLATION in contrib.violations
-
-    def test_low_confidence_propagates_highlight_box(self):
-        ocr = make_ocr_report(amount=0.60)
-        provider = FinancialEvidenceProvider()
-        p = make_purchase("100.00", ocr_report=ocr)
-        g = make_gst("100.00")
-        contrib = provider.evaluate([p], [g])
-        boxes = contrib.metadata.get("highlight_boxes", ())
-        assert len(boxes) >= 1
-
-    def test_low_confidence_propagates_ocr_warnings(self):
-        ocr = make_ocr_report(amount=0.60)
-        provider = FinancialEvidenceProvider()
-        p = make_purchase("100.00", ocr_report=ocr)
-        g = make_gst("100.00")
-        contrib = provider.evaluate([p], [g])
-        warnings = contrib.metadata.get("ocr_warnings", ())
-        assert len(warnings) >= 1
-        assert any("amount" in w.lower() for w in warnings)
-
-    def test_ocr_metadata_stores_confidence_and_level(self):
-        ocr = make_ocr_report(amount=0.85)
-        provider = FinancialEvidenceProvider()
-        p = make_purchase("100.00", ocr_report=ocr)
-        g = make_gst("100.00")
-        contrib = provider.evaluate([p], [g])
-        assert abs(contrib.metadata.get("amount_ocr_confidence", 0) - 0.85) < 1e-9
-        assert contrib.metadata.get("amount_ocr_level") == "medium"
+        result = evaluate_with_engine(p, g, [FinancialEvidenceProvider()])
+        amount_score = result.supporting_evidence["signals"]["amount"]
+        assert amount_score == 0.0
+        assert "OCR_AMOUNT_UNREADABLE" in result.violations
 
 
 # ---------------------------------------------------------------------------
-# 7. TemporalEvidenceProvider OCR behaviour
+# 7. TemporalEvidenceProvider OCR behaviour (via HypothesisEvaluator)
 # ---------------------------------------------------------------------------
 
 class TestTemporalEvidenceProviderOcr:
     def test_no_ocr_data_no_violations(self):
-        provider = TemporalEvidenceProvider(max_days=7)
         p = make_purchase()
         g = make_gst()
-        contrib = provider.evaluate([p], [g])
-        assert TemporalEvidenceProvider.OCR_DATE_LOW_CONFIDENCE_VIOLATION not in contrib.violations
+        result = evaluate_with_engine(p, g, [TemporalEvidenceProvider(max_days=7)])
+        assert "OCR_DATE_LOW_CONFIDENCE" not in result.violations
 
     def test_low_date_confidence_emits_violation(self):
         ocr = make_ocr_report(record_date=0.60)
-        provider = TemporalEvidenceProvider(max_days=7)
         p = make_purchase(ocr_report=ocr)
         g = make_gst()
-        contrib = provider.evaluate([p], [g])
-        assert TemporalEvidenceProvider.OCR_DATE_LOW_CONFIDENCE_VIOLATION in contrib.violations
+        result = evaluate_with_engine(p, g, [TemporalEvidenceProvider(max_days=7)])
+        assert "OCR_DATE_LOW_CONFIDENCE" in result.violations
 
     def test_unreadable_date_emits_unreadable_violation(self):
         ocr = make_ocr_report(record_date=0.30)
-        provider = TemporalEvidenceProvider(max_days=7)
         p = make_purchase(ocr_report=ocr)
         g = make_gst()
-        contrib = provider.evaluate([p], [g])
-        assert TemporalEvidenceProvider.OCR_DATE_UNREADABLE_VIOLATION in contrib.violations
-
-    def test_low_date_confidence_propagates_highlight_box(self):
-        ocr = make_ocr_report(record_date=0.60)
-        provider = TemporalEvidenceProvider(max_days=7)
-        p = make_purchase(ocr_report=ocr)
-        g = make_gst()
-        contrib = provider.evaluate([p], [g])
-        boxes = contrib.metadata.get("highlight_boxes", ())
-        assert len(boxes) >= 1
+        result = evaluate_with_engine(p, g, [TemporalEvidenceProvider(max_days=7)])
+        assert "OCR_DATE_UNREADABLE" in result.violations
 
     def test_high_date_confidence_no_violations(self):
         ocr = make_ocr_report(record_date=0.95)
-        provider = TemporalEvidenceProvider(max_days=7)
         p = make_purchase(ocr_report=ocr)
         g = make_gst()
-        contrib = provider.evaluate([p], [g])
-        assert TemporalEvidenceProvider.OCR_DATE_LOW_CONFIDENCE_VIOLATION not in contrib.violations
+        result = evaluate_with_engine(p, g, [TemporalEvidenceProvider(max_days=7)])
+        assert "OCR_DATE_LOW_CONFIDENCE" not in result.violations
 
 
 # ---------------------------------------------------------------------------

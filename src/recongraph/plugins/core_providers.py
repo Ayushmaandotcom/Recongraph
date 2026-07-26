@@ -62,53 +62,15 @@ class FinancialEvidenceProvider:
         return [ExactAmountBlocker()]
 
     def evaluate(self, purchases: Sequence[PurchaseRecord], gsts: Sequence[GSTRecord]) -> EvidenceContribution:
-        from recongraph.domain.ocr.confidence import attenuate_score, collect_low_confidence_boxes, generate_ocr_warnings
-        from recongraph.domain.document.layout import OcrConfidenceLevel
-
         observation = self.pipeline.extract(purchases, gsts)
         interpretation = self.pipeline.interpret(observation)
         contrib_v2 = self.pipeline.contribute(interpretation)
 
-        # --- OCR attenuation on 'amount' field ---
-        attenuated_score = contrib_v2.score
-        violations: set[str] = set(contrib_v2.violations)
-        ocr_metadata: dict = {}
-
-        # Collect amount-field provenance from all purchase records
-        highlight_boxes = []
-        ocr_warnings: list[str] = []
-        for record in list(purchases) + list(gsts):
-            report = getattr(record, "ocr_confidence_report", None)
-            if report is None:
-                continue
-            prov = report.get("amount")
-            if prov is not None:
-                new_score, _ = attenuate_score(attenuated_score, "amount", report)
-                attenuated_score = new_score
-                level = prov.level
-                if level == OcrConfidenceLevel.UNREADABLE:
-                    violations.add(self.OCR_UNREADABLE_VIOLATION)
-                elif level == OcrConfidenceLevel.LOW:
-                    violations.add(self.OCR_LOW_CONFIDENCE_VIOLATION)
-                boxes = collect_low_confidence_boxes(report, threshold=0.70)
-                highlight_boxes.extend(boxes)
-                ocr_warnings.extend(generate_ocr_warnings(report, critical_fields=["amount"]))
-                ocr_metadata["amount_ocr_confidence"] = prov.confidence
-                ocr_metadata["amount_ocr_level"] = prov.level.value
-                break  # Use first record with amount provenance
-
-        if highlight_boxes:
-            ocr_metadata["highlight_boxes"] = tuple(highlight_boxes)
-        if ocr_warnings:
-            ocr_metadata["ocr_warnings"] = tuple(ocr_warnings)
-
-        merged_metadata = {**contrib_v2.metadata, **ocr_metadata}
-
         return EvidenceContribution(
             provider_name=contrib_v2.provider_name,
-            score=attenuated_score,
-            violations=frozenset(violations),
-            metadata=merged_metadata
+            score=contrib_v2.score,
+            violations=contrib_v2.violations,
+            metadata=contrib_v2.metadata
         )
 
 
@@ -237,46 +199,15 @@ class TemporalEvidenceProvider:
         return []
 
     def evaluate(self, purchases: Sequence[PurchaseRecord], gsts: Sequence[GSTRecord]) -> EvidenceContribution:
-        from recongraph.domain.ocr.confidence import collect_low_confidence_boxes, generate_ocr_warnings
-        from recongraph.domain.document.layout import OcrConfidenceLevel
-
         observation = self.pipeline.extract(purchases, gsts)
         interpretation = self.pipeline.interpret(observation)
         contrib_v2 = self.pipeline.contribute(interpretation)
 
-        violations: set[str] = set(contrib_v2.violations)
-        ocr_metadata: dict = {}
-        highlight_boxes = []
-        ocr_warnings: list[str] = []
-
-        for record in list(purchases) + list(gsts):
-            report = getattr(record, "ocr_confidence_report", None)
-            if report is None:
-                continue
-            prov = report.get("record_date")
-            if prov is not None:
-                if prov.level == OcrConfidenceLevel.UNREADABLE:
-                    violations.add(self.OCR_DATE_UNREADABLE_VIOLATION)
-                elif prov.level == OcrConfidenceLevel.LOW:
-                    violations.add(self.OCR_DATE_LOW_CONFIDENCE_VIOLATION)
-                boxes = collect_low_confidence_boxes(report, threshold=0.70)
-                highlight_boxes.extend(boxes)
-                ocr_warnings.extend(generate_ocr_warnings(report, critical_fields=["record_date"]))
-                ocr_metadata["date_ocr_confidence"] = prov.confidence
-                ocr_metadata["date_ocr_level"] = prov.level.value
-
-        if highlight_boxes:
-            ocr_metadata["highlight_boxes"] = tuple(highlight_boxes)
-        if ocr_warnings:
-            ocr_metadata["ocr_warnings"] = tuple(ocr_warnings)
-
-        merged_metadata = {**contrib_v2.metadata, **ocr_metadata}
-
         return EvidenceContribution(
             provider_name=contrib_v2.provider_name,
             score=contrib_v2.score,
-            violations=frozenset(violations),
-            metadata=merged_metadata
+            violations=contrib_v2.violations,
+            metadata=contrib_v2.metadata
         )
 
 

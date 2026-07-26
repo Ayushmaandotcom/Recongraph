@@ -122,11 +122,12 @@ elif result.review_packets:
 
 Dive deeper into ReconGraph's design philosophy and internal APIs:
 
-- [API Reference](docs/API.md)
-- [Architecture & Diagrams](docs/ARCHITECTURE.md)
-- [Multi-Layer Explainability](docs/explainability.md)
-- [The Provenance Contract](docs/provenance.md)
-- [Traceability](docs/traceability.md)
+- [Quick Start](docs/quickstart.md)
+- [Installation Guide](docs/installation.md)
+- [API Reference](docs/api.md)
+- [Architecture & Diagrams](docs/architecture.md)
+- [FAQ](docs/faq.md)
+- [Troubleshooting](docs/troubleshooting.md)
 
 ## 🤝 Contributing
 

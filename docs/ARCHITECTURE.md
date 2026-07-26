@@ -1,100 +1,64 @@
 # ReconGraph Architecture
 
-ReconGraph is a pipeline of semantic transformation. Data moves from unstructured, disconnected records into a unified graph of evidence.
+ReconGraph is a deterministic engine designed to solve $N:M$ reconciliation problems, primarily focusing on matching localized purchase records against official tax authority (GST) records.
 
-## System Flow
+ReconGraph replaces probabilistic matching, opaque machine learning confidence scores, and ad-hoc heuristics with a **strictly deterministic, graph-based evaluation engine**. It separates the act of *observing* data from the act of *interpreting* data, allowing for fully explainable, audit-ready financial reconciliations.
 
-The core of ReconGraph executes in these distinct phases:
+## High-Level Pipeline
 
-```mermaid
-sequenceDiagram
-    participant Engine as ReconGraph Engine
-    participant Generator as Candidate Generator
-    participant Builder as Graph Builder
-    participant Fusion as Fusion Engine
-    participant Explain as Explainability Engine
-
-    Engine->>Generator: Input (Purchase, GST[])
-    Generator->>Engine: Candidate Graph (Nodes + Blocking Edges)
-    Engine->>Builder: Build Semantic Hypotheses
-    
-    loop For each Hypothesis
-        Builder->>Builder: Parse -> Observe -> Interpret -> Project
-        Builder->>Builder: Evaluate Provider Contributions
-    end
-    
-    Builder->>Engine: Evidence Graph
-    Engine->>Fusion: Propagate and Fuse
-    Fusion-->>Engine: FusionResult (Action)
-    
-    Engine->>Explain: Generate Provenance Artifact
-    Explain-->>Engine: ExplanationArtifact
-    
-    Engine->>User: ReviewPacket
-```
-
-## Data Lifecycle
-
-ReconGraph's epistemic guarantee comes from its strict data lifecycle. Data is transformed immutably at each step:
+The reconciliation process flows through a linear, directed acyclic pipeline. Each stage strictly produces immutable artifacts.
 
 ```mermaid
 graph TD
-    A[Raw Record] -->|Parsers| B[Observation]
-    B -->|Interpreter| C[Interpretation]
-    C -->|Projector| D[Projection]
-    D -->|EvidenceProvider| E[EvidenceContribution]
-    
-    subgraph Evidence Graph
-    E --> F[Fusion Node]
-    F -->|Dependency Edge| G[Parent Node]
-    F -->|Contradiction Edge| H[Conflicting Node]
-    end
-    
-    F -->|Propagation| I[Fusion Result]
-    I --> J[Decision Action]
+    A[Raw Data Extraction] -->|Providers| B(Observation Layer)
+    B -->|ReliabilityEnvelope| C(Hypothesis Generation)
+    C -->|CandidateGraph| D(Evaluation Engine)
+    D -->|EvaluatedHypothesis| E(Decision Engine)
+    E -->|DecisionTrace| F[Explainability Layer]
 ```
 
-## Differential Shadow Mode Architecture
+## Evidence Graph
 
-To support safe deployments, ReconGraph can run Legacy Heuristics and Graph Fusion side-by-side, producing differential reports.
+ReconGraph models potential matches as a bipartite graph. Nodes represent records (e.g., Purchases and GSTs), and edges represent hypothesized matches.
 
 ```mermaid
-flowchart LR
-    A[Input Records] --> B{shadow_mode?}
-    B -- Yes --> C[Legacy Engine]
-    B -- Yes --> D[Fusion Engine]
-    
-    C --> E[Legacy Action]
-    D --> F[Fusion Action]
-    
-    E --> G{Compare}
-    F --> G
-    
-    G -- Matches --> H[Differential: OK]
-    G -- Mismatches --> I[Differential: Discrepancy]
+graph LR
+    P1((Purchase 1)) ---|Hypothesis| G1((GST A))
+    P1 ---|Hypothesis| G2((GST B))
+    P2((Purchase 2)) ---|Hypothesis| G2
 ```
 
-## Evidence Node Taxonomy
+The **Hypothesis Evaluator** takes subgraphs (e.g., $P1 + P2 \leftrightarrow G2$) and scores them based on canonical semantic projections, evaluating whether the combined financial assertions satisfy the rules of the domain.
 
-A `FusionNode` encapsulates an `EvidenceContribution`. It carries explicit state regarding its role in the graph.
+## Reliability Flow (Observation Quality)
+
+Data extracted via OCR or LLMs is inherently noisy. ReconGraph handles this noise via a **Universal Reliability Framework**.
+
+1. **Extraction**: A parser extracts an amount. It attaches a `ReliabilityProfile` describing extraction quality (e.g., `DEGRADED`).
+2. **Orchestration**: The `HypothesisEvaluator` detects the profile.
+3. **Attenuation**: The `AttenuationPolicy` maps `DEGRADED` to a multiplier (e.g., `0.85`) and a violation string (e.g., `OCR_AMOUNT_DEGRADED`).
+4. **Semantics**: The attenuated signal is fed into the semantic matching engine.
 
 ```mermaid
-classDiagram
-    class FusionNode {
-        +String identity_hash
-        +String provider_name
-        +List~String~ violations
-        +PropagationStatus status
-    }
-    
-    class PropagationStatus {
-        <<enumeration>>
-        UNAFFECTED
-        SUPPORTED
-        QUESTIONED
-        CONTRADICTED
-        CORROBORATED
-    }
+sequenceDiagram
+    participant Parser
+    participant Evaluator
+    participant Policy
+    participant Matcher
 
-    FusionNode --> PropagationStatus
+    Parser->>Evaluator: Amount + ReliabilityEnvelope
+    Evaluator->>Policy: What is policy for DEGRADED Amount?
+    Policy-->>Evaluator: Multiply by 0.85, emit OCR_AMOUNT_DEGRADED
+    Evaluator->>Matcher: Attenuated Signal
 ```
+
+## Explainability Flow
+
+ReconGraph produces a `DecisionTrace` for every automated or manual decision. This trace is cryptographically stable and translates directly into an `ExplanationArtifact`.
+
+The explanation artifact contains:
+- **Executive Summary**: The final action taken.
+- **Key Determinants**: The primary drivers of the decision (e.g., "Financial amounts matched perfectly").
+- **Technical Details**: Granular sub-component breakdowns (e.g., "Tax Node conflict").
+
+This ensures that a human auditor can trace an automated match all the way back to the raw parser logs and exact semantic policies that executed at runtime.

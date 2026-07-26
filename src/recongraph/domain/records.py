@@ -8,6 +8,7 @@ from typing import Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from recongraph.domain.document.layout import DocumentLayoutArtifact, OcrConfidenceReport
+    from recongraph.domain.reliability import ReliabilityEnvelope
 
 @dataclass(frozen=True)
 class PurchaseRecord:
@@ -29,6 +30,7 @@ class PurchaseRecord:
     sign: int = 1
     layout_artifact: "Optional['DocumentLayoutArtifact']" = None
     ocr_confidence_report: "Optional['OcrConfidenceReport']" = None
+    reliability_envelope: "Optional['ReliabilityEnvelope']" = None
     def __post_init__(self):
         for field in ("amount", "net_amount", "tax_amount", "tax_rate"):
             val = getattr(self, field, None)
@@ -55,6 +57,7 @@ class GSTRecord:
     sign: int = -1
     layout_artifact: "Optional['DocumentLayoutArtifact']" = None
     ocr_confidence_report: "Optional['OcrConfidenceReport']" = None
+    reliability_envelope: "Optional['ReliabilityEnvelope']" = None
     def __post_init__(self):
         for field in ("amount", "net_amount", "tax_amount", "tax_rate"):
             val = getattr(self, field, None)

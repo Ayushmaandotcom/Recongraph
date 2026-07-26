@@ -1,23 +1,27 @@
-# ReconGraph v1.0 Benchmarks
+# ReconGraph Benchmarking Methodology
 
-These benchmarks were run on a synthetic dataset of 100 exact-match pairs to measure the baseline performance of the Fusion Engine.
+ReconGraph includes a rigorous, deterministic benchmarking framework located in `src/recongraph/benchmark`.
 
-## Engine Total Throughput
+## Reproducible Benchmarking
 
-- **Total Time for 100 pairs:** 27.89 ms
-- **Average Time per pair:** 0.28 ms
+To ensure that engine optimizations (e.g. graph partitioning, pair interpretation) do not regress precision, recall, or runtime performance, ReconGraph provides a standard command-line harness.
 
-## Breakdown (Estimated via Architecture Complexity)
+### Running Benchmarks
 
-| Stage | Complexity | Typical Duration |
-|-------|------------|-----------------|
-| **Parsing** | `O(N)` | `~0.1ms` |
-| **Observation** | `O(N)` | `~0.1ms` |
-| **Interpretation** | `O(N)` | `~0.2ms` |
-| **Graph Build** | `O(N+E)` | `~0.5ms` |
-| **Propagation** | `O(N+E)` | `~0.5ms` |
-| **Fusion / Decision** | `O(1)` | `~0.1ms` |
-| **Explanation** | `O(N+E)` (Lazy) | `~0.5ms` |
+```bash
+python -m recongraph.benchmark.runner --profile full
+```
 
-### Notes on Explainability
-The `ExplanationArtifact` is lazy-evaluated. Layer 4 (Audit Nodes) and string serializations are not materialized during the core hot path, allowing the reasoning graph to propagate in under a millisecond per match candidate.
+### Metrics Collected
+
+The benchmarking framework measures:
+
+- **Parsing Time**: Latency introduced by external providers parsing unstructured inputs.
+- **Observation Latency**: Time to wrap raw data in `ReliabilityEnvelope`s.
+- **Graph Construction (N x M)**: Time complexity of building the bipartite Candidate Graph based on blocking keys.
+- **Hypothesis Evaluation**: The bottleneck. Time spent evaluating semantic projection rules on hypotheses.
+- **Fusion & Decision**: Overhead of resolving graph constraints into a `DecisionTrace`.
+
+### Memory Footprint
+
+ReconGraph is designed to be highly memory efficient. Benchmarks track peak memory allocations. The use of `__slots__` and frozen dataclasses (e.g., `ReliabilityProfile`) guarantees a strict upper bound on memory consumption per record.

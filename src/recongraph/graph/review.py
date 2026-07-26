@@ -38,23 +38,35 @@ class ReviewPacket:
     ocr_warnings: tuple[str, ...] = ()
 
 
-def _collect_ocr_data_from_hypothesis(
-    hypothesis: EvaluatedHypothesis,
+from recongraph.domain.reliability.dimensions import ExtractionQuality
+from recongraph.domain.reliability import convert_ocr_report_to_envelope
+
+def _collect_ocr_data_from_records(
+    purchases: list[PurchaseRecord],
+    gsts: list[GSTRecord]
 ) -> tuple["tuple[BoundingBox, ...]", "tuple[str, ...]"]:
     """
-    Walk the provider metadata on a hypothesis and collect all OCR highlight
-    boxes and warnings that were emitted by OCR-aware providers.
+    Collect OCR highlight boxes and warnings directly from the ReliabilityEnvelope
+    attached to the underlying records.
     """
     all_boxes: list[Any] = []
-    all_warnings: list[str] = []
+    all_warnings: set[str] = set()
 
-    contributions = hypothesis.supporting_evidence.get("contributions", {})
-    for contrib in contributions.values():
-        meta = contrib.metadata or {}
-        boxes = meta.get("highlight_boxes", ())
-        warnings = meta.get("ocr_warnings", ())
-        all_boxes.extend(boxes)
-        all_warnings.extend(warnings)
+    for record in purchases + gsts:
+        env = getattr(record, "reliability_envelope", None)
+        if not env and getattr(record, "ocr_confidence_report", None):
+            env = convert_ocr_report_to_envelope(record.ocr_confidence_report)
+            
+        if not env:
+            continue
+            
+        for field in env.profiles:
+            q = field.profile.extraction_quality
+            # Degraded, Low, Failed are mapped to warnings
+            if q in (ExtractionQuality.DEGRADED, ExtractionQuality.LOW, ExtractionQuality.FAILED):
+                if "box" in field.profile.audit_metadata:
+                    all_boxes.append(field.profile.audit_metadata["box"])
+                all_warnings.add(f"OCR_{field.field_name.upper()}_WARNING")
 
     return tuple(all_boxes), tuple(all_warnings)
 
@@ -122,8 +134,8 @@ class ReviewPacketBuilder:
                     purchases.append(graph.nodes[urn])
                 elif urn.startswith("urn:recongraph:gst:"):
                     gsts.append(graph.nodes[urn])
-            # Collect OCR data from the selected hypothesis
-            highlight_regions, ocr_warnings = _collect_ocr_data_from_hypothesis(target_hypothesis)
+            # Collect OCR data from the underlying records directly
+            highlight_regions, ocr_warnings = _collect_ocr_data_from_records(purchases, gsts)
 
         checklist = self._generate_checklist(explanation, ocr_warnings)
         curated_competitors = decision.competitors[:3]
