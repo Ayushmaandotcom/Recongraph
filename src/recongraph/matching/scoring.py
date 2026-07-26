@@ -22,9 +22,6 @@ class RelationshipPolicy:
     """Define how a financial relationship interprets primitive signals."""
 
     weights: Mapping[str, float]
-    contradiction_penalties: Mapping[str, float] = field(
-        default_factory=dict
-    )
     attenuation_policy: AttenuationPolicy = field(
         default_factory=AttenuationPolicy.default
     )
@@ -41,20 +38,6 @@ class RelationshipPolicy:
                     "Signal weights must be finite and greater than zero."
                 )
 
-        for penalty in self.contradiction_penalties.values():
-            if not isfinite(penalty) or not 0.0 <= penalty <= 1.0:
-                raise ValueError(
-                    "Contradiction penalties must be between "
-                    "0.0 and 1.0."
-                )
-
-        for signal_name in self.contradiction_penalties:
-            if signal_name not in self.weights:
-                raise ValueError(
-                    "A contradiction signal must also have "
-                    "a configured weight."
-                )
-
 
 @dataclass(frozen=True)
 class RelationshipScore:
@@ -63,8 +46,6 @@ class RelationshipScore:
     score: float | None
     base_score: float | None
     coverage: float
-    contradiction_penalty: float
-    active_contradictions: tuple[str, ...]
 
 
 def calculate_relationship_score(
@@ -103,35 +84,18 @@ def calculate_relationship_score(
 
     coverage = available_weight / total_weight
 
-    active_contradictions = tuple(
-        signal_name
-        for signal_name in policy.contradiction_penalties
-        if signals[signal_name] == 0.0
-    )
-
-    contradiction_penalty = 1.0
-
-    for signal_name in active_contradictions:
-        contradiction_penalty *= (
-            policy.contradiction_penalties[signal_name]
-        )
-
     if available_weight == 0.0:
         return RelationshipScore(
             score=None,
             base_score=None,
             coverage=coverage,
-            contradiction_penalty=contradiction_penalty,
-            active_contradictions=active_contradictions,
         )
 
     base_score = weighted_numerator / available_weight
-    final_score = base_score * contradiction_penalty
+    final_score = base_score
 
     return RelationshipScore(
         score=final_score,
         base_score=base_score,
         coverage=coverage,
-        contradiction_penalty=contradiction_penalty,
-        active_contradictions=active_contradictions,
     )

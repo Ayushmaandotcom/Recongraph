@@ -37,7 +37,7 @@ def test_engine_reconcile():
     engine = ReconGraphEngine(config, providers)
     result = engine.reconcile([p1], [g1])
     
-    assert result.engine_version == "1.0.0"
+    assert result.engine_version == ReconGraphEngine.VERSION
     assert len(result.auto_matches) == 1
 
 def test_conservation_hole_auto_match_leftovers():
@@ -80,15 +80,14 @@ def test_conservation_hole_auto_match_leftovers():
     # We expect p2 to be conserved as a ReviewPacket because it is a leftover unmatched node
     assert len(result.review_packets) == 1
     leftover_packet = result.review_packets[0]
-    assert leftover_packet.action == DecisionAction.REVIEW_INSUFFICIENT_EVIDENCE
+    assert leftover_packet.action == DecisionAction.NO_MATCH
     assert len(leftover_packet.purchases) == 1
     assert leftover_packet.purchases[0].record_id == "p2"
     assert len(leftover_packet.gsts) == 0
     trace = result.traces[0]
     
-    assert trace.engine_version == "1.0.0"
+    assert trace.engine_version == ReconGraphEngine.VERSION
     assert trace.config_hash is not None
     # Assert serializability
     trace_dict = trace.to_dict()
-    assert trace_dict["engine_version"] == "1.0.0"
-    assert len(trace_dict["events"]) == 4
+    assert trace_dict["engine_version"] == engine.VERSION

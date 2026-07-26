@@ -14,7 +14,7 @@ from recongraph.graph.algorithms import extract_connected_components
 from recongraph.graph.search import HypothesisSearcher
 from recongraph.graph.evaluator import HypothesisEvaluator
 from recongraph.graph.review import ReviewPacketBuilder, ReviewPacket
-from recongraph.graph.trace import DecisionTrace, TraceEvent, TraceStage, TraceBuilder
+from recongraph.graph.trace import DecisionTrace, TraceEvent, TraceStage
 from recongraph.graph.explainability import ExplanationBuilder
 from recongraph.errors import ReconciliationFallbackError
 from recongraph.config import DecisionMode
@@ -34,7 +34,11 @@ class ReconciliationResult:
     differential_results: list['DifferentialResult'] = field(default_factory=list)
     
 class ReconGraphEngine:
-    VERSION = "1.0.0"
+    try:
+        import importlib.metadata
+        VERSION = importlib.metadata.version("recongraph")
+    except Exception:
+        VERSION = "0.9.0"
 
     def __init__(self, config: ReconGraphConfig, providers: Sequence[EvidenceProvider]):
         self.config = config
@@ -129,25 +133,12 @@ class ReconGraphEngine:
                     decision=decision
                 )
                 
-                trace_builder = TraceBuilder(
+                trace = DecisionTrace(
                     trace_id=trace_id,
                     engine_version=self.VERSION,
                     config_hash=hashlib.md5(str(self.config).encode()).hexdigest(),
+                    events=()
                 )
-                
-                trace_builder.record_event(TraceStage.CANDIDATE_GENERATION, {"edges_generated": len(edges)})
-                trace_builder.record_event(TraceStage.GRAPH_BUILDING, {"nodes_added": len(graph.nodes)})
-                trace_builder.record_event(TraceStage.HYPOTHESIS_EVALUATION, {"hypotheses_evaluated": len(evaluated)})
-                
-                decision_payload = {
-                    "action": decision.action.value,
-                    "selected_hypothesis": {
-                        "score": decision.selected_hypothesis.score if decision.selected_hypothesis else 0.0
-                    }
-                }
-                
-                trace_builder.record_event(TraceStage.DECISION_EVALUATION, decision_payload)
-                trace = trace_builder.build()
                 traces.append(trace)
                 
                 # Explanation Generation
@@ -156,7 +147,7 @@ class ReconGraphEngine:
                 
                 if 'evidence_graph' in locals() and 'fusion_result' in locals() and evidence_graph and fusion_result:
                     from recongraph.graph.explanation_generator import ExplanationGenerator
-                    explanation_generator = ExplanationGenerator(trace, evidence_graph, fusion_result)
+                    explanation_generator = ExplanationGenerator(trace, evidence_graph, fusion_result, decision)
                     fusion_explanation = explanation_generator.generate()
                     
                 if self.config.decision_config.decision_mode in (DecisionMode.SHADOW, DecisionMode.FUSION) and 'fusion_decision' in locals():
@@ -169,19 +160,37 @@ class ReconGraphEngine:
                     )
                     differential_results.append(diff_result)
         
+                # Determine which nodes were "consumed" by the primary action
+                consumed_nodes = frozenset()
+
                 # Action Mapping
                 if decision.action == DecisionAction.AUTO_MATCH:
                     auto_matches.append(decision)
-                    if decision.selected_hypothesis and decision.selected_hypothesis.hypothesis.unmatched_nodes:
-                        leftover_packet = packet_builder.build_leftover(
-                            decision.selected_hypothesis.hypothesis.unmatched_nodes, 
-                            graph
-                        )
-                        if leftover_packet:
-                            review_packets.append(leftover_packet)
+                    if decision.selected_hypothesis:
+                        consumed_nodes = decision.selected_hypothesis.hypothesis.matched_nodes
                 elif self.config.review_config.enabled and decision.action in (DecisionAction.REVIEW_WEAK, DecisionAction.REVIEW_AMBIGUOUS):
-                    # We pass the Fusion explanation to the review packet if available, otherwise None
                     packet = packet_builder.build(decision, fusion_explanation, graph)
+                    if packet:
+                        review_packets.append(packet)
+                        
+                        target_hypothesis = decision.selected_hypothesis
+                        if not target_hypothesis and decision.competitors:
+                            target_hypothesis = decision.competitors[0]
+                        if target_hypothesis:
+                            consumed_nodes = target_hypothesis.hypothesis.matched_nodes
+                            
+                # -------------------------------------------------------------
+                # THE CONSERVATION FALLBACK (Closing the data-loss hole)
+                # -------------------------------------------------------------
+                # Any node in the component that was NOT consumed by the primary
+                # action gets its own individual NO_MATCH packet.
+                # If the action was NO_MATCH, consumed_nodes is empty, so EVERY 
+                # node gets a packet.
+                component_nodes = frozenset(comp.graph.nodes.keys())
+                leftover_nodes = component_nodes - consumed_nodes
+                
+                for urn in leftover_nodes:
+                    packet = packet_builder.build_single_leftover(urn, graph)
                     if packet:
                         review_packets.append(packet)
                         

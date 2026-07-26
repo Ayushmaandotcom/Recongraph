@@ -1,6 +1,6 @@
 # Recongraph
 
-[![Tests](https://github.com/Ayushmaandotcom/Recongraph/actions/workflows/test.yml/badge.svg)](https://github.com/Ayushmaandotcom/Recongraph/actions)
+[![Tests](https://github.com/Ayushmaandotcom/Recongraph/actions/workflows/verify.yml/badge.svg)](https://github.com/Ayushmaandotcom/Recongraph/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **A deterministic, graph-based evidence reasoning framework for financial reconciliation.**
@@ -12,7 +12,7 @@ Recongraph is an approach to financial reconciliation that moves beyond opaque s
 Traditional reconciliation systems fail at scale because they conflate *similarity* with *identity*. Recongraph extracts the structural semantic reality of records, distinguishing between "missing evidence" and "contradicting evidence".
 
 - **Epistemic Honesty:** Missing evidence is never treated as a contradiction.
-- **Decision Engine:** It evaluates Vendor, Tax, Financial, and Temporal evidence streams.
+- **Decision Engine:** It evaluates Vendor, Tax, Financial, Reference, and Temporal evidence streams.
 - **Explainability:** The engine yields an `ExplanationArtifact` outlining exactly which signals corroborated or contradicted a match.
 
 ## 🏗 Architecture at a Glance
@@ -23,7 +23,7 @@ Traditional reconciliation systems fail at scale because they conflate *similari
 4. **Hypothesis Evaluation:** Connected components are partitioned into hypotheses and scored.
 5. **Decision & Routing:** Sparse or conflicting matches are routed to manual review packets.
 
-*(See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for system flows).*
+*(See [docs/architecture.md](docs/architecture.md) for system flows).*
 
 ## 🚀 Quick Start
 
@@ -122,16 +122,12 @@ elif result.review_packets:
 
 Dive deeper into ReconGraph's design philosophy and internal APIs:
 
-- [Quick Start](docs/quickstart.md)
-- [Installation Guide](docs/installation.md)
 - [API Reference](docs/api.md)
 - [Architecture & Diagrams](docs/architecture.md)
-- [FAQ](docs/faq.md)
-- [Troubleshooting](docs/troubleshooting.md)
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on submitting bug reports and ensuring your code passes our test suite.
+We welcome contributions! Please ensure your code passes our verification workflow before submitting.
 
 ## 📄 License
 

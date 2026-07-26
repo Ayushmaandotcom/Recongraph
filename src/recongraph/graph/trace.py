@@ -105,31 +105,4 @@ class DecisionTrace:
             ]
         }
 
-class TraceBuilder:
-    """
-    A passive recorder that assembles the historical trace chronologically.
-    It strictly adheres to the Recorder Principle (never recalculates or alters).
-    """
-    def __init__(self, trace_id: str, engine_version: str, config_hash: str):
-        self._trace_id = trace_id
-        self._engine_version = engine_version
-        self._config_hash = config_hash
-        self._events: list[TraceEvent] = []
-        
-    def record_event(self, stage: TraceStage, payload: Any) -> None:
-        """Records a new event in the chronological sequence."""
-        event = TraceEvent(
-            timestamp=datetime.now(timezone.utc),
-            stage=stage,
-            payload=payload
-        )
-        self._events.append(event)
-        
-    def build(self) -> DecisionTrace:
-        """Freezes the chronological events into an immutable DecisionTrace."""
-        return DecisionTrace(
-            trace_id=self._trace_id,
-            engine_version=self._engine_version,
-            config_hash=self._config_hash,
-            events=tuple(self._events)
-        )
+

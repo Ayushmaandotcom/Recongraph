@@ -50,8 +50,7 @@ def test_purchase_to_gst_policy_uses_expected_weights() -> None:
         SignalName.TAX_IDENTITY: 0.25
     }
 
-def test_purchase_gst_policy_uses_pure_compatibility() -> None:
-    assert PURCHASE_TO_GST_POLICY.contradiction_penalties == {}
+
 
 def test_purchase_to_gst_temporal_window_is_seven_days() -> None:
     assert PURCHASE_TO_GST_MAX_DAYS == 7

@@ -19,15 +19,15 @@ class ExplanationGenerator:
     """
     Deterministically generates the multi-layer explanation artifact for a given decision.
     """
-    def __init__(self, trace: DecisionTrace, evidence_graph: EvidenceGraph, fusion_result: FusionResult):
+    def __init__(self, trace: DecisionTrace, evidence_graph: EvidenceGraph, fusion_result: FusionResult, decision: ReconciliationDecision):
         self.trace = trace
         self.evidence_graph = evidence_graph
         self.fusion_result = fusion_result
+        self.decision = decision
         
     def generate(self) -> ExplanationArtifact:
         # Layer 1: Executive Summary
-        decision_payload = self.trace.events[-1].payload
-        action = decision_payload["action"]
+        action = self.decision.action.value
         
         executive_summary = {
             "decision": action,

@@ -17,9 +17,17 @@ def mock_trace():
         trace_id="TRACE_12345",
         engine_version="1.0.0",
         config_hash="CONFIG_HASH",
-        events=(
-            TraceEvent(timestamp=datetime.now(timezone.utc), stage=TraceStage.DECISION_EVALUATION, payload={"action": DecisionAction.AUTO_MATCH.value}),
-        )
+        events=()
+    )
+
+@pytest.fixture
+def mock_decision():
+    from recongraph.graph.decision import ReconciliationDecision, DecisionAction
+    return ReconciliationDecision(
+        action=DecisionAction.AUTO_MATCH,
+        selected_hypothesis=None,
+        competitors=(),
+        rationale="Mock rationale"
     )
 
 @pytest.fixture
@@ -43,8 +51,6 @@ def mock_evidence_graph():
     graph = EvidenceGraph()
     
     contrib1 = EvidenceContributionV2(provider_name="TAX", score=1.0)
-    node1 = FusionNode.from_contribution(contrib1)
-    # We must patch the node_id to match the fusion_result
     node1 = FusionNode(node_id="TAX_NODE", contribution=contrib1)
     
     contrib2 = EvidenceContributionV2(provider_name="FINANCIAL", score=1.0)
@@ -58,24 +64,24 @@ def mock_evidence_graph():
     graph.add_node(node3)
     return graph
 
-def test_determinism_audit(mock_trace, mock_evidence_graph, mock_fusion_result):
-    generator = ExplanationGenerator(mock_trace, mock_evidence_graph, mock_fusion_result)
+def test_determinism_audit(mock_trace, mock_evidence_graph, mock_fusion_result, mock_decision):
+    generator = ExplanationGenerator(mock_trace, mock_evidence_graph, mock_fusion_result, mock_decision)
     artifact1 = generator.generate()
     artifact2 = generator.generate()
     
     assert artifact1.executive_summary == artifact2.executive_summary
     assert artifact1.audit_nodes.keys() == artifact2.audit_nodes.keys()
 
-def test_completeness_audit(mock_trace, mock_evidence_graph, mock_fusion_result):
-    generator = ExplanationGenerator(mock_trace, mock_evidence_graph, mock_fusion_result)
+def test_completeness_audit(mock_trace, mock_evidence_graph, mock_fusion_result, mock_decision):
+    generator = ExplanationGenerator(mock_trace, mock_evidence_graph, mock_fusion_result, mock_decision)
     artifact = generator.generate()
     
     # Verify no orphan nodes: every node in the evidence graph should have a corresponding contribution node
     for node_id in mock_evidence_graph.nodes:
         assert f"CONTRIBUTION_{node_id}" in artifact.audit_nodes
 
-def test_mermaid_export(mock_trace, mock_evidence_graph, mock_fusion_result):
-    generator = ExplanationGenerator(mock_trace, mock_evidence_graph, mock_fusion_result)
+def test_mermaid_export(mock_trace, mock_evidence_graph, mock_fusion_result, mock_decision):
+    generator = ExplanationGenerator(mock_trace, mock_evidence_graph, mock_fusion_result, mock_decision)
     artifact = generator.generate()
     
     exporter = MermaidExporter()
