@@ -7,7 +7,7 @@ from typing import Optional
 from typing import Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from recongraph.domain.document.layout import DocumentLayoutArtifact
+    from recongraph.domain.document.layout import DocumentLayoutArtifact, OcrConfidenceReport
 
 @dataclass(frozen=True)
 class PurchaseRecord:
@@ -28,6 +28,7 @@ class PurchaseRecord:
     currency: str = "USD"
     sign: int = 1
     layout_artifact: "Optional['DocumentLayoutArtifact']" = None
+    ocr_confidence_report: "Optional['OcrConfidenceReport']" = None
     def __post_init__(self):
         for field in ("amount", "net_amount", "tax_amount", "tax_rate"):
             val = getattr(self, field, None)
@@ -53,6 +54,7 @@ class GSTRecord:
     currency: str = "USD"
     sign: int = -1
     layout_artifact: "Optional['DocumentLayoutArtifact']" = None
+    ocr_confidence_report: "Optional['OcrConfidenceReport']" = None
     def __post_init__(self):
         for field in ("amount", "net_amount", "tax_amount", "tax_rate"):
             val = getattr(self, field, None)
