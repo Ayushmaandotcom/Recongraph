@@ -46,7 +46,8 @@ def test_evidence_provider_order_independence() -> None:
     vendor_context = _get_vendor_context()
     reference_context = _default_reference_context()
 
-    all_providers = [
+    from recongraph.plugins.provider import EvidenceProvider
+    all_providers: list[EvidenceProvider] = [
         VendorEvidenceProvider(vendor_context),
         ReferenceEvidenceProvider(reference_context),
         FinancialEvidenceProvider(tolerance=0.05),

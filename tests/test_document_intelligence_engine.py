@@ -6,7 +6,8 @@ from recongraph.domain.records import PurchaseRecord, GSTRecord
 from recongraph.domain.document.layout import DocumentLayoutArtifact, DocumentBlock, DocumentRegion, BoundingBox
 from recongraph.plugins.core_providers import DocumentIntelligenceProvider
 
-def create_mock_purchase(layout: DocumentLayoutArtifact = None) -> PurchaseRecord:
+from typing import Optional
+def create_mock_purchase(layout: Optional[DocumentLayoutArtifact] = None) -> PurchaseRecord:
     return PurchaseRecord(
         record_id="p1", vendor_name="Acme", reference="1", 
         amount=Decimal("100"), record_date=date(2023,1,1),

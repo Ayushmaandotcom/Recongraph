@@ -2,7 +2,7 @@ import pytest
 from recongraph.matching.purchase_gst_semantics import EligibilityResult, OneToOneEligibility, SemanticFinding, ONE_TO_ONE_BLOCKING_FINDINGS, analyze_purchase_gst_semantics, evaluate_purchase_gst_one_to_one_eligibility
 from recongraph.matching.scoring import SignalName
 
-def complete_evidence(*, entity: float | None=1.0, reference: float | None=1.0, amount: float | None=1.0, temporal: float | None=1.0, tax_identity: float | None=1.0) -> dict[SignalName, float | None]:
+def complete_evidence(*, entity: float | None=1.0, reference: float | None=1.0, amount: float | None=1.0, temporal: float | None=1.0, tax_identity: float | None=1.0) -> dict[str, float | None]:
     return {SignalName.ENTITY: entity, SignalName.REFERENCE: reference, SignalName.AMOUNT: amount, SignalName.TEMPORAL: temporal, SignalName.TAX_IDENTITY: tax_identity}
 
 def test_analyze_purchase_gst_semantics_returns_no_findings_for_clean_evidence():
@@ -90,7 +90,7 @@ def test_does_not_detect_distinct_event_identity_when_tax_identity_is_unknown():
     assert SemanticFinding.DISTINCT_EVENT_IDENTITY_EVIDENCE not in findings
 
 @pytest.mark.parametrize('missing_signal', [SignalName.ENTITY, SignalName.REFERENCE, SignalName.AMOUNT, SignalName.TEMPORAL, SignalName.TAX_IDENTITY])
-def test_analyze_purchase_gst_semantics_rejects_missing_evidence_keys(missing_signal: SignalName):
+def test_analyze_purchase_gst_semantics_rejects_missing_evidence_keys(missing_signal: str):
     evidence = complete_evidence()
     del evidence[missing_signal]
     with pytest.raises(KeyError):

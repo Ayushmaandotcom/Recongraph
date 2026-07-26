@@ -19,7 +19,7 @@ class OrganizationalKnowledgeBase:
     A deterministic, immutable knowledge base for resolving organizational identity.
     Maps a canonical vendor core string to known related entities.
     """
-    def __init__(self, mappings: Dict[str, Set[KnowledgeBaseEntry]] = None):
+    def __init__(self, mappings: Optional[Dict[str, Set[KnowledgeBaseEntry]]] = None):
         # We store mappings symmetrically for O(1) lookups.
         # If A is a parent of B, then A -> (B, PARENT_SUBSIDIARY) and B -> (A, PARENT_SUBSIDIARY)
         self._mappings: Dict[str, Set[KnowledgeBaseEntry]] = mappings or {}

@@ -1,7 +1,13 @@
 from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
+from typing import Optional
 
+
+from typing import Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from recongraph.domain.document.layout import DocumentLayoutArtifact
 
 @dataclass(frozen=True)
 class PurchaseRecord:
@@ -21,7 +27,7 @@ class PurchaseRecord:
     tax_rate: Decimal | None = None
     currency: str = "USD"
     sign: int = 1
-    layout_artifact: 'recongraph.domain.document.layout.DocumentLayoutArtifact | None' = None
+    layout_artifact: "Optional['DocumentLayoutArtifact']" = None
     def __post_init__(self):
         for field in ("amount", "net_amount", "tax_amount", "tax_rate"):
             val = getattr(self, field, None)
@@ -46,7 +52,7 @@ class GSTRecord:
     tax_rate: Decimal | None = None
     currency: str = "USD"
     sign: int = -1
-    layout_artifact: 'recongraph.domain.document.layout.DocumentLayoutArtifact | None' = None
+    layout_artifact: "Optional['DocumentLayoutArtifact']" = None
     def __post_init__(self):
         for field in ("amount", "net_amount", "tax_amount", "tax_rate"):
             val = getattr(self, field, None)

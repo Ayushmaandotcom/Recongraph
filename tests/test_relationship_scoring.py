@@ -56,7 +56,7 @@ def test_relationship_score_is_immutable() -> None:
     )
 
     with pytest.raises(AttributeError):
-        result.score = 0.5
+        result.score = 0.5  # type: ignore[misc]
 
 
 def test_relationship_policy_rejects_empty_weights() -> None:

@@ -49,7 +49,8 @@ def test_golden_path_execution_trace() -> None:
     reference_context = _default_reference_context()
 
     # 3. Setup Canonical Pipeline
-    providers = [
+    from recongraph.plugins.provider import EvidenceProvider
+    providers: list[EvidenceProvider] = [
         VendorEvidenceProvider(vendor_context),
         TaxEvidenceProvider(),
         ReferenceEvidenceProvider(reference_context),

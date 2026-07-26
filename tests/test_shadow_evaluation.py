@@ -10,6 +10,7 @@ from recongraph.plugins.provider import EvidenceProvider, EvidenceContribution
 from recongraph.candidate_generation.blockers import Blocker, TaxIdentityBlocker
 from recongraph.matching.scoring import SignalName
 
+from typing import Sequence
 class DummyProvider(EvidenceProvider):
     def __init__(self, name: str, score: float):
         self.name = name
@@ -21,7 +22,7 @@ class DummyProvider(EvidenceProvider):
     def get_blockers(self) -> list[Blocker]:
         return [TaxIdentityBlocker()]
         
-    def evaluate(self, purchases: list[PurchaseRecord], gsts: list[GSTRecord]) -> EvidenceContribution:
+    def evaluate(self, purchases: Sequence[PurchaseRecord], gsts: Sequence[GSTRecord]) -> EvidenceContribution:
         return EvidenceContribution(
             provider_name=self.name,
             score=self.score_value
