@@ -140,12 +140,12 @@ class BenchmarkRunner:
             )
         )
 
-def execute_reconbench(size: int = 1000, enable_faf: bool = False) -> int:
+def execute_reconbench(size: int = 1000, enable_faf: bool = False, auto_match_threshold: float = 0.99, ambiguity_margin: float = 0.05) -> int:
     import json
     from recongraph.synthetic.reconbench import generate_reconbench_dataset
     from recongraph.benchmark.evaluator import evaluate_results
     from recongraph.benchmark.faf import generate_faf_report
-    from recongraph.plugins.core_providers import FinancialEvidenceProvider, AmountMultipleEvidenceProvider, AmountMultipleEvidenceProvider, TemporalEvidenceProvider, TaxEvidenceProvider, VendorEvidenceProvider, ReferenceEvidenceProvider
+    from recongraph.plugins.core_providers import FinancialEvidenceProvider, TemporalEvidenceProvider, TaxEvidenceProvider, VendorEvidenceProvider, ReferenceEvidenceProvider
     from recongraph.matching.reference_evidence import ReferenceCorpusProfile, ReferenceEvidenceContext, ReferenceEvidencePolicy
     from recongraph.domain.vendor.context import VendorIdentityContext, VendorCorpusProfile
     from recongraph.engine import ReconGraphEngine
@@ -166,16 +166,17 @@ def execute_reconbench(size: int = 1000, enable_faf: bool = False) -> int:
     )
     
     providers = [
-        FinancialEvidenceProvider(), AmountMultipleEvidenceProvider(),
+        FinancialEvidenceProvider(),
         TemporalEvidenceProvider(),
         TaxEvidenceProvider(),
         VendorEvidenceProvider(vendor_context),
         ReferenceEvidenceProvider(ref_context)
     ]
-    
     from recongraph.config import ReconGraphConfig, DecisionConfig, DecisionMode
-    
-    config = ReconGraphConfig(decision_config=DecisionConfig(decision_mode=DecisionMode.FUSION))
+    config = ReconGraphConfig(decision_config=DecisionConfig(
+        decision_mode=DecisionMode.LEGACY,
+        policy=DecisionPolicy(auto_match_threshold=auto_match_threshold, ambiguity_margin=ambiguity_margin)
+    ))
     engine = ReconGraphEngine(
         config=config,
         providers=providers

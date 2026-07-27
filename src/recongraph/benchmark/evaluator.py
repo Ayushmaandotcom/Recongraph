@@ -12,8 +12,11 @@ class EvaluationMetrics:
     false_negatives: int
     precision: float
     recall: float
+    f1_score: float
     review_rate: float
+    review_reduction_rate: float
     exact_match_rate: float
+    ece_score: float
 
 def evaluate_results(results: Sequence[tuple[ReconciliationResult, ExpectedOutcome]]) -> EvaluationMetrics:
     tp = 0
@@ -24,16 +27,6 @@ def evaluate_results(results: Sequence[tuple[ReconciliationResult, ExpectedOutco
     exact_matches = 0
 
     for result, expected in results:
-        # Simplistic evaluation for benchmark framework
-        # If expected is AUTO_MATCH, and we got AUTO_MATCH for the exact same components -> TP
-        # If we got AUTO_MATCH for something wrong -> FP
-        # If expected is AUTO_MATCH and we didn't -> FN
-        # Note: Since the engine outputs a batch of decisions, we must check if the expected decision is present
-        
-        # We assume each scenario runs through the engine and produces traces/decisions.
-        matched = False
-        reviewed = False
-        
         if expected.expected_decision == DecisionAction.AUTO_MATCH:
             if len(result.auto_matches) > 0:
                 tp += 1
@@ -52,8 +45,11 @@ def evaluate_results(results: Sequence[tuple[ReconciliationResult, ExpectedOutco
 
     precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
     recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+    f1_score = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0.0
     review_rate = reviews / total if total > 0 else 0.0
+    review_reduction_rate = 1.0 - review_rate
     exact_match_rate = exact_matches / total if total > 0 else 0.0
+    ece_score = 0.0 # Placeholder for Expected Calibration Error
 
     return EvaluationMetrics(
         total_scenarios=total,
@@ -62,6 +58,9 @@ def evaluate_results(results: Sequence[tuple[ReconciliationResult, ExpectedOutco
         false_negatives=fn,
         precision=precision,
         recall=recall,
+        f1_score=f1_score,
         review_rate=review_rate,
-        exact_match_rate=exact_match_rate
+        review_reduction_rate=review_reduction_rate,
+        exact_match_rate=exact_match_rate,
+        ece_score=ece_score
     )

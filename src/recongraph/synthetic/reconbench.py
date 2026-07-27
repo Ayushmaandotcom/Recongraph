@@ -17,7 +17,9 @@ def generate_reconbench_dataset(size: int, seed: int = 42) -> list[ScenarioSpeci
         base_date = date(2023, rng.randint(1, 12), rng.randint(1, 28))
         base_ref = f"INV-{rng.randint(1000, 99999)}-{i}"
         base_vendor = f"Vendor Corp {rng.randint(1, 100)}"
-        base_tax = f"TAX{rng.randint(100000, 999999)}"
+        base_tax_prefix = f"27AAAAA{rng.randint(1000, 9999)}A1Z"
+        from recongraph.domain.tax.parser import calculate_gstin_checksum
+        base_tax = base_tax_prefix + calculate_gstin_checksum(base_tax_prefix)
         
         p = PurchaseRecord(record_id=f"p_bench_{i}", amount=base_amt, record_date=base_date, reference=base_ref, vendor_name=base_vendor, tax_identity=base_tax)
         g = GSTRecord(record_id=f"g_bench_{i}", amount=base_amt, record_date=base_date, reference=base_ref, vendor_name=base_vendor, tax_identity=base_tax)
