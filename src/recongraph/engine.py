@@ -35,9 +35,12 @@ class ReconciliationResult:
     
 class ReconGraphEngine:
     try:
-        import importlib.metadata
-        VERSION = importlib.metadata.version("recongraph")
+        from importlib.metadata import version as _get_version
+        VERSION = _get_version("recongraph")
+        del _get_version
     except Exception:
+        # Fallback for editable installs or missing metadata.
+        # Must stay in sync with pyproject.toml [project] version.
         VERSION = "0.9.0"
 
     def __init__(self, config: ReconGraphConfig, providers: Sequence[EvidenceProvider]):
