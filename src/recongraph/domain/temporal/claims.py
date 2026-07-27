@@ -1,5 +1,5 @@
-from recongraph.domain.claims import ClaimDescriptor, ClaimId, ClaimSemanticVersion, ClaimSymmetry
-from recongraph.domain.scopes import ScopeKind
+from recongraph.contrib.kernel.claims import ClaimDescriptor, ClaimId, ClaimSemanticVersion, ClaimSymmetry
+from recongraph.contrib.kernel.scopes import ScopeKind
 
 SAME_FISCAL_PERIOD_CLAIM = ClaimDescriptor(
     claim_id=ClaimId("temporal.same_fiscal_period"),

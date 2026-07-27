@@ -99,3 +99,14 @@ def calculate_relationship_score(
         base_score=base_score,
         coverage=coverage,
     )
+
+from typing import Any
+
+@dataclass(frozen=True)
+class ScoringEvidence:
+    """Detailed evidence supporting an evaluated hypothesis."""
+    signals: dict[str, float | None] = field(default_factory=dict)
+    relationship: RelationshipScore | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
+    contributions: dict[str, Any] = field(default_factory=dict)
+

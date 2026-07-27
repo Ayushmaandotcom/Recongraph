@@ -83,6 +83,9 @@ class AmountInterpretation:
     relative_difference: Decimal
     residual: Decimal
     
+    is_multiple: bool = False
+    multiple_factor: int | None = None
+    
     compatibility_flags: tuple[CompatibilityFlag, ...] = field(default_factory=tuple)
     
     comparison_basis: str = "Gross Amount"
@@ -183,6 +186,17 @@ class FinancialEvidencePipeline(EvidencePipeline[FinancialObservation, AmountInt
         max_val = max(mag_p, mag_g)
         relative_difference = Decimal("0") if max_val == Decimal("0") else delta / max_val
         
+        is_multiple = False
+        multiple_factor = None
+        
+        if mag_p > 0 and mag_g > 0:
+            if mag_p > mag_g and mag_p % mag_g == 0:
+                is_multiple = True
+                multiple_factor = int(mag_p / mag_g)
+            elif mag_g > mag_p and mag_g % mag_p == 0:
+                is_multiple = True
+                multiple_factor = int(mag_g / mag_p)
+
         return AmountInterpretation(
             equality=equality,
             magnitude_relation=magnitude_relation,
@@ -193,6 +207,8 @@ class FinancialEvidencePipeline(EvidencePipeline[FinancialObservation, AmountInt
             absolute_difference=delta,
             relative_difference=relative_difference,
             residual=residual,
+            is_multiple=is_multiple,
+            multiple_factor=multiple_factor,
             compatibility_flags=tuple(flags),
             notes=(),
             assumptions=()

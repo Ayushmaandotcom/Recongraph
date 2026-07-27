@@ -225,7 +225,7 @@ class ReferenceEvidencePolicy:
     exact_reference_fallback: float = 0.60
     repeated_pattern_discount: float = 0.50
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         import math
         if self.short_token_max_length < 1:
             raise ValueError("short_token_max_length must be >= 1")
@@ -265,7 +265,7 @@ class ReferenceEvidenceContribution:
     evidential_weight: float
     statistics_available: bool
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if not self.identity_value:
             raise ValueError("identity_value cannot be empty")
         
@@ -295,7 +295,7 @@ class ReferenceEvidenceInterpretation:
     statistical_coverage: float
     contributions: tuple[ReferenceEvidenceContribution, ...]
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         import math
         if not math.isfinite(self.score):
             raise ValueError("score must be finite")
@@ -415,7 +415,7 @@ def _select_strongest_reference_contribution(
     if not contributions:
         raise ValueError("at least one reference evidence contribution is required")
 
-    def sort_key(c: ReferenceEvidenceContribution):
+    def sort_key(c: ReferenceEvidenceContribution) -> tuple[float, float, bool]:
         return (c.positive_evidence, c.evidential_weight, c.statistics_available)
 
     return max(contributions, key=sort_key)

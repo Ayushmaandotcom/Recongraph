@@ -3,7 +3,7 @@ import json
 import struct
 from dataclasses import dataclass
 from typing import Tuple
-from recongraph.domain.identity import KernelIdentityRef, IdentityDomainId, IdentitySchemaId, IdentityDigest
+from recongraph.contrib.kernel.identity import KernelIdentityRef, IdentityDomainId, IdentitySchemaId, IdentityDigest
 
 @dataclass(frozen=True, slots=True, order=True)
 class EmbeddingProviderIdentity:

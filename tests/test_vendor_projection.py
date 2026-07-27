@@ -109,8 +109,8 @@ def test_identical_exact_common_token_attenuation(default_context):
     assert proj2.similarity == 0.85
 
 def test_same_source_derivation_logged(default_context):
-    left, left_id = parse_and_wrap("07ABCDE1234F1Z5")
-    right, right_id = parse_and_wrap("07ABCDE1234F1Z5")
+    left, left_id = parse_and_wrap("07ABCDE1234F1Z2")
+    right, right_id = parse_and_wrap("07ABCDE1234F1Z2")
     
     interp = VendorPairInterpreter.interpret(left, left_id, right, right_id, default_context)
     proj = VendorProjectionPolicyV1.project(interp)

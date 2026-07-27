@@ -1,5 +1,5 @@
-from recongraph.domain.claims import ClaimDescriptor, ClaimId, ClaimSemanticVersion, ClaimSymmetry
-from recongraph.domain.scopes import ScopeKind
+from recongraph.contrib.kernel.claims import ClaimDescriptor, ClaimId, ClaimSemanticVersion, ClaimSymmetry
+from recongraph.contrib.kernel.scopes import ScopeKind
 
 # Latent Semantic Business Assertions
 SAME_BUSINESS_PURPOSE_CLAIM = ClaimDescriptor(

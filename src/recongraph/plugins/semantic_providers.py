@@ -4,13 +4,13 @@ from recongraph.candidate_generation.blockers import Blocker
 from recongraph.domain.semantics.artifact import SimulatedEmbeddingProvider
 from recongraph.domain.semantics.observation import SemanticObservation
 from recongraph.domain.semantics.interpretation import SemanticPairInterpreter, SemanticInterpretationResult
-from recongraph.domain.assertions import EvidenceAssertion, AssertionPolarity, EvidenceAncestryRef
-from recongraph.domain.claims import ClaimId, ClaimSemanticVersion
-from recongraph.domain.authority import AuthorityDescriptor, AuthorityBasisId
-from recongraph.domain.scopes import Proposition, ScopeKind, SubjectRef
+from recongraph.contrib.kernel.assertions import EvidenceAssertion, AssertionPolarity, EvidenceAncestryRef
+from recongraph.contrib.kernel.claims import ClaimId, ClaimSemanticVersion
+from recongraph.contrib.kernel.authority import AuthorityDescriptor, AuthorityBasisId
+from recongraph.contrib.kernel.scopes import Proposition, ScopeKind, SubjectRef
 from recongraph.domain.semantics.claims import SAME_BUSINESS_PURPOSE_CLAIM
 from recongraph.plugins.provider_v2 import EvidenceProviderV2, EvidencePipeline, EvidenceContributionV2
-from recongraph.domain.identity import KernelIdentityRef, IdentityDomainId, IdentitySchemaId, IdentityDigest
+from recongraph.contrib.kernel.identity import KernelIdentityRef, IdentityDomainId, IdentitySchemaId, IdentityDigest
 
 class SemanticEvidencePipeline(EvidencePipeline[tuple[SemanticObservation, SemanticObservation], SemanticInterpretationResult]):
     """

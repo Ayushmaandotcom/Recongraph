@@ -1,7 +1,7 @@
 import pytest
-from recongraph.domain.lineage import StructuredSourceLineage, SourceSystemId, SourceArtifactId, SourceLocator, SourceVersionRef
-from recongraph.domain.observations import ObservationIdentity, ObservationSlot, ObservationState, Observation, FieldPath, ObservationOccurrenceIdentity, ObservationOccurrence
-from recongraph.domain.scopes import SubjectRef
+from recongraph.contrib.kernel.lineage import StructuredSourceLineage, SourceSystemId, SourceArtifactId, SourceLocator, SourceVersionRef
+from recongraph.contrib.kernel.observations import ObservationIdentity, ObservationSlot, ObservationState, Observation, FieldPath, ObservationOccurrenceIdentity, ObservationOccurrence
+from recongraph.contrib.kernel.scopes import SubjectRef
 
 
 def _make_lineage(sys, art, loc, ver=None):

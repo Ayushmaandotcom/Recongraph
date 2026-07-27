@@ -1,5 +1,5 @@
 import pytest
-from recongraph.domain.observations import ObservationState, InterpretationState
+from recongraph.contrib.kernel.observations import ObservationState, InterpretationState
 
 # Testing orthogonal state algebra conceptually
 

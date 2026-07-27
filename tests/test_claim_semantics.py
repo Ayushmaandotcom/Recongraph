@@ -1,6 +1,6 @@
 import pytest
-from recongraph.domain.claims import ClaimId, ClaimSemanticVersion, ClaimSymmetry, ClaimDescriptor
-from recongraph.domain.scopes import ScopeKind
+from recongraph.contrib.kernel.claims import ClaimId, ClaimSemanticVersion, ClaimSymmetry, ClaimDescriptor
+from recongraph.contrib.kernel.scopes import ScopeKind
 
 def test_claim_id_accepts_valid_namespaced_identifier():
     assert ClaimId("identity.same_legal_entity").value == "identity.same_legal_entity"

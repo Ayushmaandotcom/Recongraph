@@ -46,19 +46,19 @@ def create_gst(tax_id=None, vendor_name=None, record_date=date(2024, 1, 1)):
 
 def test_equivalent_tax_identities_do_not_produce_a_conflict():
     provider = TaxEvidenceProvider()
-    p = create_purchase(tax_id="27ABCDE1234F1Z5")
-    g = create_gst(tax_id="27abcde1234f1z5")
+    p = create_purchase(tax_id="27ABCDE1234F1Z0")
+    g = create_gst(tax_id="27abcde1234f1z0")
     contrib = provider.evaluate([p], [g])
     assert contrib.score == 1.0
     
-    p2 = create_purchase(tax_id="27ABCDE1234F1Z5 ")
+    p2 = create_purchase(tax_id="27ABCDE1234F1Z0 ")
     contrib2 = provider.evaluate([p2], [g])
     assert contrib2.score == 1.0
 
 def test_genuinely_different_tax_identities_still_conflict():
     provider = TaxEvidenceProvider()
-    p = create_purchase(tax_id="27ABCDE1234F1Z5")
-    g = create_gst(tax_id="27XXXXX1234F1Z5")
+    p = create_purchase(tax_id="27ABCDE1234F1Z0")
+    g = create_gst(tax_id="27XXXXX1234F1ZV")
     contrib = provider.evaluate([p], [g])
     assert contrib.score == 0.0
     assert "TAX_IDENTITY_CONFLICT" in contrib.violations
@@ -78,9 +78,9 @@ def test_vendor_signal_discriminates_between_matching_and_unrelated_vendors():
 
 def test_group_containing_a_conflicting_tax_identity_conflicts():
     provider = TaxEvidenceProvider()
-    p1 = create_purchase(tax_id="27ABCDE1234F1Z5")
-    p2_conflict = create_purchase(tax_id="27ZZZZZ9999Z1Z5")
-    g = create_gst(tax_id="27ABCDE1234F1Z5")
+    p1 = create_purchase(tax_id="27ABCDE1234F1Z0")
+    p2_conflict = create_purchase(tax_id="27ZZZZZ9999Z1Z8")
+    g = create_gst(tax_id="27ABCDE1234F1Z0")
     
     contrib = provider.evaluate([p1, p2_conflict], [g])
     assert contrib.score == 0.0

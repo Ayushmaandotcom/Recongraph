@@ -1,12 +1,12 @@
 import pytest
-from recongraph.domain.assertions import (
+from recongraph.contrib.kernel.assertions import (
     EvidenceAssertion, EvidenceAssertionIdentity, EvidenceAncestryRef,
     AssertionPolarity, EvidenceInterpretationResult, EvidenceInterpretationState
 )
-from recongraph.domain.identity import KernelIdentityRef, IdentityDomainId, IdentitySchemaId, IdentityDigest
-from recongraph.domain.authority import AuthorityDescriptor, AuthorityBasisId
-from recongraph.domain.scopes import Proposition, PropositionSubject, ScopeKind, SubjectRef
-from recongraph.domain.claims import CoreClaims
+from recongraph.contrib.kernel.identity import KernelIdentityRef, IdentityDomainId, IdentitySchemaId, IdentityDigest
+from recongraph.contrib.kernel.authority import AuthorityDescriptor, AuthorityBasisId
+from recongraph.contrib.kernel.scopes import Proposition, PropositionSubject, ScopeKind, SubjectRef
+from recongraph.contrib.kernel.claims import CoreClaims
 
 
 def _make_ancestry(domain="recongraph.observation_occurrence"):

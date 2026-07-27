@@ -33,8 +33,9 @@ def structurally_interpretable_gstin():
         structurally_interpretable_pan(),
         st.sampled_from(list(entity_chars)),
         st.just("Z"),
-        st.sampled_from(list(check_chars)),
-    ).map(lambda t: t[0] + t[1] + t[2] + t[3] + t[4])
+    ).map(lambda t: t[0] + t[1] + t[2] + t[3]).map(
+        lambda prefix: prefix + __import__("recongraph.domain.tax.parser", fromlist=["calculate_gstin_checksum"]).calculate_gstin_checksum(prefix)
+    )
 
 
 def malformed_pan_candidate():
@@ -262,7 +263,7 @@ def test_mp_016_equal_value_origin_preservation(pan, state):
 
 def test_mp_017_ocr_non_repair():
     """MP-017: OCR-like mutation cannot silently canonicalize back to baseline."""
-    baseline = "07ABCDE1234F1Z5"
+    baseline = "07ABCDE1234F1Z2"
     mutations = [
         baseline.replace("0", "O", 1),  # O in state code
         baseline.replace("1", "I", 1),  # I in numeric
@@ -278,28 +279,28 @@ def test_mp_017_ocr_non_repair():
 def test_mp_018_context_independence():
     """MP-018: Changing VendorIdentityContext cannot alter a parsed tax artifact."""
     # DeterministicTaxParser.parse takes no context parameter
-    a = DeterministicTaxParser.parse("07ABCDE1234F1Z5")
-    b = DeterministicTaxParser.parse("07ABCDE1234F1Z5")
+    a = DeterministicTaxParser.parse("07ABCDE1234F1Z2")
+    b = DeterministicTaxParser.parse("07ABCDE1234F1Z2")
     assert a == b
 
 
 def test_mp_019_projection_independence():
     """MP-019: Changing VendorProjectionPolicy cannot alter a parsed tax artifact."""
-    art = DeterministicTaxParser.parse("07ABCDE1234F1Z5")
+    art = DeterministicTaxParser.parse("07ABCDE1234F1Z2")
     assert not hasattr(art, "projection")
     assert not hasattr(art, "similarity")
 
 
 def test_mp_020_decision_independence():
     """MP-020: Changing DecisionPolicy cannot alter a parsed tax artifact."""
-    art = DeterministicTaxParser.parse("07ABCDE1234F1Z5")
+    art = DeterministicTaxParser.parse("07ABCDE1234F1Z2")
     assert not hasattr(art, "decision")
     assert not hasattr(art, "eligibility")
 
 
 def test_mp_021_no_pair_conclusion():
     """MP-021: ParsedTaxIdentifierArtifact cannot encode pair relation state."""
-    art = DeterministicTaxParser.parse("07ABCDE1234F1Z5")
+    art = DeterministicTaxParser.parse("07ABCDE1234F1Z2")
     assert not hasattr(art, "pair_result")
     assert not hasattr(art, "is_match")
     assert not hasattr(art, "compatibility")
@@ -307,14 +308,14 @@ def test_mp_021_no_pair_conclusion():
 
 def test_mp_022_no_legal_entity_claim():
     """MP-022: Parsed tax artifact cannot assert legal entity."""
-    art = DeterministicTaxParser.parse("07ABCDE1234F1Z5")
+    art = DeterministicTaxParser.parse("07ABCDE1234F1Z2")
     assert not hasattr(art, "legal_entity")
     assert not hasattr(art, "entity_type")
 
 
 def test_mp_023_no_transaction_claim():
     """MP-023: Parsed tax artifact cannot assert transaction."""
-    art = DeterministicTaxParser.parse("07ABCDE1234F1Z5")
+    art = DeterministicTaxParser.parse("07ABCDE1234F1Z2")
     assert not hasattr(art, "transaction")
 
 
@@ -411,31 +412,31 @@ def test_adversarial_control_characters():
 # === OCR NON-REPAIR ===
 
 def test_ocr_001_O_for_0_in_state_code():
-    baseline = DeterministicTaxParser.parse("07ABCDE1234F1Z5")
+    baseline = DeterministicTaxParser.parse("07ABCDE1234F1Z2")
     mutated = DeterministicTaxParser.parse("O7ABCDE1234F1Z5")
     assert baseline.gstin_candidate != (mutated.gstin_candidate if mutated.gstin_candidate else "")
 
 def test_ocr_002_I_for_1_in_numeric():
-    baseline = DeterministicTaxParser.parse("07ABCDE1234F1Z5")
+    baseline = DeterministicTaxParser.parse("07ABCDE1234F1Z2")
     mutated = DeterministicTaxParser.parse("07ABCDEI234F1Z5")
     # After uppercase I stays I, not silently repaired to 1
     if mutated.gstin_candidate is not None:
         assert "I" in mutated.gstin_candidate or mutated.gstin_candidate != baseline.gstin_candidate
 
 def test_ocr_003_B_for_8_in_numeric():
-    baseline = DeterministicTaxParser.parse("07ABCDE1234F1Z5")
+    baseline = DeterministicTaxParser.parse("07ABCDE1234F1Z2")
     mutated = DeterministicTaxParser.parse("07ABCDE12B4F1Z5")
     if mutated.gstin_candidate is not None:
         assert mutated.gstin_candidate != baseline.gstin_candidate
 
 def test_ocr_004_S_for_5_in_checksum():
-    baseline = DeterministicTaxParser.parse("07ABCDE1234F1Z5")
+    baseline = DeterministicTaxParser.parse("07ABCDE1234F1Z2")
     mutated = DeterministicTaxParser.parse("07ABCDE1234F1ZS")
     if mutated.gstin_candidate is not None:
         assert mutated.gstin_candidate != baseline.gstin_candidate
 
 def test_ocr_005_Z_for_2_in_state_code():
-    baseline = DeterministicTaxParser.parse("27ABCDE1234F1Z5")
+    baseline = DeterministicTaxParser.parse("27ABCDE1234F1Z0")
     mutated = DeterministicTaxParser.parse("Z7ABCDE1234F1Z5")
     if mutated.gstin_candidate is not None:
         assert mutated.gstin_candidate != baseline.gstin_candidate

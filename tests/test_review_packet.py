@@ -1,3 +1,4 @@
+from recongraph.matching.scoring import ScoringEvidence
 from decimal import Decimal
 import pytest
 from datetime import date
@@ -93,7 +94,7 @@ def test_packet_materialization():
         score=0.9,
             coverage=1.0,
         eligibility=EligibilityStatus.ELIGIBLE,
-        supporting_evidence={},
+        supporting_evidence=ScoringEvidence(),
         violations=frozenset()
     )
     

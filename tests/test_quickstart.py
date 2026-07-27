@@ -49,7 +49,7 @@ def test_readme_quick_start():
         reference="INV-2026-A",
         amount=Decimal("15000.00"),
         record_date=date(2026, 1, 15),
-        tax_identity="07ABCDE1234F1Z1"
+        tax_identity="07ABCDE1234F1Z2"
     )
 
     gst = GSTRecord(
@@ -58,7 +58,7 @@ def test_readme_quick_start():
         reference="2026-A",
         amount=Decimal("15000.00"),
         record_date=date(2026, 1, 16),
-        tax_identity="07ABCDE1234F1Z1"
+        tax_identity="07ABCDE1234F1Z2"
     )
 
     # 4. Evaluate Match

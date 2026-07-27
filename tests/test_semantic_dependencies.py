@@ -1,7 +1,7 @@
 import pytest
-from recongraph.domain.identity import IdentityDomainId, IdentityDigest
-from recongraph.domain.dependencies import SemanticDependencyRef, SemanticDependencyKind, DependencyStability
-from recongraph.domain.derivations import DerivationIdentity, ProviderSemanticVersion, DerivationMethodDescriptor, ProviderId, DerivationMethodId
+from recongraph.contrib.kernel.identity import IdentityDomainId, IdentityDigest
+from recongraph.contrib.kernel.dependencies import SemanticDependencyRef, SemanticDependencyKind, DependencyStability
+from recongraph.contrib.kernel.derivations import DerivationIdentity, ProviderSemanticVersion, DerivationMethodDescriptor, ProviderId, DerivationMethodId
 
 
 def _dummy_method():

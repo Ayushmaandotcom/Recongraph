@@ -71,7 +71,7 @@ class SemanticPropagator:
                 corroborations[edge.source_id].append(edge.target_id)
                 corroborations[edge.target_id].append(edge.source_id)
                 
-        def dfs_detect_cycle(node_id: str):
+        def dfs_detect_cycle(node_id: str) -> None:
             visited.add(node_id)
             recursion_stack.add(node_id)
             
@@ -119,7 +119,7 @@ class SemanticPropagator:
                 propagated[node_id].status = PropagationStatus.CONTRADICTED
                 
         questioned_nodes = set()
-        def propagate_questioned_upstream(node_id: str):
+        def propagate_questioned_upstream(node_id: str) -> None:
             for parent in upstream[node_id]:
                 if parent not in questioned_nodes and parent not in contradicted_nodes:
                     questioned_nodes.add(parent)

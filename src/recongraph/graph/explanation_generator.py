@@ -74,7 +74,7 @@ class ExplanationGenerator:
             node_id="DECISION_NODE",
             identity_hash=hashlib.sha256(f"{action}_{self.fusion_result.coverage}".encode()).hexdigest(),
             dependencies=(trace_node.node_id, "FUSION_NODE"),
-            action=action,
+            action=self.decision.action,
             rationale="Deterministic evaluation of Fusion Result",
             coverage=self.fusion_result.coverage
         )

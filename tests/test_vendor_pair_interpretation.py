@@ -45,8 +45,8 @@ def test_semantic_symmetry(default_context):
     assert interp_ab.lexical_relation.state == LexicalRelationState.BOTH_MISSING
 
 def test_gstin_and_pan_dependence(default_context):
-    gstin1 = "07ABCDE1234F1Z5"
-    gstin2 = "09ABCDE1234F1Z1"
+    gstin1 = "07ABCDE1234F1Z2"
+    gstin2 = "09ABCDE1234F1ZY"
     
     left, left_id = parse_and_wrap(gstin1)
     right, right_id = parse_and_wrap(gstin2)

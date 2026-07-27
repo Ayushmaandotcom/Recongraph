@@ -10,13 +10,13 @@ def test_tax_intelligence_engine_assertions():
     p1 = PurchaseRecord(
         record_id="p1", vendor_name="V", reference="1", 
         amount=Decimal("118"), record_date=date(2023,1,1),
-        tax_identity="27ABCDE1234F1Z5", net_amount=Decimal("100"), 
+        tax_identity="27ABCDE1234F1Z0", net_amount=Decimal("100"), 
         tax_amount=Decimal("18"), tax_rate=Decimal("18")
     )
     g1 = GSTRecord(
         record_id="g1", vendor_name="V", reference="1", 
         amount=Decimal("118"), record_date=date(2023,1,1),
-        tax_identity="27ABCDE1234F1Z5", net_amount=Decimal("100"), 
+        tax_identity="27ABCDE1234F1Z0", net_amount=Decimal("100"), 
         tax_amount=Decimal("18"), tax_rate=Decimal("18")
     )
 
@@ -42,13 +42,13 @@ def test_tax_intelligence_engine_conflict():
     p1 = PurchaseRecord(
         record_id="p1", vendor_name="V", reference="1", 
         amount=Decimal("118"), record_date=date(2023,1,1),
-        tax_identity="27ABCDE1234F1Z5", net_amount=Decimal("100"), 
+        tax_identity="27ABCDE1234F1Z0", net_amount=Decimal("100"), 
         tax_amount=Decimal("18"), tax_rate=Decimal("18")
     )
     g1 = GSTRecord(
         record_id="g1", vendor_name="V", reference="1", 
         amount=Decimal("105"), record_date=date(2023,1,1),
-        tax_identity="27ABCDE1234F1Z5", net_amount=Decimal("100"), 
+        tax_identity="27ABCDE1234F1Z0", net_amount=Decimal("100"), 
         tax_amount=Decimal("5"), tax_rate=Decimal("5")
     )
 

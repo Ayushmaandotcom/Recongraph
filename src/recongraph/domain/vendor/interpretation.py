@@ -12,7 +12,7 @@ from recongraph.domain.vendor.factors import (
     CorpusDistinctiveness, CorpusDistinctivenessState,
     OrganizationalRelation, OrganizationalRelationState
 )
-from recongraph.domain.derivations import DerivedArtifactIdentity
+from recongraph.contrib.kernel.derivations import DerivedArtifactIdentity
 
 @dataclass(frozen=True)
 class VendorIdentityInterpretation:

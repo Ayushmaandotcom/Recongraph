@@ -1,7 +1,7 @@
 import pytest
 import json
-from recongraph.domain.claims import ClaimDescriptor, ClaimSymmetry
-from recongraph.domain.scopes import ScopeKind, SubjectRef, PropositionSubject
+from recongraph.contrib.kernel.claims import ClaimDescriptor, ClaimSymmetry
+from recongraph.contrib.kernel.scopes import ScopeKind, SubjectRef, PropositionSubject
 
 @pytest.fixture
 def sym_descriptor():

@@ -9,7 +9,7 @@ class FusionNode:
     A vertex in the EvidenceGraph representing a single domain's contribution.
     """
     node_id: str
-    contribution: EvidenceContributionV2
+    contribution: EvidenceContributionV2[Any]
     
     @property
     def domain(self) -> str:
@@ -48,7 +48,7 @@ class FusionNode:
         return cls(node_id=data["node_id"], contribution=contrib)
 
     @classmethod
-    def from_contribution(cls, contribution: EvidenceContributionV2) -> 'FusionNode':
+    def from_contribution(cls, contribution: EvidenceContributionV2[Any]) -> 'FusionNode':
         h = hashlib.sha256()
         h.update(contribution.provider_name.encode('utf-8'))
         if contribution.interpretation is not None:

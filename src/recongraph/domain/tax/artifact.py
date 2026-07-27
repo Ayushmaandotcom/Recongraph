@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from recongraph.domain.derivations import (
+from recongraph.contrib.kernel.derivations import (
     DerivedArtifactIdentity,
     DerivedArtifactTypeId,
     CanonicalPayloadEnvelope

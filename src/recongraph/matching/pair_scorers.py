@@ -1,5 +1,6 @@
 from collections.abc import Mapping
 from dataclasses import dataclass
+from typing import Any
 
 from recongraph.domain.records import GSTRecord, PurchaseRecord
 from recongraph.matching.scoring import (
@@ -46,7 +47,7 @@ PURCHASE_TO_GST_POLICY_WITH_SEMANTICS = RelationshipPolicy(
 @dataclass(frozen=True)
 class PairScoringResult:
     """Represent raw evidence contributions from Providers."""
-    contributions: Mapping[str, EvidenceContributionV2]
+    contributions: Mapping[str, EvidenceContributionV2[Any]]
     
     @property
     def signals(self) -> dict[str, float | None]:
@@ -88,10 +89,10 @@ def score_purchase_to_gst(
     # 1. Collect ReliabilityEnvelopes
     envelopes = []
     for record in purchases + gsts:
-        if getattr(record, "reliability_envelope", None):
-            envelopes.append(record.reliability_envelope)
-        elif getattr(record, "ocr_confidence_report", None):
-            envelopes.append(convert_ocr_report_to_envelope(record.ocr_confidence_report))
+        if env := getattr(record, "reliability_envelope", None):
+            envelopes.append(env)
+        elif report := getattr(record, "ocr_confidence_report", None):
+            envelopes.append(convert_ocr_report_to_envelope(report))
             
     # 2. Evaluate Evidence Providers
     for provider in providers:
@@ -114,7 +115,8 @@ def score_purchase_to_gst(
         
         fields_to_check = set((r.signal_name, r.field_name) for r in policy.attenuation_policy.rules)
         for signal_name, field_name in fields_to_check:
-            if signal_name not in signals or signals[signal_name] is None:
+            sig_val = signals.get(signal_name)
+            if sig_val is None:
                 continue
                 
             lowest_quality = None
@@ -127,7 +129,7 @@ def score_purchase_to_gst(
                             
             if lowest_quality is not None:
                 weight, new_violations = policy.attenuation_policy.apply(signal_name, lowest_quality)
-                signals[signal_name] *= weight
+                signals[signal_name] = sig_val * weight
                 violations.update(new_violations)
             
     semantic_findings = analyze_purchase_gst_semantics(signals)

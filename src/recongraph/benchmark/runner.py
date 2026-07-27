@@ -139,3 +139,91 @@ class BenchmarkRunner:
                 decision_ms=decision_ms
             )
         )
+
+def execute_reconbench(size: int = 1000, enable_faf: bool = False) -> int:
+    import json
+    from recongraph.synthetic.reconbench import generate_reconbench_dataset
+    from recongraph.benchmark.evaluator import evaluate_results
+    from recongraph.benchmark.faf import generate_faf_report
+    from recongraph.plugins.core_providers import FinancialEvidenceProvider, TemporalEvidenceProvider, TaxEvidenceProvider, VendorEvidenceProvider, ReferenceEvidenceProvider
+    from recongraph.matching.reference_evidence import ReferenceCorpusProfile, ReferenceEvidenceContext, ReferenceEvidencePolicy
+    from recongraph.domain.vendor.context import VendorIdentityContext, VendorCorpusProfile
+    from recongraph.engine import ReconGraphEngine
+    from recongraph.matching.pair_scorers import PURCHASE_TO_GST_POLICY
+    from recongraph.graph.decision import DecisionPolicy
+    
+    print(f"Generating ReconBench dataset with {size} scenarios...")
+    scenarios = generate_reconbench_dataset(size=size)
+    
+    # We need basic contexts
+    corpus_profile = ReferenceCorpusProfile(reference_count=1, normalized_reference_frequency={'dummy': 1}, numeric_token_document_frequency={})
+    ref_context = ReferenceEvidenceContext(corpus_profile, ReferenceEvidencePolicy())
+    vendor_context = VendorIdentityContext(
+        corpus_profile=VendorCorpusProfile(corpus_size=1, token_document_frequencies={}, digest="1"),
+        interpreter_policy_version="1.0.0",
+        fuzzy_minimum_length=6,
+        fuzzy_threshold=0.85
+    )
+    
+    providers = [
+        FinancialEvidenceProvider(),
+        TemporalEvidenceProvider(),
+        TaxEvidenceProvider(),
+        VendorEvidenceProvider(vendor_context),
+        ReferenceEvidenceProvider(ref_context)
+    ]
+    
+    from recongraph.config import ReconGraphConfig, DecisionConfig, DecisionMode
+    
+    config = ReconGraphConfig(decision_config=DecisionConfig(decision_mode=DecisionMode.FUSION))
+    engine = ReconGraphEngine(
+        config=config,
+        providers=providers
+    )
+    
+    results = []
+    print(f"Executing engine against {size} scenarios...")
+    
+    for spec in scenarios:
+        # Resolve mutations
+        purchases = list(spec.base_purchases)
+        gsts = list(spec.base_gsts)
+        for idx, op in spec.purchase_mutations:
+            purchases[idx] = op.apply(purchases[idx])
+        for idx, op in spec.gst_mutations:
+            gsts[idx] = op.apply(gsts[idx])
+            
+        result = engine.reconcile(purchases, gsts)
+        results.append((result, spec.expected_outcome))
+        
+        if enable_faf:
+            from recongraph.graph.decision import DecisionAction
+            matched = len(result.auto_matches) > 0
+            reviewed = len(result.review_packets) > 0
+            
+            expected = spec.expected_outcome.expected_decision
+            actual = DecisionAction.AUTO_MATCH if matched else (DecisionAction.REVIEW_WEAK if reviewed else DecisionAction.NO_MATCH)
+            
+            # Identify Failure: (simplistic check for FAF)
+            if expected == DecisionAction.AUTO_MATCH and not matched:
+                generate_faf_report(spec, purchases, gsts, result, actual)
+            elif expected != DecisionAction.AUTO_MATCH and matched:
+                generate_faf_report(spec, purchases, gsts, result, actual)
+        
+    print("Evaluating metrics...")
+    metrics = evaluate_results(results)
+    
+    print("\n================ ReconBench Results ================")
+    print(f"Total Scenarios:    {metrics.total_scenarios}")
+    print(f"True Positives:     {metrics.true_positives}")
+    print(f"False Positives:    {metrics.false_positives}")
+    print(f"False Negatives:    {metrics.false_negatives}")
+    print(f"Precision:          {metrics.precision:.4f}")
+    print(f"Recall:             {metrics.recall:.4f}")
+    print(f"Review Rate:        {metrics.review_rate:.2%}")
+    print(f"Exact Match Rate:   {metrics.exact_match_rate:.2%}")
+    print("==================================================\n")
+    
+    # Return 0 on success (or if precision/recall are decent), 1 on catastrophic failure
+    return 0 if metrics.precision > 0.0 else 1
+

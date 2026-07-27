@@ -41,8 +41,8 @@ def test_golden_path_execution_trace() -> None:
     to DecisionTrace and ExplanationBuilder.
     """
     # 1. Raw Records
-    purchase = PurchaseRecord(record_id='p1', vendor_name='CloudLedger Software Private Limited', reference='CL-JUN-123', amount=Decimal('25000.0'), record_date=date(2026, 6, 5), tax_identity='07CLOUD1234A1Z1')
-    gst = GSTRecord(record_id='g1', vendor_name='CLOUDLEDGER SOFTWARE PVT LTD', reference='CL-JUN-123', amount=Decimal('25000.0'), record_date=date(2026, 6, 5), tax_identity='07CLOUD1234A1Z1')
+    purchase = PurchaseRecord(record_id='p1', vendor_name='CloudLedger Software Private Limited', reference='CL-JUN-123', amount=Decimal('25000.0'), record_date=date(2026, 6, 5), tax_identity='07CLOUD1234A1ZF')
+    gst = GSTRecord(record_id='g1', vendor_name='CLOUDLEDGER SOFTWARE PVT LTD', reference='CL-JUN-123', amount=Decimal('25000.0'), record_date=date(2026, 6, 5), tax_identity='07CLOUD1234A1ZF')
 
     # 2. Setup Contexts
     vendor_context = _get_vendor_context()

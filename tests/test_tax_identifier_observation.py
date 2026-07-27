@@ -132,9 +132,9 @@ def test_obs_019_pan_shaped():
     assert art.gstin_candidate is None
 
 def test_obs_020_gstin_shaped():
-    art = DeterministicTaxParser.parse("07ABCDE1234F1Z5")
+    art = DeterministicTaxParser.parse("07ABCDE1234F1Z2")
     assert art.observation.observation_state == TaxObservationState.PRESENT
-    assert art.observation.raw_value == "07ABCDE1234F1Z5"
+    assert art.observation.raw_value == "07ABCDE1234F1Z2"
     assert art.observation.candidate_type == TaxIdentifierCandidateType.GSTIN
-    assert art.gstin_candidate == "07ABCDE1234F1Z5"
+    assert art.gstin_candidate == "07ABCDE1234F1Z2"
     assert art.gstin_valid is True

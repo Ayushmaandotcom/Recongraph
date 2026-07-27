@@ -88,7 +88,7 @@ def test_evaluator_case_2(empty_reference_context):
     result = evaluator.evaluate(builder.build(), hypothesis)
     
     assert result.eligibility == EligibilityStatus.ELIGIBLE
-    assert result.supporting_evidence["signals"][SignalName.AMOUNT] == 1.0
+    assert result.supporting_evidence.signals[SignalName.AMOUNT] == 1.0
     assert result.score > 0.7
 
 def test_evaluator_case_3(empty_reference_context):
@@ -118,7 +118,7 @@ def test_evaluator_case_3(empty_reference_context):
     evaluator = HypothesisEvaluator(providers, PURCHASE_TO_GST_POLICY)
     result = evaluator.evaluate(builder.build(), hypothesis)
     
-    assert result.supporting_evidence["signals"][SignalName.AMOUNT] < 1.0
+    assert result.supporting_evidence.signals[SignalName.AMOUNT] < 1.0
     assert result.score < 0.9
 
 def test_evaluator_case_4(empty_reference_context):

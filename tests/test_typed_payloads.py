@@ -1,6 +1,6 @@
 import pytest
-from recongraph.domain.payloads import CanonicalPayloadEnvelope, TypedPayloadEnvelope
-from recongraph.domain.identity import canonical_encode
+from recongraph.contrib.kernel.payloads import CanonicalPayloadEnvelope, TypedPayloadEnvelope
+from recongraph.contrib.kernel.identity import canonical_encode
 
 
 def test_tpe001_typed_payload_envelope():

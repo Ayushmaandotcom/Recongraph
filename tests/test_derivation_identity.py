@@ -2,7 +2,7 @@ import pytest
 import json
 from dataclasses import dataclass
 
-from recongraph.domain.derivations import (
+from recongraph.contrib.kernel.derivations import (
     ProviderId,
     ProviderSemanticVersion,
     DerivationMethodId,
@@ -10,8 +10,8 @@ from recongraph.domain.derivations import (
     DerivationInputBinding,
     DerivationIdentity
 )
-from recongraph.domain.observations import ObservationSlot, ObservationState, Observation, FieldPath
-from recongraph.domain.scopes import SubjectRef
+from recongraph.contrib.kernel.observations import ObservationSlot, ObservationState, Observation, FieldPath
+from recongraph.contrib.kernel.scopes import SubjectRef
 
 
 def test_provider_id_validation():

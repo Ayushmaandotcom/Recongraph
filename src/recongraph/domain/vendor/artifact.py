@@ -1,4 +1,4 @@
-from recongraph.domain.derivations import (
+from recongraph.contrib.kernel.derivations import (
     DerivedArtifactTypeId,
     DerivedArtifactIdentity,
     CanonicalPayloadEnvelope,

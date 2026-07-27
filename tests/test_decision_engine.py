@@ -1,3 +1,4 @@
+from recongraph.matching.scoring import ScoringEvidence
 import pytest
 from recongraph.graph.hypotheses import EvaluatedHypothesis, Hypothesis, EligibilityStatus
 from recongraph.graph.decision import DecisionEngine, DecisionPolicy, DecisionAction
@@ -10,7 +11,7 @@ def create_mock_hypothesis(score: float, eligibility: EligibilityStatus) -> Eval
         score=score,
         coverage=1.0,
         eligibility=eligibility,
-        supporting_evidence={},
+        supporting_evidence=ScoringEvidence(),
         violations=frozenset()
     )
 

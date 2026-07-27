@@ -13,6 +13,23 @@ from recongraph.domain.tax.observation import (
 GSTIN_PATTERN = re.compile(r"^([0-9]{2})([A-Z]{5}[0-9]{4}[A-Z]{1})([1-9A-Z]{1})(Z)([0-9A-Z]{1})$")
 PAN_PATTERN = re.compile(r"^[A-Z]{5}[0-9]{4}[A-Z]{1}$")
 
+def calculate_gstin_checksum(gstin_14: str) -> str:
+    """Calculate the Mod36 checksum for a 14-character GSTIN prefix."""
+    charset = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    factor = 1
+    total_sum = 0
+    for char in gstin_14:
+        try:
+            val = charset.index(char)
+        except ValueError:
+            return ""
+        product = val * factor
+        total_sum += (product // 36) + (product % 36)
+        factor = 2 if factor == 1 else 1
+    
+    checksum_val = (36 - (total_sum % 36)) % 36
+    return charset[checksum_val]
+
 class TaxNormalizationTransformation(Enum):
     UNICODE_NORMALIZATION = auto()
     CASE_NORMALIZATION = auto()
@@ -140,6 +157,9 @@ class DeterministicTaxParser:
         if len(final_str) == 15 and final_str.isalnum():
             gstin_candidate = final_str
             gstin_valid = bool(GSTIN_PATTERN.match(final_str))
+            if gstin_valid:
+                expected_checksum = calculate_gstin_checksum(final_str[:14])
+                gstin_valid = (expected_checksum == final_str[14])
             if gstin_valid:
                 pan_candidate = final_str[2:12]
                 pan_valid = True

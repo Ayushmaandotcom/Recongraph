@@ -2,7 +2,7 @@ import pytest
 import json
 from dataclasses import dataclass
 
-from recongraph.domain.lineage import (
+from recongraph.contrib.kernel.lineage import (
     SourceSystemId,
     SourceArtifactId,
     SourceLocator
@@ -118,10 +118,10 @@ def test_sl018_source_system_does_not_parse_provider_identity():
     assert sys_id.value == "recongraph.vendor"
 
 
-from recongraph.domain.observations import ObservationSlot, ObservationState, Observation, FieldPath
-from recongraph.domain.scopes import SubjectRef
-from recongraph.domain.lineage import StructuredSourceLineage, SourceVersionRef
-from recongraph.domain.observations import ObservationOccurrence
+from recongraph.contrib.kernel.observations import ObservationSlot, ObservationState, Observation, FieldPath
+from recongraph.contrib.kernel.scopes import SubjectRef
+from recongraph.contrib.kernel.lineage import StructuredSourceLineage, SourceVersionRef
+from recongraph.contrib.kernel.observations import ObservationOccurrence
 
 def test_structured_source_lineage_serialization():
     sys = SourceSystemId("sap.production")

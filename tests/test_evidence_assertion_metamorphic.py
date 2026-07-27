@@ -1,15 +1,15 @@
 import pytest
 import unicodedata
-from recongraph.domain.lineage import StructuredSourceLineage, SourceSystemId, SourceArtifactId, SourceLocator
-from recongraph.domain.observations import ObservationIdentity, ObservationSlot, ObservationState, Observation, FieldPath, ObservationOccurrenceIdentity, ObservationOccurrence
-from recongraph.domain.scopes import SubjectRef, Proposition, PropositionSubject, ScopeKind
-from recongraph.domain.identity import KernelIdentityRef, IdentityDomainId, IdentitySchemaId, IdentityDigest
-from recongraph.domain.dependencies import SemanticDependencyRef, SemanticDependencyKind, DependencyStability
-from recongraph.domain.derivations import DerivationIdentity, ProviderSemanticVersion, DerivationMethodDescriptor, ProviderId, DerivationMethodId, DerivationOccurrenceIdentity
-from recongraph.domain.payloads import CanonicalPayloadEnvelope, TypedPayloadEnvelope
-from recongraph.domain.assertions import EvidenceAssertion, AssertionPolarity, EvidenceAncestryRef, EvidenceInterpretationResult, EvidenceInterpretationState
-from recongraph.domain.authority import AuthorityDescriptor, AuthorityBasisId
-from recongraph.domain.claims import CoreClaims
+from recongraph.contrib.kernel.lineage import StructuredSourceLineage, SourceSystemId, SourceArtifactId, SourceLocator
+from recongraph.contrib.kernel.observations import ObservationIdentity, ObservationSlot, ObservationState, Observation, FieldPath, ObservationOccurrenceIdentity, ObservationOccurrence
+from recongraph.contrib.kernel.scopes import SubjectRef, Proposition, PropositionSubject, ScopeKind
+from recongraph.contrib.kernel.identity import KernelIdentityRef, IdentityDomainId, IdentitySchemaId, IdentityDigest
+from recongraph.contrib.kernel.dependencies import SemanticDependencyRef, SemanticDependencyKind, DependencyStability
+from recongraph.contrib.kernel.derivations import DerivationIdentity, ProviderSemanticVersion, DerivationMethodDescriptor, ProviderId, DerivationMethodId, DerivationOccurrenceIdentity
+from recongraph.contrib.kernel.payloads import CanonicalPayloadEnvelope, TypedPayloadEnvelope
+from recongraph.contrib.kernel.assertions import EvidenceAssertion, AssertionPolarity, EvidenceAncestryRef, EvidenceInterpretationResult, EvidenceInterpretationState
+from recongraph.contrib.kernel.authority import AuthorityDescriptor, AuthorityBasisId
+from recongraph.contrib.kernel.claims import CoreClaims
 
 
 def test_ma021_same_observation_content_different_lineage_changes_occurrence_identity():

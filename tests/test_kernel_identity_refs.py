@@ -1,5 +1,5 @@
 import pytest
-from recongraph.domain.identity import (
+from recongraph.contrib.kernel.identity import (
     IdentityDomainId, IdentitySchemaId, IdentityDigest, KernelIdentityRef
 )
 

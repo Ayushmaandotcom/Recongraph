@@ -59,8 +59,8 @@ class ExplanationBuilder:
                 evidence_summary=None
             )
 
-        signals = hypothesis.supporting_evidence.get("signals", {})
-        metadata = hypothesis.supporting_evidence.get("metadata", {})
+        signals = hypothesis.supporting_evidence.signals
+        metadata = hypothesis.supporting_evidence.metadata
         amount_meta = metadata.get(SignalName.AMOUNT, {})
         
         summary = EvidenceSummary(

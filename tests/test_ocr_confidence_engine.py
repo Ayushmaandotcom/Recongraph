@@ -225,7 +225,7 @@ class TestFinancialEvidenceProviderOcr:
         p = make_purchase("100.00")
         g = make_gst("100.00")
         result = evaluate_with_engine(p, g, [FinancialEvidenceProvider()])
-        amount_score = result.supporting_evidence["signals"]["amount"]
+        amount_score = result.supporting_evidence.signals["amount"]
         assert amount_score is not None
         assert amount_score >= 0.99
 
@@ -234,7 +234,7 @@ class TestFinancialEvidenceProviderOcr:
         p = make_purchase("100.00", ocr_report=ocr)
         g = make_gst("100.00")
         result = evaluate_with_engine(p, g, [FinancialEvidenceProvider()])
-        amount_score = result.supporting_evidence["signals"]["amount"]
+        amount_score = result.supporting_evidence.signals["amount"]
         assert amount_score is not None
         assert amount_score >= 0.99
 
@@ -243,7 +243,7 @@ class TestFinancialEvidenceProviderOcr:
         p = make_purchase("100.00", ocr_report=ocr)
         g = make_gst("100.00")
         result = evaluate_with_engine(p, g, [FinancialEvidenceProvider()])
-        amount_score = result.supporting_evidence["signals"]["amount"]
+        amount_score = result.supporting_evidence.signals["amount"]
         assert amount_score is not None
         assert abs(amount_score - 0.85) < 1e-6
 
@@ -252,7 +252,7 @@ class TestFinancialEvidenceProviderOcr:
         p = make_purchase("100.00", ocr_report=ocr)
         g = make_gst("100.00")
         result = evaluate_with_engine(p, g, [FinancialEvidenceProvider()])
-        amount_score = result.supporting_evidence["signals"]["amount"]
+        amount_score = result.supporting_evidence.signals["amount"]
         assert amount_score is not None
         assert abs(amount_score - 0.60) < 1e-6
         assert "OCR_AMOUNT_LOW_CONFIDENCE" in result.violations
@@ -262,7 +262,7 @@ class TestFinancialEvidenceProviderOcr:
         p = make_purchase("100.00", ocr_report=ocr)
         g = make_gst("100.00")
         result = evaluate_with_engine(p, g, [FinancialEvidenceProvider()])
-        amount_score = result.supporting_evidence["signals"]["amount"]
+        amount_score = result.supporting_evidence.signals["amount"]
         assert amount_score == 0.0
         assert "OCR_AMOUNT_UNREADABLE" in result.violations
 

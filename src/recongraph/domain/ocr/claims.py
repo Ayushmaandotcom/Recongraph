@@ -6,8 +6,8 @@ These claims allow the evidence engine to express:
  - That a field was completely unreadable (conflict on the underlying evidence).
 """
 
-from recongraph.domain.claims import ClaimDescriptor, ClaimId, ClaimSemanticVersion, ClaimSymmetry
-from recongraph.domain.scopes import ScopeKind
+from recongraph.contrib.kernel.claims import ClaimDescriptor, ClaimId, ClaimSemanticVersion, ClaimSymmetry
+from recongraph.contrib.kernel.scopes import ScopeKind
 
 # Emitted as SUPPORT when all key financial fields are >= HIGH confidence.
 OCR_HIGH_CONFIDENCE_CLAIM = ClaimDescriptor(

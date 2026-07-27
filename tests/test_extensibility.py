@@ -1,3 +1,4 @@
+from recongraph.matching.scoring import ScoringEvidence
 import pytest
 from decimal import Decimal
 from datetime import date
@@ -103,7 +104,7 @@ def test_review_packet_extracts_reliability_warnings():
     
     eval_hyp = EvaluatedHypothesis(
         hypothesis=hypothesis, score=0.8, coverage=1.0, 
-        eligibility=None, supporting_evidence={}, violations=frozenset()
+        eligibility=None, supporting_evidence=ScoringEvidence(), violations=frozenset()
     )
     
     # The review.py system should extract the box directly from the record envelope

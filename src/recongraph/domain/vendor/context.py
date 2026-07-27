@@ -2,7 +2,7 @@ import hashlib
 import json
 from dataclasses import dataclass, field
 from typing import Optional
-from recongraph.domain.identity import KernelIdentityRef, IdentityDomainId, IdentitySchemaId, IdentityDigest
+from recongraph.contrib.kernel.identity import KernelIdentityRef, IdentityDomainId, IdentitySchemaId, IdentityDigest
 from recongraph.domain.vendor.corpus import VendorCorpusProfile
 from recongraph.domain.vendor.knowledge import OrganizationalKnowledgeBase
 

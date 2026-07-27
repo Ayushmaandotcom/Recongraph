@@ -7,7 +7,7 @@ from recongraph.domain.tax.factors import GSTINRelationState, PANRelationState
 
 def test_tpi_001_exact_gstin_match():
     # Same GSTIN
-    gstin = "27ABCDE1234F1Z5"
+    gstin = "27ABCDE1234F1Z0"
     p_val = DeterministicTaxParser.parse(gstin)
     g_val = DeterministicTaxParser.parse(gstin)
     
@@ -22,8 +22,8 @@ def test_tpi_001_exact_gstin_match():
 
 def test_tpi_002_different_state_same_pan():
     # State 27 vs 29, same PAN
-    gstin_27 = "27ABCDE1234F1Z5"
-    gstin_29 = "29ABCDE1234F1Z5"
+    gstin_27 = "27ABCDE1234F1Z0"
+    gstin_29 = "29ABCDE1234F1ZW"
     p_val = DeterministicTaxParser.parse(gstin_27)
     g_val = DeterministicTaxParser.parse(gstin_29)
     
@@ -37,8 +37,8 @@ def test_tpi_002_different_state_same_pan():
 
 def test_tpi_003_distinct_pans():
     # Different PANs
-    gstin_1 = "27ABCDE1234F1Z5"
-    gstin_2 = "27ZZZZZ9999Z1Z5"
+    gstin_1 = "27ABCDE1234F1Z0"
+    gstin_2 = "27ZZZZZ9999Z1Z8"
     p_val = DeterministicTaxParser.parse(gstin_1)
     g_val = DeterministicTaxParser.parse(gstin_2)
     
@@ -53,7 +53,7 @@ def test_tpi_003_distinct_pans():
 def test_tpi_004_pan_vs_gstin_same_pan():
     # One is PAN, one is GSTIN derived PAN
     pan = "ABCDE1234F"
-    gstin = "27ABCDE1234F1Z5"
+    gstin = "27ABCDE1234F1Z0"
     p_val = DeterministicTaxParser.parse(pan)
     g_val = DeterministicTaxParser.parse(gstin)
     

@@ -20,6 +20,17 @@ class SemanticFinding(StrEnum):
     PAN_IDENTIFIER_CONFLICT = "pan_identifier_conflict"
     GST_REGISTRATION_IDENTIFIER_DIFFERENCE = "gst_registration_identifier_difference"
     LEGAL_FORM_LEXICAL_DIFFERENCE = "legal_form_lexical_difference"
+    AMOUNT_MULTIPLE = "amount_multiple"
+    
+    # Provider-level violations
+    OCR_AMOUNT_LOW_CONFIDENCE = "OCR_AMOUNT_LOW_CONFIDENCE"
+    OCR_AMOUNT_UNREADABLE = "OCR_AMOUNT_UNREADABLE"
+    OCR_DATE_LOW_CONFIDENCE = "OCR_DATE_LOW_CONFIDENCE"
+    OCR_DATE_UNREADABLE = "OCR_DATE_UNREADABLE"
+    
+    # Engine-level violations
+    EMPTY_HYPOTHESIS = "EMPTY_HYPOTHESIS"
+    MISSING_COUNTERPARTY = "MISSING_COUNTERPARTY"
 
 
 def analyze_purchase_gst_semantics(

@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from recongraph.graph.trace import DecisionTrace, TraceEvent, TraceStage, canonicalize_score
 from recongraph.graph.decision import ReconciliationDecision, DecisionAction
 from recongraph.graph.hypotheses import EvaluatedHypothesis, EligibilityStatus, Hypothesis
+from recongraph.matching.scoring import ScoringEvidence
 from recongraph.matching.purchase_gst_semantics import SemanticFinding
 
 def build_dummy_hypothesis(score=1.0, coverage=1.0) -> EvaluatedHypothesis:
@@ -18,11 +19,11 @@ def build_dummy_hypothesis(score=1.0, coverage=1.0) -> EvaluatedHypothesis:
         score=score,
         coverage=coverage,
         eligibility=EligibilityStatus.ELIGIBLE,
-        supporting_evidence={
-            "signals": {"amount": score},
-            "relationship": DummyRel(score),
-            "metadata": {"vendor_plugin": {}}
-        },
+        supporting_evidence=ScoringEvidence(
+            signals={"amount": score},
+            relationship=DummyRel(score),
+            metadata={"vendor_plugin": {}}
+        ),
         violations=frozenset(["EXACT_MATCH"])
     )
 
@@ -84,7 +85,7 @@ def test_trace_semantic_mutations():
 
     # 6. Provider interpretation / Projection identity changes
     h_proj = build_dummy_hypothesis(score=0.9, coverage=0.9)
-    h_proj.supporting_evidence["metadata"]["new_plugin"] = {}
+    h_proj.supporting_evidence.metadata["new_plugin"] = {}
     d_proj = ReconciliationDecision(action=DecisionAction.AUTO_MATCH, selected_hypothesis=h_proj, competitors=tuple(), rationale="Base")
     assert id_base != DecisionTrace.compute_identity("1.0", "hash1", frozenset(["n1", "n2"]), d_proj), "Projection identity mutation failed"
 

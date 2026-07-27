@@ -2,7 +2,7 @@ import pytest
 import json
 from dataclasses import dataclass
 
-from recongraph.domain.derivations import (
+from recongraph.contrib.kernel.derivations import (
     DerivedArtifactTypeId,
     DerivedArtifactIdentity,
     DerivedArtifact,

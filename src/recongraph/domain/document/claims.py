@@ -1,5 +1,5 @@
-from recongraph.domain.claims import ClaimDescriptor, ClaimId, ClaimSemanticVersion, ClaimSymmetry
-from recongraph.domain.scopes import ScopeKind
+from recongraph.contrib.kernel.claims import ClaimDescriptor, ClaimId, ClaimSemanticVersion, ClaimSymmetry
+from recongraph.contrib.kernel.scopes import ScopeKind
 
 HAS_VALID_SIGNATURE_REGION_CLAIM = ClaimDescriptor(
     claim_id=ClaimId("document.has_valid_signature_region"),

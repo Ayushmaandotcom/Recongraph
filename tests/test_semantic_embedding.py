@@ -3,7 +3,7 @@ from decimal import Decimal
 from datetime import date
 from recongraph.domain.records import PurchaseRecord, GSTRecord
 from recongraph.domain.semantics.claims import SAME_BUSINESS_PURPOSE_CLAIM
-from recongraph.domain.assertions import AssertionPolarity
+from recongraph.contrib.kernel.assertions import AssertionPolarity
 from recongraph.plugins.semantic_providers import SemanticEvidenceProvider
 
 def test_semantic_provider_support():
@@ -128,5 +128,5 @@ def test_semantic_provider_engine_integration():
     decision = result.auto_matches[0]
     
     # Verify semantic evidence was integrated into the decision
-    assert "semantics" in decision.selected_hypothesis.supporting_evidence["contributions"]
+    assert "semantics" in decision.selected_hypothesis.supporting_evidence.contributions
 

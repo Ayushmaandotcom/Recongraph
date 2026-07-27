@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Generic, TypeVar, Any
 from enum import Enum
 from recongraph.graph.candidate import NodeID, CandidateGraph
+from recongraph.matching.scoring import ScoringEvidence
 
 @dataclass(frozen=True)
 class ConnectedComponent:
@@ -44,6 +45,6 @@ class EvaluatedHypothesis:
     score: float
     coverage: float
     eligibility: EligibilityStatus
-    supporting_evidence: dict[str, Any]
+    supporting_evidence: ScoringEvidence
     violations: frozenset[str]
 

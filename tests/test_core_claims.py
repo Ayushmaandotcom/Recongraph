@@ -1,6 +1,6 @@
 import pytest
-from recongraph.domain.claims import CoreClaims
-from recongraph.domain.scopes import ScopeKind
+from recongraph.contrib.kernel.claims import CoreClaims
+from recongraph.contrib.kernel.scopes import ScopeKind
 
 def test_core_claim_ids_are_unique():
     # Extract all descriptors

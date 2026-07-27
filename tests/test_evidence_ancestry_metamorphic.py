@@ -1,12 +1,12 @@
 import pytest
 
-from recongraph.domain.lineage import (
+from recongraph.contrib.kernel.lineage import (
     SourceSystemId, SourceArtifactId, SourceLocator, StructuredSourceLineage
 )
-from recongraph.domain.observations import ObservationOccurrence
-from recongraph.domain.observations import ObservationSlot, ObservationState, Observation, FieldPath
-from recongraph.domain.scopes import SubjectRef
-from recongraph.domain.derivations import (
+from recongraph.contrib.kernel.observations import ObservationOccurrence
+from recongraph.contrib.kernel.observations import ObservationSlot, ObservationState, Observation, FieldPath
+from recongraph.contrib.kernel.scopes import SubjectRef
+from recongraph.contrib.kernel.derivations import (
     ProviderId, ProviderSemanticVersion, DerivationMethodId, DerivationMethodDescriptor,
     DerivationInputBinding, DerivationIdentity, DerivedArtifactTypeId, CanonicalPayloadEnvelope,
     DerivedArtifactIdentity

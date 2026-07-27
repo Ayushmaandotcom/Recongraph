@@ -1,5 +1,5 @@
-from recongraph.domain.claims import ClaimDescriptor, ClaimId, ClaimSemanticVersion, ClaimSymmetry
-from recongraph.domain.scopes import ScopeKind
+from recongraph.contrib.kernel.claims import ClaimDescriptor, ClaimId, ClaimSemanticVersion, ClaimSymmetry
+from recongraph.contrib.kernel.scopes import ScopeKind
 
 SAME_ECONOMIC_ENTITY_CLAIM = ClaimDescriptor(
     claim_id=ClaimId("vendor.same_economic_entity"),

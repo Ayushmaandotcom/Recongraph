@@ -6,7 +6,7 @@ from recongraph.domain.vendor.observation import (
 )
 from recongraph.domain.vendor.parser import DeterministicVendorParser
 from recongraph.domain.vendor.artifact import build_vendor_observation_artifact
-from recongraph.domain.derivations import DerivedArtifact
+from recongraph.contrib.kernel.derivations import DerivedArtifact
 
 def test_missing_and_empty_observations():
     obs_none = DeterministicVendorParser.parse(None)
@@ -84,7 +84,7 @@ def test_geographic_and_division_extraction():
 
 def test_gstin_and_pan_detection():
     # Valid GSTIN
-    gstin = "07ABCDE1234F1Z5"
+    gstin = "07ABCDE1234F1Z2"
     obs_gstin = DeterministicVendorParser.parse(gstin)
     assert obs_gstin.tax_artifact is not None
     assert obs_gstin.tax_artifact.gstin_candidate == gstin
@@ -94,7 +94,7 @@ def test_gstin_and_pan_detection():
     assert obs_gstin.tax_artifact.pan_derived_from_gstin is True
 
     # Invalid GSTIN but looks like one (e.g. wrong length or OCR error)
-    invalid_gstin = "07ABCDE1234F1Z5A" # 16 chars
+    invalid_gstin = "07ABCDE1234F1Z2A" # 16 chars
     obs_invalid = DeterministicVendorParser.parse(invalid_gstin)
     # The new deterministic tax parser classifies by length. 16 chars means UNKNOWN candidate type.
     # The vendor name is 16 chars long. Wait, if it doesn't match length, the candidate type is UNKNOWN.

@@ -51,6 +51,9 @@ def project_amount_similarity(interpretation: AmountInterpretation) -> Projected
     if interpretation.currency_relation in (CurrencyRelation.LEFT_MISSING, CurrencyRelation.RIGHT_MISSING, CurrencyRelation.BOTH_MISSING):
         warnings.append("MISSING_CURRENCY")
         
+    if interpretation.is_multiple:
+        warnings.append("AMOUNT_MULTIPLE")
+        
     return ProjectedAmountSimilarity(
         similarity=similarity,
         assumptions=("Projected using AmountSimilarityProjection.V2",),

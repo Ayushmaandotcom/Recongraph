@@ -1,3 +1,4 @@
+from recongraph.matching.scoring import ScoringEvidence
 import pytest
 from decimal import Decimal
 from recongraph.graph.hypotheses import EvaluatedHypothesis, Hypothesis, EligibilityStatus
@@ -40,18 +41,18 @@ def test_explain_auto_match():
         score=0.99,
             coverage=1.0,
         eligibility=EligibilityStatus.ELIGIBLE,
-        supporting_evidence={
-            "signals": {
+        supporting_evidence=ScoringEvidence(
+            signals={
                 SignalName.AMOUNT: 1.0,
                 SignalName.REFERENCE: 0.95,
                 SignalName.TEMPORAL: 1.0,
                 SignalName.ENTITY: 0.9,
                 SignalName.TAX_IDENTITY: 1.0
             },
-            "metadata": {
+            metadata={
                 SignalName.AMOUNT: mock_amount_meta(EqualityRelation.EQUAL, MagnitudeRelation.EQUAL, CurrencyRelation.SAME, SignRelation.SAME_POSITIVE, 1.0)
             }
-        },
+        ),
         violations=frozenset()
     )
     decision = ReconciliationDecision(
@@ -76,7 +77,7 @@ def test_explain_review_ambiguous():
         score=0.95,
             coverage=1.0,
         eligibility=EligibilityStatus.ELIGIBLE,
-        supporting_evidence={"signals": {SignalName.AMOUNT: 1.0}, "metadata": {SignalName.AMOUNT: mock_amount_meta(EqualityRelation.EQUAL, MagnitudeRelation.EQUAL, CurrencyRelation.SAME, SignRelation.SAME_POSITIVE, 1.0)}},
+        supporting_evidence=ScoringEvidence(signals={SignalName.AMOUNT: 1.0}, metadata={SignalName.AMOUNT: mock_amount_meta(EqualityRelation.EQUAL, MagnitudeRelation.EQUAL, CurrencyRelation.SAME, SignRelation.SAME_POSITIVE, 1.0)}),
         violations=frozenset()
     )
     h2 = EvaluatedHypothesis(
@@ -84,7 +85,7 @@ def test_explain_review_ambiguous():
         score=0.94,
             coverage=1.0,
         eligibility=EligibilityStatus.ELIGIBLE,
-        supporting_evidence={"signals": {SignalName.AMOUNT: 1.0}, "metadata": {SignalName.AMOUNT: mock_amount_meta(EqualityRelation.EQUAL, MagnitudeRelation.EQUAL, CurrencyRelation.SAME, SignRelation.SAME_POSITIVE, 1.0)}},
+        supporting_evidence=ScoringEvidence(signals={SignalName.AMOUNT: 1.0}, metadata={SignalName.AMOUNT: mock_amount_meta(EqualityRelation.EQUAL, MagnitudeRelation.EQUAL, CurrencyRelation.SAME, SignRelation.SAME_POSITIVE, 1.0)}),
         violations=frozenset()
     )
     
@@ -108,13 +109,13 @@ def test_explain_limiting_factors():
         score=0.5,
             coverage=1.0,
         eligibility=EligibilityStatus.ELIGIBLE,
-        supporting_evidence={
-            "signals": {
+        supporting_evidence=ScoringEvidence(
+            signals={
                 SignalName.TEMPORAL: 0.3,
                 SignalName.REFERENCE: None
             },
             # No AMOUNT metadata provided to simulate missing amount evidence
-        },
+        ),
         violations=frozenset(["TAX_IDENTITY_CONFLICT"])
     )
     decision = ReconciliationDecision(

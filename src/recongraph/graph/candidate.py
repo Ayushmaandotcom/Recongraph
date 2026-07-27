@@ -62,7 +62,7 @@ class CandidateGraph:
         return self._edges
 
 class CandidateGraphBuilder:
-    def __init__(self):
+    def __init__(self) -> None:
         self._nodes: dict[NodeID, Any] = {}
         self._adjacency: dict[NodeID, set[NodeID]] = {}
         self._edges: dict[frozenset[NodeID], set[str]] = {}

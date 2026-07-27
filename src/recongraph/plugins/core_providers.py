@@ -11,6 +11,7 @@ from recongraph.matching.reference_evidence import ReferenceEvidenceContext, com
 from recongraph.domain.financial.pipeline import FinancialEvidencePipeline
 from recongraph.domain.temporal.interpretation import TemporalPairInterpretation
 from recongraph.domain.reference.interpretation import ReferencePairInterpretation
+from recongraph.matching.purchase_gst_semantics import SemanticFinding
 
 from recongraph.domain.vendor.context import VendorIdentityContext
 from recongraph.domain.vendor.parser import DeterministicVendorParser
@@ -48,8 +49,8 @@ class FinancialEvidenceProvider:
     'amount' field. Low-confidence amounts emit a dedicated violation so the
     decision engine can route to review.
     """
-    OCR_LOW_CONFIDENCE_VIOLATION = "OCR_AMOUNT_LOW_CONFIDENCE"
-    OCR_UNREADABLE_VIOLATION = "OCR_AMOUNT_UNREADABLE"
+    OCR_LOW_CONFIDENCE_VIOLATION = SemanticFinding.OCR_AMOUNT_LOW_CONFIDENCE
+    OCR_UNREADABLE_VIOLATION = SemanticFinding.OCR_AMOUNT_UNREADABLE
 
     def __init__(self, tolerance: float = 0.05):
         from decimal import Decimal
@@ -109,13 +110,13 @@ class TemporalEvidencePipeline(EvidencePipeline[TemporalObservation, tuple[Tempo
     def contribute(self, interpretation: tuple[TemporalPairInterpretation, ...]) -> EvidenceContributionV2[tuple[TemporalPairInterpretation, ...]]:
         from recongraph.domain.temporal.projection import TemporalV1ProjectionContract
         from recongraph.domain.temporal.claims import SAME_FISCAL_PERIOD_CLAIM, VALID_LATE_FILING_CLAIM
-        from recongraph.domain.scopes import Proposition, ScopeKind, SubjectRef
-        from recongraph.domain.assertions import EvidenceAssertion, AssertionPolarity
-        from recongraph.domain.authority import AuthorityDescriptor, AuthorityBasisId
+        from recongraph.contrib.kernel.scopes import Proposition, ScopeKind, SubjectRef
+        from recongraph.contrib.kernel.assertions import EvidenceAssertion, AssertionPolarity
+        from recongraph.contrib.kernel.authority import AuthorityDescriptor, AuthorityBasisId
         from recongraph.domain.temporal.factors import TemporalRelationState
         # For missing ancestry, we mock it for tests for now just like in Semantic
-        from recongraph.domain.assertions import EvidenceAncestryRef
-        from recongraph.domain.identity import KernelIdentityRef, IdentityDomainId, IdentitySchemaId, IdentityDigest
+        from recongraph.contrib.kernel.assertions import EvidenceAncestryRef
+        from recongraph.contrib.kernel.identity import KernelIdentityRef, IdentityDomainId, IdentitySchemaId, IdentityDigest
         mock_ancestry = EvidenceAncestryRef(
             identity=KernelIdentityRef(
                 domain=IdentityDomainId("recongraph.observation_occurrence"),
@@ -185,8 +186,8 @@ class TemporalEvidenceProvider:
     (the date can still match correctly even if OCR was uncertain) but
     the violation causes the packet to include highlight bounding boxes.
     """
-    OCR_DATE_LOW_CONFIDENCE_VIOLATION = "OCR_DATE_LOW_CONFIDENCE"
-    OCR_DATE_UNREADABLE_VIOLATION = "OCR_DATE_UNREADABLE"
+    OCR_DATE_LOW_CONFIDENCE_VIOLATION = SemanticFinding.OCR_DATE_LOW_CONFIDENCE
+    OCR_DATE_UNREADABLE_VIOLATION = SemanticFinding.OCR_DATE_UNREADABLE
 
     def __init__(self, max_days: int = 7):
         self.max_days = max_days
@@ -220,11 +221,11 @@ from recongraph.domain.tax.parser import DeterministicTaxParser
 from recongraph.domain.tax.artifact import TaxIntelligenceArtifact
 from recongraph.domain.tax.interpretation import TaxIntelligenceInterpreter, TaxIntelligenceInterpretation
 from recongraph.domain.tax.factors import GSTINRelationState, PANRelationState, RegimeRelationState, GrossNetRelationState
-from recongraph.domain.scopes import Proposition, PropositionSubject, ScopeKind, SubjectRef
-from recongraph.domain.assertions import EvidenceAssertionIdentity, EvidenceAssertion, AssertionPolarity
-from recongraph.domain.authority import AuthorityDescriptor, AuthorityBasisId
-from recongraph.domain.assertions import EvidenceAncestryRef
-from recongraph.domain.identity import KernelIdentityRef, IdentityDomainId, IdentitySchemaId, IdentityDigest
+from recongraph.contrib.kernel.scopes import Proposition, PropositionSubject, ScopeKind, SubjectRef
+from recongraph.contrib.kernel.assertions import EvidenceAssertionIdentity, EvidenceAssertion, AssertionPolarity
+from recongraph.contrib.kernel.authority import AuthorityDescriptor, AuthorityBasisId
+from recongraph.contrib.kernel.assertions import EvidenceAncestryRef
+from recongraph.contrib.kernel.identity import KernelIdentityRef, IdentityDomainId, IdentitySchemaId, IdentityDigest
 from recongraph.domain.tax.claims import SAME_TAX_IDENTITY_CLAIM, VALID_REGIME_ALIGNMENT_CLAIM, GROSS_NET_CONSISTENCY_CLAIM
 
 class TaxEvidencePipeline(EvidencePipeline[TaxObservation, tuple[TaxIntelligenceInterpretation, ...]]):
@@ -333,7 +334,7 @@ class VendorObservationPayload:
 class VendorEvidencePipeline(EvidencePipeline[VendorObservationPayload, Any]):
     def __init__(self, context: VendorIdentityContext):
         from recongraph.domain.vendor.observation import VendorNameObservation
-        from recongraph.domain.derivations import DerivedArtifactIdentity
+        from recongraph.contrib.kernel.derivations import DerivedArtifactIdentity
         self.context = context
         self._artifact_cache: dict[str | None, tuple[VendorNameObservation, DerivedArtifactIdentity]] = {}
 
@@ -376,10 +377,10 @@ class VendorEvidencePipeline(EvidencePipeline[VendorObservationPayload, Any]):
             
         weakest_similarity, weakest_interp, weakest_proj = interpretation
         
-        from recongraph.domain.assertions import EvidenceAncestryRef, EvidenceAssertion, AssertionPolarity
-        from recongraph.domain.scopes import Proposition, ScopeKind, SubjectRef
-        from recongraph.domain.authority import AuthorityDescriptor, AuthorityBasisId
-        from recongraph.domain.identity import KernelIdentityRef, IdentityDomainId, IdentitySchemaId, IdentityDigest
+        from recongraph.contrib.kernel.assertions import EvidenceAncestryRef, EvidenceAssertion, AssertionPolarity
+        from recongraph.contrib.kernel.scopes import Proposition, ScopeKind, SubjectRef
+        from recongraph.contrib.kernel.authority import AuthorityDescriptor, AuthorityBasisId
+        from recongraph.contrib.kernel.identity import KernelIdentityRef, IdentityDomainId, IdentitySchemaId, IdentityDigest
         from recongraph.domain.vendor.claims import (
             SAME_ECONOMIC_ENTITY_CLAIM, SAME_LEGAL_ENTITY_CLAIM,
             SHARED_TAX_REGISTRATION_CLAIM, ALIAS_MATCH_CLAIM
@@ -492,8 +493,8 @@ class ReferenceEvidencePipeline(EvidencePipeline[ReferenceObservation, tuple[Ref
         self.context = context
 
     def extract(self, purchases: Sequence[PurchaseRecord], gsts: Sequence[GSTRecord]) -> ReferenceObservation:
-        p_refs = " ".join(p.reference for p in purchases if p.reference)
-        g_refs = " ".join(g.reference for g in gsts if g.reference)
+        p_refs = " ".join(sorted(set(p.reference for p in purchases if p.reference)))
+        g_refs = " ".join(sorted(set(g.reference for g in gsts if g.reference)))
         return ReferenceObservation(p_refs=p_refs, g_refs=g_refs)
 
     def interpret(self, observation: ReferenceObservation) -> tuple[ReferencePairInterpretation, ...]:
@@ -573,10 +574,10 @@ class DocumentEvidencePipeline(EvidencePipeline[DocumentObservationPayload, Any]
                 interpretation=None
             )
             
-        from recongraph.domain.assertions import EvidenceAncestryRef, EvidenceAssertion, AssertionPolarity
-        from recongraph.domain.scopes import Proposition, ScopeKind, SubjectRef
-        from recongraph.domain.authority import AuthorityDescriptor, AuthorityBasisId
-        from recongraph.domain.identity import KernelIdentityRef, IdentityDomainId, IdentitySchemaId, IdentityDigest
+        from recongraph.contrib.kernel.assertions import EvidenceAncestryRef, EvidenceAssertion, AssertionPolarity
+        from recongraph.contrib.kernel.scopes import Proposition, ScopeKind, SubjectRef
+        from recongraph.contrib.kernel.authority import AuthorityDescriptor, AuthorityBasisId
+        from recongraph.contrib.kernel.identity import KernelIdentityRef, IdentityDomainId, IdentitySchemaId, IdentityDigest
         from recongraph.domain.document.claims import (
             HAS_VALID_SIGNATURE_REGION_CLAIM, TOTALS_BLOCK_CONSISTENCY_CLAIM, HEADER_MATCH_CLAIM
         )

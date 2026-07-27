@@ -54,8 +54,9 @@ def _collect_ocr_data_from_records(
 
     for record in purchases + gsts:
         env = getattr(record, "reliability_envelope", None)
-        if not env and getattr(record, "ocr_confidence_report", None):
-            env = convert_ocr_report_to_envelope(record.ocr_confidence_report)
+        if not env:
+            if report := getattr(record, "ocr_confidence_report", None):
+                env = convert_ocr_report_to_envelope(report)
             
         if not env:
             continue
@@ -74,7 +75,7 @@ def _collect_ocr_data_from_records(
 class ReviewPacketBuilder:
     """Constructs ReviewPackets exclusively for non-automated decisions."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._counter = 0
 
     def _generate_checklist(self, explanation: ExplanationArtifact | None, ocr_warnings: tuple[str, ...] = ()) -> tuple[str, ...]:
@@ -125,8 +126,8 @@ class ReviewPacketBuilder:
         if not target_hypothesis and decision.competitors:
             target_hypothesis = decision.competitors[0]
 
-        highlight_regions: tuple = ()
-        ocr_warnings: tuple = ()
+        highlight_regions: tuple['BoundingBox', ...] = ()
+        ocr_warnings: tuple[str, ...] = ()
 
         if target_hypothesis:
             for urn in target_hypothesis.hypothesis.matched_nodes:

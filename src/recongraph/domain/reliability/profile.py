@@ -1,7 +1,7 @@
 import hashlib
 from dataclasses import dataclass, field
 from typing import Optional, Any
-from recongraph.domain.identity import canonical_encode
+from recongraph.contrib.kernel.identity import canonical_encode
 
 from .dimensions import ExtractionQuality, ParserQuality, Completeness, VerificationState, ConfidenceProvenance
 from .reasons import ReliabilityReason

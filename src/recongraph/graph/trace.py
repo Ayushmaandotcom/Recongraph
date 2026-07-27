@@ -3,7 +3,7 @@ from enum import StrEnum
 from typing import Any
 from datetime import datetime, timezone
 import hashlib
-from recongraph.domain.identity import canonical_encode
+from recongraph.contrib.kernel.identity import canonical_encode
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -39,8 +39,8 @@ def _map_evaluated_hypothesis(h: 'EvaluatedHypothesis') -> dict[str, Any]:
     proposed_edges_list.sort()
     
     base_score = None
-    if "relationship" in h.supporting_evidence:
-        rel = h.supporting_evidence["relationship"]
+    if h.supporting_evidence.relationship is not None:
+        rel = h.supporting_evidence.relationship
         if hasattr(rel, "base_score"):
             base_score = rel.base_score
     
@@ -51,7 +51,7 @@ def _map_evaluated_hypothesis(h: 'EvaluatedHypothesis') -> dict[str, Any]:
         "base_score": canonicalize_score(base_score),
         "coverage": canonicalize_score(h.coverage),
         "relationship_score": canonicalize_score(h.score),
-        "provider_projection_identities": sorted(list(h.supporting_evidence.get("metadata", {}).keys()))
+        "provider_projection_identities": sorted(list(h.supporting_evidence.metadata.keys()))
     }
 
 @dataclass(frozen=True)
@@ -62,6 +62,11 @@ class DecisionTrace:
     config_hash: str
     events: tuple[TraceEvent, ...]
     
+    def to_json(self) -> str:
+        import json
+        from recongraph.serialization import ReconEncoder
+        return json.dumps(self, cls=ReconEncoder)
+
     @classmethod
     def compute_identity(cls, engine_version: str, config_hash: str, component_nodes: frozenset[str], decision: 'ReconciliationDecision | None' = None) -> str:
         """

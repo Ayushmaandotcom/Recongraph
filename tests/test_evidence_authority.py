@@ -1,5 +1,5 @@
 import pytest
-from recongraph.domain.authority import AuthorityBasisId, AuthorityDescriptor
+from recongraph.contrib.kernel.authority import AuthorityBasisId, AuthorityDescriptor
 
 
 def test_ea067_unknown_authority_basis_transported():

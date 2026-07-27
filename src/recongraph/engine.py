@@ -43,6 +43,21 @@ class ReconGraphEngine:
     def __init__(self, config: ReconGraphConfig, providers: Sequence[EvidenceProvider]):
         self.config = config
         self.providers = tuple(providers)
+
+    @property
+    def config_hash(self) -> str:
+        base_hash = str(self.config)
+        digests = []
+        for provider in self.providers:
+            ctx = getattr(provider, "context", None)
+            if ctx:
+                cp = getattr(ctx, "corpus_profile", None)
+                if cp and hasattr(cp, "digest"):
+                    digests.append(cp.digest)
+        if digests:
+            base_hash += "_" + "_".join(sorted(digests))
+        import hashlib
+        return hashlib.md5(base_hash.encode()).hexdigest()
         
     def reconcile(self, purchases: Sequence[PurchaseRecord], gsts: Sequence[GSTRecord]) -> ReconciliationResult:
         # 1. Candidate Generation
@@ -93,7 +108,7 @@ class ReconGraphEngine:
                         # Build EvidenceGraph from EvaluatedHypotheses
                         evidence_graph = EvidenceGraph()
                         for h in evaluated:
-                            contributions = h.supporting_evidence.get("contributions", {})
+                            contributions = h.supporting_evidence.contributions
                             for provider_name, contrib in contributions.items():
                                 # We must convert EvidenceContribution to EvidenceContributionV2
                                 contrib_v2: EvidenceContributionV2[Any] = EvidenceContributionV2(
@@ -128,7 +143,7 @@ class ReconGraphEngine:
                 # 7E: Trace Versioning (always generated)
                 trace_id = DecisionTrace.compute_identity(
                     engine_version=self.VERSION,
-                    config_hash=hashlib.md5(str(self.config).encode()).hexdigest(),
+                    config_hash=self.config_hash,
                     component_nodes=frozenset(comp.graph.nodes.keys()),
                     decision=decision
                 )
@@ -136,7 +151,7 @@ class ReconGraphEngine:
                 trace = DecisionTrace(
                     trace_id=trace_id,
                     engine_version=self.VERSION,
-                    config_hash=hashlib.md5(str(self.config).encode()).hexdigest(),
+                    config_hash=self.config_hash,
                     events=()
                 )
                 traces.append(trace)

@@ -1,7 +1,7 @@
 import pytest
 from decimal import Decimal
-from recongraph.domain.scopes import SubjectRef
-from recongraph.domain.observations import (
+from recongraph.contrib.kernel.scopes import SubjectRef
+from recongraph.contrib.kernel.observations import (
     FieldPath,
     ObservationSlot,
     ObservationState,

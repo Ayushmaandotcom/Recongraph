@@ -51,14 +51,14 @@ class CandidateGenerator:
                 
             # Aggregate matches: GSTRecord -> shared_keys
             matches = {}  # type: ignore
-            for key in purchase_keys:
+            for key in sorted(purchase_keys):
                 for gst in gst_index.query(key):
                     if gst not in matches:
                         matches[gst] = set()
                     matches[gst].add(key)
                     
-            # Yield candidate edges
-            for gst, shared_keys in matches.items():
+            # Yield candidate edges in deterministic order
+            for gst, shared_keys in sorted(matches.items(), key=lambda item: item[0].record_id):
                 yield CandidateEdge(
                     purchase=purchase,
                     gst_record=gst,

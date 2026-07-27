@@ -26,20 +26,20 @@ def _default_context() -> ReferenceEvidenceContext:
     return ReferenceEvidenceContext(profile=prof, policy=ReferenceEvidencePolicy())
 
 def test_purchase_record_preserves_financial_fields() -> None:
-    record = PurchaseRecord(record_id='dummy_p', vendor_name='ABC Steel Private Limited', reference='INV-1042', amount=Decimal('118000.0'), record_date=date(2026, 6, 12), tax_identity='07ABCDE1234F1Z5')
+    record = PurchaseRecord(record_id='dummy_p', vendor_name='ABC Steel Private Limited', reference='INV-1042', amount=Decimal('118000.0'), record_date=date(2026, 6, 12), tax_identity='07ABCDE1234F1Z2')
     assert record.vendor_name == 'ABC Steel Private Limited'
     assert record.reference == 'INV-1042'
     assert record.amount == 118000.0
     assert record.record_date == date(2026, 6, 12)
-    assert record.tax_identity == '07ABCDE1234F1Z5'
+    assert record.tax_identity == '07ABCDE1234F1Z2'
 
 def test_gst_record_preserves_financial_fields() -> None:
-    record = GSTRecord(record_id='dummy_g', vendor_name='ABC STEELS PVT. LTD.', reference='AB/1042', amount=Decimal('118000.0'), record_date=date(2026, 6, 13), tax_identity='07ABCDE1234F1Z5')
+    record = GSTRecord(record_id='dummy_g', vendor_name='ABC STEELS PVT. LTD.', reference='AB/1042', amount=Decimal('118000.0'), record_date=date(2026, 6, 13), tax_identity='07ABCDE1234F1Z2')
     assert record.vendor_name == 'ABC STEELS PVT. LTD.'
     assert record.reference == 'AB/1042'
     assert record.amount == 118000.0
     assert record.record_date == date(2026, 6, 13)
-    assert record.tax_identity == '07ABCDE1234F1Z5'
+    assert record.tax_identity == '07ABCDE1234F1Z2'
 
 def test_purchase_to_gst_policy_uses_expected_weights() -> None:
     assert PURCHASE_TO_GST_POLICY.weights == {

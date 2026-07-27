@@ -1,6 +1,6 @@
 import pytest
-from recongraph.domain.scopes import ScopeKind, SubjectRef, PropositionSubject, Proposition
-from recongraph.domain.claims import CoreClaims, ClaimDescriptor, ClaimSymmetry
+from recongraph.contrib.kernel.scopes import ScopeKind, SubjectRef, PropositionSubject, Proposition
+from recongraph.contrib.kernel.claims import CoreClaims, ClaimDescriptor, ClaimSymmetry
 
 
 def test_pi001_same_claim_and_version_accepted():

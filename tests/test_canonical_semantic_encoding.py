@@ -1,6 +1,6 @@
 import pytest
 import unicodedata
-from recongraph.domain.identity import canonical_encode
+from recongraph.contrib.kernel.identity import canonical_encode
 
 
 def test_ce001_mapping_key_insertion_order_invariant():
