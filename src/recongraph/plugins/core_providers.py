@@ -74,7 +74,6 @@ class FinancialEvidenceProvider:
             metadata=contrib_v2.metadata
         )
 
-
 @dataclass(frozen=True)
 class TemporalObservation:
     p_dates: tuple[datetime.date, ...]

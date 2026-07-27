@@ -60,6 +60,30 @@ class ParsedTaxIdentifierArtifact:
     
     normalization_events: Tuple[TaxNormalizationEvent, ...]
 
+    def to_dict(self) -> dict:
+        return {
+            "observation": {
+                "raw_value": self.observation.raw_value,
+                "source_field_identity": self.observation.source_field_identity,
+                "candidate_type": self.observation.candidate_type.name,
+                "observation_state": self.observation.observation_state.name,
+            },
+            "gstin_candidate": self.gstin_candidate,
+            "gstin_valid": self.gstin_valid,
+            "pan_candidate": self.pan_candidate,
+            "pan_valid": self.pan_valid,
+            "pan_derived_from_gstin": self.pan_derived_from_gstin,
+            "normalization_events": [
+                {
+                    "transformation_type": e.transformation_type.name,
+                    "before_value": e.before_value,
+                    "after_value": e.after_value,
+                    "rule_name": e.rule_name,
+                }
+                for e in self.normalization_events
+            ],
+        }
+
 class DeterministicTaxParser:
     """
     Context-independent parser for raw tax identifiers.

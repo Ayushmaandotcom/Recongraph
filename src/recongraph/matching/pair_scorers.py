@@ -59,7 +59,8 @@ from recongraph.plugins.provider import EvidenceProvider
 from recongraph.matching.purchase_gst_semantics import (
     analyze_purchase_gst_semantics, 
     evaluate_purchase_gst_one_to_one_eligibility, 
-    OneToOneEligibility
+    OneToOneEligibility,
+    SemanticFinding
 )
 from recongraph.domain.reliability import convert_ocr_report_to_envelope, ExtractionQuality
 
@@ -143,7 +144,7 @@ def score_purchase_to_gst(
     
     violations.update({str(f.value) for f in semantic_findings})
     
-    if "TEMPORAL_MAX_DAYS_EXCEEDED" in violations:
+    if SemanticFinding.TEMPORAL_MAX_DAYS_EXCEEDED in violations:
         is_eligible = False
         
     return ScoredPair(

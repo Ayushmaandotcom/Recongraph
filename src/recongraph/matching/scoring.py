@@ -13,6 +13,7 @@ class SignalName:
     TEMPORAL = "temporal"
     TAX_IDENTITY = "tax_identity"
     SEMANTICS = "semantics"
+    AMOUNT_MULTIPLE = "amount_multiple"
 
 
 from recongraph.domain.reliability import AttenuationPolicy
@@ -105,8 +106,7 @@ from typing import Any
 @dataclass(frozen=True)
 class ScoringEvidence:
     """Detailed evidence supporting an evaluated hypothesis."""
-    signals: dict[str, float | None] = field(default_factory=dict)
+    signals: Mapping[str, float | None] = field(default_factory=dict)
     relationship: RelationshipScore | None = None
-    metadata: dict[str, Any] = field(default_factory=dict)
-    contributions: dict[str, Any] = field(default_factory=dict)
-
+    metadata: Mapping[str, Any] = field(default_factory=dict)
+    contributions: Mapping[str, Any] = field(default_factory=dict)

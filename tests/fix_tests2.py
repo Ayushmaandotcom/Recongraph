@@ -19,7 +19,7 @@ def fix_file(file_path):
     with open(file_path, "r") as f:
         content = f.read()
 
-    # We need to find block of `providers = [...]` or `[` containing FinancialEvidenceProvider
+    # We need to find block of `providers = [...]` or `[` containing FinancialEvidenceProvider 
     # A simple approach: 
     # Any block from `[` to `]` that contains `FinancialEvidenceProvider` should have `SemanticEvidenceProvider()` at the end.
     

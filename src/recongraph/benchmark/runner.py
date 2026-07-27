@@ -145,7 +145,7 @@ def execute_reconbench(size: int = 1000, enable_faf: bool = False) -> int:
     from recongraph.synthetic.reconbench import generate_reconbench_dataset
     from recongraph.benchmark.evaluator import evaluate_results
     from recongraph.benchmark.faf import generate_faf_report
-    from recongraph.plugins.core_providers import FinancialEvidenceProvider, TemporalEvidenceProvider, TaxEvidenceProvider, VendorEvidenceProvider, ReferenceEvidenceProvider
+    from recongraph.plugins.core_providers import FinancialEvidenceProvider, AmountMultipleEvidenceProvider, AmountMultipleEvidenceProvider, TemporalEvidenceProvider, TaxEvidenceProvider, VendorEvidenceProvider, ReferenceEvidenceProvider
     from recongraph.matching.reference_evidence import ReferenceCorpusProfile, ReferenceEvidenceContext, ReferenceEvidencePolicy
     from recongraph.domain.vendor.context import VendorIdentityContext, VendorCorpusProfile
     from recongraph.engine import ReconGraphEngine
@@ -166,7 +166,7 @@ def execute_reconbench(size: int = 1000, enable_faf: bool = False) -> int:
     )
     
     providers = [
-        FinancialEvidenceProvider(),
+        FinancialEvidenceProvider(), AmountMultipleEvidenceProvider(),
         TemporalEvidenceProvider(),
         TaxEvidenceProvider(),
         VendorEvidenceProvider(vendor_context),

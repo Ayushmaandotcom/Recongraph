@@ -11,7 +11,7 @@ from recongraph.engine import ReconGraphEngine
 from recongraph.config import ReconGraphConfig, DecisionConfig, DecisionMode
 from recongraph.domain.records import PurchaseRecord, GSTRecord
 from recongraph.plugins.core_providers import (
-    VendorEvidenceProvider, ReferenceEvidenceProvider, FinancialEvidenceProvider,
+    VendorEvidenceProvider, ReferenceEvidenceProvider, FinancialEvidenceProvider, AmountMultipleEvidenceProvider, AmountMultipleEvidenceProvider,
     TemporalEvidenceProvider, TaxEvidenceProvider
 )
 from recongraph.domain.vendor.context import VendorIdentityContext, VendorCorpusProfile
@@ -33,7 +33,7 @@ def test_determinism():
     providers = [
         VendorEvidenceProvider(vendor_context),
         ReferenceEvidenceProvider(ref_context),
-        FinancialEvidenceProvider(),
+        FinancialEvidenceProvider(), AmountMultipleEvidenceProvider(),
         TemporalEvidenceProvider(),
         TaxEvidenceProvider()
     ]

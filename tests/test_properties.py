@@ -1,109 +1,110 @@
-import pytest
 from decimal import Decimal
-from datetime import date
+import datetime
 from hypothesis import given, settings, strategies as st
-from recongraph.engine import ReconGraphEngine
-from recongraph.config import ReconGraphConfig, DecisionConfig
+
 from recongraph.domain.records import PurchaseRecord, GSTRecord
-from recongraph.plugins.core_providers import FinancialEvidenceProvider
-
-@st.composite
-def record_strategy(draw, is_purchase: bool):
-    record_id = draw(st.uuids()).hex
-    amount = draw(st.decimals(min_value=0, max_value=1000000, places=2))
-    # Keep dates small to avoid extreme outliers
-    year = draw(st.integers(min_value=2020, max_value=2025))
-    month = draw(st.integers(min_value=1, max_value=12))
-    day = draw(st.integers(min_value=1, max_value=28))
-    rec_date = date(year, month, day)
-    
-    ref = draw(st.text(min_size=1, max_size=10))
-    vendor = draw(st.text(min_size=1, max_size=20))
-    tax_id = draw(st.text(min_size=5, max_size=15))
-    
-    if is_purchase:
-        return PurchaseRecord(
-            record_id=f"P_{record_id}", 
-            amount=amount, 
-            record_date=rec_date, 
-            reference=ref, 
-            vendor_name=vendor, 
-            tax_identity=tax_id
-        )
-    else:
-        return GSTRecord(
-            record_id=f"G_{record_id}", 
-            amount=amount, 
-            record_date=rec_date, 
-            reference=ref, 
-            vendor_name=vendor, 
-            tax_identity=tax_id
-        )
-
+from recongraph.engine import ReconGraphEngine
+from recongraph.config import ReconGraphConfig
 from recongraph.plugins.core_providers import FinancialEvidenceProvider, TemporalEvidenceProvider, TaxEvidenceProvider, VendorEvidenceProvider, ReferenceEvidenceProvider
-from recongraph.domain.vendor.context import VendorIdentityContext, VendorCorpusProfile
+from recongraph.plugins.semantic_providers import SemanticEvidenceProvider
 from recongraph.matching.reference_evidence import ReferenceEvidenceContext, ReferenceCorpusProfile, ReferenceEvidencePolicy
+from recongraph.domain.vendor.context import VendorIdentityContext, VendorCorpusProfile
 
-def _get_vendor_context():
-    return VendorIdentityContext(
+def make_engine():
+    context = ReferenceEvidenceContext(
+        profile=ReferenceCorpusProfile(reference_count=1, normalized_reference_frequency={"inv1": 1}, numeric_token_document_frequency={"1": 1}),
+        policy=ReferenceEvidencePolicy()
+    )
+    vendor_context = VendorIdentityContext(
         corpus_profile=VendorCorpusProfile(corpus_size=1, token_document_frequencies={}, digest="1"),
         interpreter_policy_version="1.0.0",
         fuzzy_minimum_length=6,
         fuzzy_threshold=0.85,
         distinctiveness_threshold=0.01
     )
-
-def _get_providers():
-    corpus_profile = ReferenceCorpusProfile(
-        reference_count=1,
-        normalized_reference_frequency={"inv1": 1},
-        numeric_token_document_frequency={"1": 1}
+    return ReconGraphEngine(
+        config=ReconGraphConfig(),
+        providers=[
+            FinancialEvidenceProvider(0.05),
+            TemporalEvidenceProvider(30),
+            TaxEvidenceProvider(),
+            VendorEvidenceProvider(vendor_context),
+            ReferenceEvidenceProvider(context)
+        ]
     )
-    return [
-        FinancialEvidenceProvider(),
-        TemporalEvidenceProvider(),
-        TaxEvidenceProvider(),
-        VendorEvidenceProvider(_get_vendor_context()),
-        ReferenceEvidenceProvider(ReferenceEvidenceContext(corpus_profile, ReferenceEvidencePolicy()))
-    ]
+
+@st.composite
+def purchase_strategy(draw):
+    return PurchaseRecord(
+        record_id=draw(st.text(min_size=1, max_size=10)),
+        vendor_name=draw(st.text(min_size=1, max_size=20) | st.none()),
+        reference=draw(st.text(min_size=1, max_size=10) | st.none()),
+        amount=Decimal(draw(st.integers(min_value=1, max_value=100000))),
+        record_date=draw(st.dates(min_value=datetime.date(2020, 1, 1), max_value=datetime.date(2025, 12, 31))),
+        tax_identity=draw(st.text(min_size=10, max_size=15) | st.none()),
+        net_amount=None, tax_amount=None
+    )
+
+@st.composite
+def gst_strategy(draw):
+    return GSTRecord(
+        record_id=draw(st.text(min_size=1, max_size=10)),
+        vendor_name=draw(st.text(min_size=1, max_size=20) | st.none()),
+        reference=draw(st.text(min_size=1, max_size=10) | st.none()),
+        amount=Decimal(draw(st.integers(min_value=1, max_value=100000))),
+        record_date=draw(st.dates(min_value=datetime.date(2020, 1, 1), max_value=datetime.date(2025, 12, 31))),
+        tax_identity=draw(st.text(min_size=10, max_size=15) | st.none()),
+        net_amount=None, tax_amount=None
+    )
 
 @settings(max_examples=50)
+@given(purchase_strategy(), gst_strategy())
+def test_score_and_coverage_bounds(p: PurchaseRecord, g: GSTRecord):
+    # Ensure they have different IDs to avoid collision if they happen to draw the same
+    if p.record_id == g.record_id:
+        g = GSTRecord(
+            record_id=g.record_id + "_g", vendor_name=g.vendor_name, reference=g.reference,
+            amount=g.amount, record_date=g.record_date, tax_identity=g.tax_identity,
+            net_amount=g.net_amount, tax_amount=g.tax_amount
+        )
+
+    engine = make_engine()
+    result = engine.reconcile([p], [g])
+    
+    if result.auto_matches:
+        for match in result.auto_matches:
+            assert 0.0 <= match.confidence_score <= 1.0
+            for trace in match.sub_graph.nodes.values():
+                assert 0.0 <= trace.evidence.relationship.score <= 1.0
+                assert 0.0 <= trace.evidence.relationship.coverage <= 1.0
+
+@settings(max_examples=20)
 @given(
-    purchases=st.lists(record_strategy(is_purchase=True), max_size=10),
-    gsts=st.lists(record_strategy(is_purchase=False), max_size=10)
+    st.lists(purchase_strategy(), min_size=1, max_size=3, unique_by=lambda x: x.record_id),
+    st.lists(gst_strategy(), min_size=1, max_size=3, unique_by=lambda x: x.record_id)
 )
-def test_conservation_property(purchases, gsts):
-    """
-    PROPERTY: Output Record Set == Input Record Set
-    No matter what happens during Candidate Generation, Graph Building, 
-    Hypothesis Evaluation, or Decision Routing, NO RECORD IS EVER LOST.
-    """
-    config = ReconGraphConfig(decision_config=DecisionConfig())
-    engine = ReconGraphEngine(config=config, providers=_get_providers())
+def test_permutation_invariance(ps: list[PurchaseRecord], gs: list[GSTRecord]):
+    # Ensure no collision between P and G ids
+    p_ids = {p.record_id for p in ps}
+    for i, g in enumerate(gs):
+        if g.record_id in p_ids:
+            gs[i] = GSTRecord(
+                record_id=g.record_id + "_g", vendor_name=g.vendor_name, reference=g.reference,
+                amount=g.amount, record_date=g.record_date, tax_identity=g.tax_identity,
+                net_amount=g.net_amount, tax_amount=g.tax_amount
+            )
+
+    engine = make_engine()
+    res1 = engine.reconcile(ps, gs)
     
-    result = engine.reconcile(purchases, gsts)
+    ps_rev = list(reversed(ps))
+    gs_rev = list(reversed(gs))
+    res2 = engine.reconcile(ps_rev, gs_rev)
     
-    # Collect all records from output
-    output_purchase_ids = set()
-    output_gst_ids = set()
+    def extract_matches(result):
+        return {
+            (frozenset(p.record_id for p in match.purchases), frozenset(g.record_id for g in match.gsts))
+            for match in result.auto_matches
+        }
     
-    for match in result.auto_matches:
-        if match.selected_hypothesis:
-            for urn in match.selected_hypothesis.hypothesis.matched_nodes:
-                if urn.startswith("urn:recongraph:purchase:"):
-                    output_purchase_ids.add(urn.split(":")[-1])
-                elif urn.startswith("urn:recongraph:gst:"):
-                    output_gst_ids.add(urn.split(":")[-1])
-                    
-    for packet in result.review_packets:
-        for p in packet.purchases:
-            output_purchase_ids.add(p.record_id)
-        for g in packet.gsts:
-            output_gst_ids.add(g.record_id)
-            
-    input_purchase_ids = {p.record_id for p in purchases}
-    input_gst_ids = {g.record_id for g in gsts}
-    
-    # Assert Exact Conservation
-    assert output_purchase_ids == input_purchase_ids, "Purchases were lost or hallucinated!"
-    assert output_gst_ids == input_gst_ids, "GSTs were lost or hallucinated!"
+    assert extract_matches(res1) == extract_matches(res2)

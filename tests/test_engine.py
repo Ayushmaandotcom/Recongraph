@@ -3,7 +3,7 @@ import pytest
 from datetime import date
 from recongraph.domain.records import PurchaseRecord, GSTRecord
 from recongraph.config import ReconGraphConfig
-from recongraph.plugins.core_providers import FinancialEvidenceProvider, TemporalEvidenceProvider, ReferenceEvidenceProvider, VendorEvidenceProvider, TaxEvidenceProvider
+from recongraph.plugins.core_providers import FinancialEvidenceProvider,   TemporalEvidenceProvider, ReferenceEvidenceProvider, VendorEvidenceProvider, TaxEvidenceProvider
 from recongraph.matching.reference_evidence import ReferenceCorpusProfile, ReferenceEvidenceContext, ReferenceEvidencePolicy
 from recongraph.engine import ReconGraphEngine
 from recongraph.graph.decision import DecisionAction

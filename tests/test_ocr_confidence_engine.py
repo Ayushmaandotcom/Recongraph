@@ -5,7 +5,7 @@ Verifies:
 1. TokenProvenance confidence level classification
 2. Score attenuation via attenuated_weight()
 3. OcrConfidenceReport helpers (aggregate confidence, lowest_confidence_fields)
-4. FinancialEvidenceProvider: score is attenuated on LOW/UNREADABLE amount confidence
+4. FinancialEvidenceProvider : score is attenuated on LOW/UNREADABLE amount confidence
 5. FinancialEvidenceProvider: violations emitted for OCR problems
 6. FinancialEvidenceProvider: highlight_boxes propagated in metadata
 7. TemporalEvidenceProvider: violations emitted for low-confidence dates

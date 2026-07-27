@@ -12,7 +12,7 @@ STRONG_AMOUNT_SCORE = 0.9
 
 
 class SemanticFinding(StrEnum):
-    SEVERE_AMOUNT_CONFLICT = "severe_amount_conflict"
+    SEVERE_AMOUNT_CONFLICT = "SEVERE_AMOUNT_CONFLICT"
     TAX_IDENTITY_CONFLICT = "tax_identity_conflict"
     DISTINCT_EVENT_IDENTITY_EVIDENCE = (
         "distinct_event_identity_evidence"
@@ -20,7 +20,8 @@ class SemanticFinding(StrEnum):
     PAN_IDENTIFIER_CONFLICT = "pan_identifier_conflict"
     GST_REGISTRATION_IDENTIFIER_DIFFERENCE = "gst_registration_identifier_difference"
     LEGAL_FORM_LEXICAL_DIFFERENCE = "legal_form_lexical_difference"
-    AMOUNT_MULTIPLE = "amount_multiple"
+    AMOUNT_MULTIPLE = "AMOUNT_MULTIPLE"
+    TEMPORAL_MAX_DAYS_EXCEEDED = "TEMPORAL_MAX_DAYS_EXCEEDED"
     
     # Provider-level violations
     OCR_AMOUNT_LOW_CONFIDENCE = "OCR_AMOUNT_LOW_CONFIDENCE"
