@@ -25,8 +25,16 @@ class DecisionConfig:
 class ReviewConfig:
     enabled: bool = True
 
+from recongraph.rules.models import RuleSet
+from typing import Mapping
+
+@dataclass(frozen=True)
+class RuleConfig:
+    rule_sets: Mapping[str, RuleSet] = field(default_factory=dict)
+
 @dataclass(frozen=True)
 class ReconGraphConfig:
     reference_config: ReferenceConfig = field(default_factory=ReferenceConfig)
     decision_config: DecisionConfig = field(default_factory=DecisionConfig)
     review_config: ReviewConfig = field(default_factory=ReviewConfig)
+    rule_config: RuleConfig = field(default_factory=RuleConfig)
