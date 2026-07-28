@@ -25,6 +25,13 @@ from recongraph.graph.propagation import SemanticPropagator
 from recongraph.graph.fusion_result import FusionResult
 from recongraph.plugins.provider_v2 import EvidenceContributionV2
 
+try:
+    from importlib.metadata import version as _get_version
+    __version__ = _get_version('recongraph')
+except Exception:
+    __version__ = '0.9.0'
+
+
 @dataclass(frozen=True)
 class ReconciliationResult:
     auto_matches: list[ReconciliationDecision]
@@ -33,17 +40,20 @@ class ReconciliationResult:
     engine_version: str
     differential_results: list['DifferentialResult'] = field(default_factory=list)
     
+    def to_dict(self) -> dict[str, Any]:
+        import json
+        from recongraph.serialization import ReconEncoder
+        return json.loads(json.dumps(self, cls=ReconEncoder))
+    
 class ReconGraphEngine:
     try:
-        from importlib.metadata import version as _get_version
-        VERSION = _get_version("recongraph")
-        del _get_version
+        pass
     except Exception:
         # Fallback for editable installs or missing metadata.
         # Must stay in sync with pyproject.toml [project] version.
         VERSION = "0.9.0"
 
-    def __init__(self, config: ReconGraphConfig, providers: Sequence[EvidenceProvider]):
+    def __init__(self, config: ReconGraphConfig, providers: list[EvidenceProvider]):
         self.config = config
         self.providers = tuple(providers)
 
@@ -90,12 +100,28 @@ class ReconGraphEngine:
         packet_builder = ReviewPacketBuilder()
         
         auto_matches = []
-        review_packets = []
+        review_packets: list[Any] = []
         traces = []
         differential_results = []
         
         try:
             for comp in components:
+                # OVERSIZED COMPONENT SKIP
+                if len(comp.graph.edges) > 15:
+                    # Treat the entire component as REVIEW_AMBIGUOUS
+                    purchases_in_comp = [comp.graph.nodes[u] for u in comp.graph.nodes if str(u).startswith("urn:recongraph:purchase:")]
+                    gsts_in_comp = [comp.graph.nodes[u] for u in comp.graph.nodes if str(u).startswith("urn:recongraph:gst:")]
+                    review_packets.append(ReviewPacket(
+                        packet_id=f"RP-SKIP-{len(review_packets)}",
+                        action=DecisionAction.REVIEW_AMBIGUOUS,
+                        purchases=tuple(purchases_in_comp),
+                        gsts=tuple(gsts_in_comp),
+                        explanation=None,
+                        competitors=tuple(),
+                        checklist=("Oversized component bypassed",)
+                    ))
+                    continue
+                    
                 hypotheses = searcher.search(comp)
                 evaluated = [evaluator.evaluate(graph, h) for h in hypotheses]
                 
@@ -145,7 +171,7 @@ class ReconGraphEngine:
                             
                 # 7E: Trace Versioning (always generated)
                 trace_id = DecisionTrace.compute_identity(
-                    engine_version=self.VERSION,
+                    engine_version=__version__,
                     config_hash=self.config_hash,
                     component_nodes=frozenset(comp.graph.nodes.keys()),
                     decision=decision
@@ -153,7 +179,7 @@ class ReconGraphEngine:
                 
                 trace = DecisionTrace(
                     trace_id=trace_id,
-                    engine_version=self.VERSION,
+                    engine_version=__version__,
                     config_hash=self.config_hash,
                     events=()
                 )
@@ -219,6 +245,6 @@ class ReconGraphEngine:
             auto_matches=auto_matches,
             review_packets=review_packets,
             traces=traces,
-            engine_version=self.VERSION,
+            engine_version=__version__,
             differential_results=differential_results
         )

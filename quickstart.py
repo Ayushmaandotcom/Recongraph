@@ -10,8 +10,10 @@ from recongraph.engine import ReconGraphEngine
 from recongraph.config import ReconGraphConfig
 from recongraph.domain.records import PurchaseRecord, GSTRecord
 from recongraph.plugins.core_providers import (
-    FinancialEvidenceProvider, AmountMultipleEvidenceProvider, TemporalEvidenceProvider,
-    TaxEvidenceProvider, VendorEvidenceProvider, ReferenceEvidenceProvider
+    FinancialEvidenceProvider,
+    TemporalEvidenceProvider,
+    TaxEvidenceProvider,
+    VendorEvidenceProvider, ReferenceEvidenceProvider
 )
 from recongraph.domain.vendor.context import VendorIdentityContext, VendorCorpusProfile
 from recongraph.matching.reference_evidence import (
@@ -56,7 +58,7 @@ ref_ctx = ReferenceEvidenceContext(
 )
 
 providers = [
-    FinancialEvidenceProvider(), AmountMultipleEvidenceProvider(),
+    FinancialEvidenceProvider(),
     TemporalEvidenceProvider(),
     TaxEvidenceProvider(),
     VendorEvidenceProvider(vendor_ctx),

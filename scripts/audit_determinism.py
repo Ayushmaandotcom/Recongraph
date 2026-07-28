@@ -11,8 +11,11 @@ from recongraph.engine import ReconGraphEngine
 from recongraph.config import ReconGraphConfig, DecisionConfig, DecisionMode
 from recongraph.domain.records import PurchaseRecord, GSTRecord
 from recongraph.plugins.core_providers import (
-    VendorEvidenceProvider, ReferenceEvidenceProvider, FinancialEvidenceProvider, AmountMultipleEvidenceProvider, AmountMultipleEvidenceProvider,
-    TemporalEvidenceProvider, TaxEvidenceProvider
+    FinancialEvidenceProvider,
+    TemporalEvidenceProvider,
+    TaxEvidenceProvider,
+    VendorEvidenceProvider,
+    ReferenceEvidenceProvider
 )
 from recongraph.domain.vendor.context import VendorIdentityContext, VendorCorpusProfile
 from recongraph.matching.reference_evidence import ReferenceEvidenceContext, ReferenceCorpusProfile, ReferenceEvidencePolicy
@@ -33,7 +36,7 @@ def test_determinism():
     providers = [
         VendorEvidenceProvider(vendor_context),
         ReferenceEvidenceProvider(ref_context),
-        FinancialEvidenceProvider(), AmountMultipleEvidenceProvider(),
+        FinancialEvidenceProvider(),
         TemporalEvidenceProvider(),
         TaxEvidenceProvider()
     ]
@@ -47,7 +50,7 @@ def test_determinism():
         reference="INV-999",
         amount=Decimal("15000.00"),
         record_date=date(2026, 1, 15),
-        tax_identity="07DETERMINISM9Z"
+        tax_identity="07ABCDE1234F1Z2"
     )
     
     gsts = [
@@ -57,13 +60,15 @@ def test_determinism():
             reference="INV-999" if i == 0 else f"INV-{i}",
             amount=Decimal("15000.00") if i == 0 else Decimal(f"{1000 * i}.00"),
             record_date=date(2026, 1, 15),
-            tax_identity="07DETERMINISM9Z"
+            tax_identity="07ABCDE1234F1Z2"
         )
         for i in range(5)
     ]
     
     trace_ids = set()
     packet_hashes = set()
+    
+    run_hashes = []
     
     for run in range(10):
         # Randomize input order
@@ -72,21 +77,25 @@ def test_determinism():
         
         result = engine.reconcile([purchase], shuffled_gsts)
         
+        current_run_trace_ids = set()
+        current_run_packet_hashes = set()
+        
         for trace in result.traces:
-            trace_ids.add(trace.trace_id)
+            current_run_trace_ids.add(trace.trace_id)
             
         for packet in result.review_packets:
-            packet_hashes.add((packet.action.value, tuple(sorted(packet.competitors))))
+            current_run_packet_hashes.add((packet.action.value, tuple(sorted(packet.competitors))))
             
         for match in result.auto_matches:
-            packet_hashes.add((match.action.value, tuple(sorted(match.competitors))))
+            current_run_packet_hashes.add((match.action.value, tuple(sorted(match.competitors))))
+            
+        run_hashes.append((frozenset(current_run_trace_ids), frozenset(current_run_packet_hashes)))
         
     print(f"Executed 10 randomized runs.")
-    print(f"Unique Trace IDs: {len(trace_ids)}")
-    print(f"Unique Packet Hashes: {len(packet_hashes)}")
+    unique_outcomes = set(run_hashes)
+    print(f"Unique Outcomes: {len(unique_outcomes)}")
     
-    assert len(trace_ids) == 1, "Determinism failed! Multiple trace IDs generated."
-    assert len(packet_hashes) == 1, "Determinism failed! Multiple packet hashes generated."
+    assert len(unique_outcomes) == 1, "Determinism failed! Different outcomes across runs."
     
     print("SUCCESS: Engine is strictly deterministic.")
 

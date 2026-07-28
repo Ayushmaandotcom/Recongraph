@@ -37,7 +37,8 @@ def test_engine_reconcile():
     engine = ReconGraphEngine(config, providers)
     result = engine.reconcile([p1], [g1])
     
-    assert result.engine_version == ReconGraphEngine.VERSION
+    from recongraph.engine import __version__
+    assert result.engine_version == __version__
     assert len(result.auto_matches) == 1
 
 def test_conservation_hole_auto_match_leftovers():
@@ -85,9 +86,9 @@ def test_conservation_hole_auto_match_leftovers():
     assert leftover_packet.purchases[0].record_id == "p2"
     assert len(leftover_packet.gsts) == 0
     trace = result.traces[0]
-    
-    assert trace.engine_version == ReconGraphEngine.VERSION
+    from recongraph.engine import __version__
+    assert trace.engine_version == __version__
     assert trace.config_hash is not None
     # Assert serializability
     trace_dict = trace.to_dict()
-    assert trace_dict["engine_version"] == engine.VERSION
+    assert trace_dict["engine_version"] == __version__

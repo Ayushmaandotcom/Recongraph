@@ -20,7 +20,7 @@ class BenchmarkRunner:
         dataset_id: str,
         purchases: Sequence[PurchaseRecord],
         gsts: Sequence[GSTRecord],
-        providers: Sequence[Any],
+        providers: list[Any],
         decision_policy: DecisionPolicy,
     ):
         self.dataset_id = dataset_id
@@ -140,7 +140,7 @@ class BenchmarkRunner:
             )
         )
 
-def execute_reconbench(size: int = 1000, enable_faf: bool = False, auto_match_threshold: float = 0.99, ambiguity_margin: float = 0.05) -> int:
+def execute_reconbench(size: int = 1000, enable_faf: bool = False, auto_match_threshold: float = 0.85, ambiguity_margin: float = 0.05) -> int:
     import json
     from recongraph.synthetic.reconbench import generate_reconbench_dataset
     from recongraph.benchmark.evaluator import evaluate_results

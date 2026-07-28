@@ -66,7 +66,7 @@ def run_calibration(size: int = 1000):
         
         results_map.append({
             "threshold": t,
-            "precision": metrics.precision,
+            "precision": metrics.precision if metrics else 0.0,
             "recall": metrics.recall,
             "f1_score": metrics.f1_score,
             "review_reduction_rate": metrics.review_reduction_rate
@@ -80,7 +80,7 @@ def run_calibration(size: int = 1000):
     output = {
         "best_threshold": best_threshold,
         "metrics": {
-            "precision": best_metrics.precision,
+            "precision": best_metrics.precision if metrics else 0.0,
             "recall": best_metrics.recall,
             "f1_score": best_metrics.f1_score,
             "review_reduction_rate": best_metrics.review_reduction_rate

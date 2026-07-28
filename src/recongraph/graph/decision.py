@@ -19,7 +19,7 @@ class ReconciliationDecision:
 
 @dataclass(frozen=True)
 class DecisionPolicy:
-    auto_match_threshold: float = 0.95
+    auto_match_threshold: float = 0.85
     ambiguity_margin: float = 0.05
     # 0.80 is a conservative V1 operational policy, not a scientifically 
     # proven sufficiency boundary. It requires eventual calibration against 

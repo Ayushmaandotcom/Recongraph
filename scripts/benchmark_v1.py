@@ -16,8 +16,11 @@ def run_benchmarks():
     
     from recongraph.config import DecisionConfig, DecisionMode
     from recongraph.plugins.core_providers import (
-        VendorEvidenceProvider, ReferenceEvidenceProvider, FinancialEvidenceProvider, AmountMultipleEvidenceProvider, AmountMultipleEvidenceProvider,
-        TemporalEvidenceProvider, TaxEvidenceProvider
+        FinancialEvidenceProvider,
+        TemporalEvidenceProvider,
+        TaxEvidenceProvider,
+        VendorEvidenceProvider,
+        ReferenceEvidenceProvider
     )
     from recongraph.domain.vendor.context import VendorIdentityContext, VendorCorpusProfile
     from recongraph.matching.reference_evidence import ReferenceEvidenceContext, ReferenceCorpusProfile, ReferenceEvidencePolicy
@@ -36,7 +39,7 @@ def run_benchmarks():
     providers = [
         VendorEvidenceProvider(vendor_context),
         ReferenceEvidenceProvider(ref_context),
-        FinancialEvidenceProvider(), AmountMultipleEvidenceProvider(),
+        FinancialEvidenceProvider(),
         TemporalEvidenceProvider(),
         TaxEvidenceProvider()
     ]

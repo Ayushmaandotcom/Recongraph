@@ -198,7 +198,7 @@ class TestConservationInvariant:
     This is the deterministic version of the property test in test_properties.py.
     """
 
-    def test_exact_conservation_simple(self):
+    def test_exact_conservation_simple(self) -> None:
         """1 purchase + 1 GST → they either match or both go to review."""
         p = PurchaseRecord(
             record_id="pC1", amount=Decimal("250.0"),
@@ -219,7 +219,7 @@ class TestConservationInvariant:
         assert out_p == {"pC1"}, f"Purchase conservation violated: {out_p}"
         assert out_g == {"gC1"}, f"GST conservation violated: {out_g}"
 
-    def test_exact_conservation_multi_record(self):
+    def test_exact_conservation_multi_record(self) -> None:
         """3 purchases + 2 GSTs → all 5 record IDs must appear in output."""
         records_p = [
             PurchaseRecord(
