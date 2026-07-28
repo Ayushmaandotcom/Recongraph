@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from recongraph.config import ReconGraphConfig
 from recongraph.plugins.provider import EvidenceProvider
 from recongraph.domain.records import PurchaseRecord, GSTRecord
-from recongraph.graph.decision import DecisionAction, DecisionEngine, ReconciliationDecision
+from recongraph.graph.decision import DecisionAction, ReconciliationDecision, FusionDecisionEngine
 from recongraph.candidate_generation.generator import CandidateGenerator
 from recongraph.graph.candidate import CandidateGraphBuilder, build_purchase_urn, build_gst_urn
 from recongraph.graph.algorithms import extract_connected_components
@@ -15,11 +15,7 @@ from recongraph.graph.search import HypothesisSearcher
 from recongraph.graph.evaluator import HypothesisEvaluator
 from recongraph.graph.review import ReviewPacketBuilder, ReviewPacket
 from recongraph.graph.trace import DecisionTrace, TraceEvent, TraceStage
-from recongraph.graph.explainability import ExplanationBuilder
 from recongraph.errors import ReconciliationFallbackError
-from recongraph.config import DecisionMode
-from recongraph.graph.differential import DifferentialResult, DifferenceType
-from recongraph.graph.decision import FusionDecisionEngine
 from recongraph.graph.fusion import EvidenceGraph, FusionNode
 from recongraph.graph.propagation import SemanticPropagator
 from recongraph.graph.fusion_result import FusionResult
@@ -94,15 +90,12 @@ class ReconGraphEngine:
         # 3. Component Extraction & Search
         components = extract_connected_components(graph)
         searcher = HypothesisSearcher()
-        evaluator = HypothesisEvaluator(self.providers, self.config.decision_config.relationship_policy)
-        decision_engine = DecisionEngine(self.config.decision_config.policy)
-        explanation_builder = ExplanationBuilder()
+        evaluator = HypothesisEvaluator(self.providers)
         packet_builder = ReviewPacketBuilder()
         
         auto_matches = []
         review_packets: list[Any] = []
         traces = []
-        differential_results = []
         
         try:
             for comp in components:
@@ -125,50 +118,62 @@ class ReconGraphEngine:
                 hypotheses = searcher.search(comp)
                 evaluated = [evaluator.evaluate(graph, h) for h in hypotheses]
                 
-                # Baseline Legacy Evaluation
-                t0 = time.time()
-                decision = decision_engine.decide(evaluated)
-                legacy_time = time.time() - t0
+                # Baseline Legacy Evaluation -> Removed in Stage 8J
+                # All hypotheses evaluated will now purely build EvidenceGraphs
                 
-                # Shadow/Fusion Evaluation
-                if self.config.decision_config.decision_mode in (DecisionMode.SHADOW, DecisionMode.FUSION):
-                    try:
-                        t1 = time.time()
-                        # Build EvidenceGraph from EvaluatedHypotheses
-                        evidence_graph = EvidenceGraph()
-                        for h in evaluated:
-                            contributions = h.supporting_evidence.contributions
-                            for provider_name, contrib in contributions.items():
-                                # We must convert EvidenceContribution to EvidenceContributionV2
-                                contrib_v2: EvidenceContributionV2[Any] = EvidenceContributionV2(
-                                    provider_name=contrib.provider_name,
-                                    score=contrib.score,
-                                    violations=contrib.violations,
-                                    metadata=contrib.metadata
-                                )
-                                node = FusionNode.from_contribution(contrib_v2)
-                                evidence_graph.add_node(node)
-                                
-                        propagated_nodes = SemanticPropagator.propagate(evidence_graph)
-                        
-                        fusion_result = FusionResult.from_propagated_graph(
-                            nodes=propagated_nodes,
-                            dependency_groups=[], # Omitted for brevity
-                            missingness={},
-                            coverage=decision.selected_hypothesis.coverage if decision.selected_hypothesis else 0.0
-                        )
-                        
-                        fusion_engine = FusionDecisionEngine()
-                        fusion_decision = fusion_engine.decide(fusion_result, decision.selected_hypothesis)
-                        fusion_time = time.time() - t1
-                        
-                        if self.config.decision_config.decision_mode == DecisionMode.FUSION:
-                            decision = fusion_decision
-                    except Exception as e:
-                        # Shadow failure must NEVER break the legacy pipeline
-                        if self.config.decision_config.decision_mode == DecisionMode.FUSION:
-                            raise e # Unless explicitly in FUSION mode
+                t1 = time.time()
+                fusion_decision = None
+                evidence_graph = None
+                fusion_result = None
+                fusion_explanation = None
+                
+                if evaluated:
+                    # Sort evaluated hypotheses to find the best candidate if needed
+                    # Actually, we build an EvidenceGraph for all of them? No, we need to pick a hypothesis to fuse
+                    # Or do we fuse the whole component? 
+                    # The previous code iterated over evaluated hypotheses and built an EvidenceGraph from them, but wait!
+                    # "for h in evaluated: contributions = h.supporting_evidence.contributions"
+                    # Yes, it fused ALL hypotheses in the component into ONE graph!
+                    evidence_graph = EvidenceGraph()
+                    for h in evaluated:
+                        contributions = h.supporting_evidence.contributions
+                        for provider_name, contrib in contributions.items():
+                            contrib_v2: EvidenceContributionV2[Any] = EvidenceContributionV2(
+                                provider_name=contrib.provider_name,
+                                score=contrib.score,
+                                violations=contrib.violations,
+                                metadata=contrib.metadata
+                            )
+                            node = FusionNode.from_contribution(contrib_v2)
+                            evidence_graph.add_node(node)
                             
+                    propagated_nodes = SemanticPropagator.propagate(evidence_graph)
+                    
+                    # We need to find the "selected_hypothesis"
+                    # Since we don't have the legacy DecisionEngine, FusionDecisionEngine takes (fusion_result, legacy_selected_hypothesis)
+                    # Wait, the signature of fusion_engine.decide is `def decide(self, result: FusionResult, legacy_target: EvaluatedHypothesis | None) -> ReconciliationDecision`
+                    # Without legacy, we just pass None, or the one with the highest coverage.
+                    best_hypothesis = max(evaluated, key=lambda x: x.coverage) if evaluated else None
+                    
+                    fusion_result = FusionResult.from_propagated_graph(
+                        nodes=propagated_nodes,
+                        dependency_groups=[], # Omitted for brevity
+                        missingness={},
+                        coverage=best_hypothesis.coverage if best_hypothesis else 0.0
+                    )
+                    
+                    fusion_engine = FusionDecisionEngine()
+                    fusion_decision = fusion_engine.decide(fusion_result, best_hypothesis)
+                else:
+                    # No hypotheses generated
+                    fusion_decision = ReconciliationDecision(
+                        action=DecisionAction.NO_MATCH,
+                        selected_hypothesis=None,
+                        competitors=()
+                    )
+                    
+                decision = fusion_decision
+                
                 # 7E: Trace Versioning (always generated)
                 trace_id = DecisionTrace.compute_identity(
                     engine_version=__version__,
@@ -186,23 +191,10 @@ class ReconGraphEngine:
                 traces.append(trace)
                 
                 # Explanation Generation
-                legacy_explanation = explanation_builder.build(decision)
-                fusion_explanation = None
-                
-                if 'evidence_graph' in locals() and 'fusion_result' in locals() and evidence_graph and fusion_result:
+                if evidence_graph and fusion_result:
                     from recongraph.graph.explanation_generator import ExplanationGenerator
                     explanation_generator = ExplanationGenerator(trace, evidence_graph, fusion_result, decision)
                     fusion_explanation = explanation_generator.generate()
-                    
-                if self.config.decision_config.decision_mode in (DecisionMode.SHADOW, DecisionMode.FUSION) and 'fusion_decision' in locals():
-                    diff_result = DifferentialResult.classify(
-                        legacy=decision.action if self.config.decision_config.decision_mode == DecisionMode.FUSION else decision.action,
-                        fusion=fusion_decision.action,
-                        perf={"legacy_ms": legacy_time * 1000, "fusion_ms": fusion_time * 1000},
-                        legacy_exp={"summary": legacy_explanation} if legacy_explanation else None,
-                        fusion_exp=fusion_explanation.executive_summary if fusion_explanation else None
-                    )
-                    differential_results.append(diff_result)
         
                 # Determine which nodes were "consumed" by the primary action
                 consumed_nodes = frozenset()
@@ -246,5 +238,5 @@ class ReconGraphEngine:
             review_packets=review_packets,
             traces=traces,
             engine_version=__version__,
-            differential_results=differential_results
+            differential_results=[]
         )

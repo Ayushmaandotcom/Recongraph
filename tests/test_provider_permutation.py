@@ -16,7 +16,7 @@ from recongraph.plugins.core_providers import (
     TemporalEvidenceProvider,
     TaxEvidenceProvider
 )
-from recongraph.matching.pair_scorers import PURCHASE_TO_GST_MAX_DAYS, PURCHASE_TO_GST_POLICY
+
 from recongraph.graph.evaluator import HypothesisEvaluator
 
 from recongraph.config import ReconGraphConfig
@@ -51,7 +51,7 @@ def test_evidence_provider_order_independence() -> None:
         VendorEvidenceProvider(vendor_context),
         ReferenceEvidenceProvider(reference_context),
         FinancialEvidenceProvider(tolerance=0.05),
-        TemporalEvidenceProvider(max_days=PURCHASE_TO_GST_MAX_DAYS),
+        TemporalEvidenceProvider(max_days=365),
         TaxEvidenceProvider()
     ]
     

@@ -1,7 +1,7 @@
 from datetime import date
 from decimal import Decimal
 from recongraph.engine import ReconGraphEngine
-from recongraph.config import ReconGraphConfig, DecisionConfig, DecisionMode
+from recongraph.config import ReconGraphConfig, DecisionConfig
 from recongraph.domain.records import PurchaseRecord, GSTRecord
 from recongraph.plugins.core_providers import (
     VendorEvidenceProvider,
@@ -39,7 +39,7 @@ def test_readme_quick_start():
     ]
 
     # 2. Initialize Engine (Using FUSION mode as it replaces shadow)
-    config = ReconGraphConfig(decision_config=DecisionConfig(decision_mode=DecisionMode.FUSION))
+    config = ReconGraphConfig(decision_config=DecisionConfig())
     engine = ReconGraphEngine(config=config, providers=providers)
 
     # 3. Define Evidence (Fixing Decimal arguments to ensure they are strings to avoid float inaccuracies)

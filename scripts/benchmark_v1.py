@@ -14,7 +14,7 @@ from recongraph.domain.records import PurchaseRecord, GSTRecord
 def run_benchmarks():
     print("Running ReconGraph v1.0 Benchmarks...")
     
-    from recongraph.config import DecisionConfig, DecisionMode
+    from recongraph.config import DecisionConfig
     from recongraph.plugins.core_providers import (
         FinancialEvidenceProvider,
         TemporalEvidenceProvider,
@@ -25,7 +25,7 @@ def run_benchmarks():
     from recongraph.domain.vendor.context import VendorIdentityContext, VendorCorpusProfile
     from recongraph.matching.reference_evidence import ReferenceEvidenceContext, ReferenceCorpusProfile, ReferenceEvidencePolicy
 
-    config = ReconGraphConfig(decision_config=DecisionConfig(decision_mode=DecisionMode.FUSION))
+    config = ReconGraphConfig(decision_config=DecisionConfig())
     
     vendor_context = VendorIdentityContext(
         corpus_profile=VendorCorpusProfile(corpus_size=1, token_document_frequencies={}, digest='1'), 

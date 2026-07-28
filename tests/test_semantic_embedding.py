@@ -79,22 +79,19 @@ def test_semantic_cross_model_drift_protection():
         SemanticPairInterpreter.interpret(obs1, obs2)
 
 def test_semantic_provider_engine_integration():
-    from recongraph.config import ReconGraphConfig, DecisionConfig, DecisionMode
+    from recongraph.config import ReconGraphConfig, DecisionConfig
     from recongraph.engine import ReconGraphEngine
     from recongraph.plugins.core_providers import FinancialEvidenceProvider, TemporalEvidenceProvider, ReferenceEvidenceProvider, VendorEvidenceProvider, TaxEvidenceProvider
     from recongraph.matching.reference_evidence import ReferenceCorpusProfile, ReferenceEvidenceContext, ReferenceEvidencePolicy
-    from recongraph.domain.vendor.context import VendorIdentityContext, VendorCorpusProfile
-    from recongraph.matching.pair_scorers import PURCHASE_TO_GST_POLICY_WITH_SEMANTICS
+
     
-    config = ReconGraphConfig(decision_config=DecisionConfig(
-        decision_mode=DecisionMode.FUSION,
-        relationship_policy=PURCHASE_TO_GST_POLICY_WITH_SEMANTICS
-    ))
+    config = ReconGraphConfig(decision_config=DecisionConfig())
     
     context = ReferenceEvidenceContext(
         profile=ReferenceCorpusProfile(reference_count=1, normalized_reference_frequency={"inv1": 1}, numeric_token_document_frequency={"1": 1}),
         policy=ReferenceEvidencePolicy()
     )
+    from recongraph.domain.vendor.context import VendorIdentityContext, VendorCorpusProfile
     vendor_context = VendorIdentityContext(
         corpus_profile=VendorCorpusProfile(corpus_size=1, token_document_frequencies={}, digest="1"),
         interpreter_policy_version="1.0.0",

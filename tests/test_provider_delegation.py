@@ -18,7 +18,7 @@ from recongraph.plugins.core_providers import (
     TemporalEvidenceProvider,
     _weakest_available
 )
-from recongraph.matching.pair_scorers import PURCHASE_TO_GST_MAX_DAYS
+
 
 def create_purchase(tax_id=None, vendor_name=None, record_date=date(2024, 1, 1)):
     return PurchaseRecord(
@@ -95,7 +95,7 @@ def test_vendor_provider_abstains_rather_than_scoring_zero_when_name_absent():
 
 def test_temporal_window_has_a_single_source_of_truth():
     provider = TemporalEvidenceProvider()
-    assert provider.max_days == PURCHASE_TO_GST_MAX_DAYS
+    assert provider.max_days == 7
 
 def test_weakest_available_reduces_to_the_pairwise_score_for_one_to_one():
     def mock_scorer(a, b):

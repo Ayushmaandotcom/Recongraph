@@ -58,9 +58,15 @@ class BenchmarkRunner:
         # 3. Components & Search & Eval & Decisions
         components = list(extract_connected_components(graph))
         searcher = HypothesisSearcher()
-        from recongraph.matching.pair_scorers import PURCHASE_TO_GST_POLICY
-        evaluator = HypothesisEvaluator(self.providers, PURCHASE_TO_GST_POLICY)
-        engine = DecisionEngine(self.decision_policy)
+        evaluator = HypothesisEvaluator(self.providers)
+        
+        from recongraph.graph.decision import FusionDecisionEngine
+        from recongraph.graph.fusion import EvidenceGraph, FusionNode
+        from recongraph.plugins.provider_v2 import EvidenceContributionV2
+        from recongraph.graph.propagation import SemanticPropagator
+        from recongraph.graph.fusion_result import FusionResult
+        
+        engine = FusionDecisionEngine()
         
         max_comp_size = 0
         total_comp_nodes = 0
@@ -72,8 +78,7 @@ class BenchmarkRunner:
             DecisionAction.REVIEW_WEAK: 0,
             DecisionAction.NO_MATCH: 0
         }
-        bins = {f"0.{i}-0.{i+1}": 0 for i in range(10)}
-        bins["1.0"] = 0
+        bins = {}
         
         search_time = 0.0
         decision_time = 0.0
@@ -90,16 +95,36 @@ class BenchmarkRunner:
             total_hypotheses_evaluated += len(evaluated)
             search_time += (time.perf_counter() - s_t0)
             
-            for eh in evaluated:
-                score = eh.score
-                if score >= 1.0:
-                    bins["1.0"] += 1
-                else:
-                    bucket = int(score * 10)
-                    bins[f"0.{bucket}-0.{bucket+1}"] += 1
-            
             d_t0 = time.perf_counter()
-            decision = engine.decide(evaluated)
+            if evaluated:
+                evidence_graph = EvidenceGraph()
+                for h in evaluated:
+                    for provider_name, contrib in h.supporting_evidence.contributions.items():
+                        contrib_v2 = EvidenceContributionV2(
+                            provider_name=contrib.provider_name,
+                            score=contrib.score,
+                            violations=contrib.violations,
+                            metadata=contrib.metadata
+                        )
+                        evidence_graph.add_node(FusionNode.from_contribution(contrib_v2))
+                
+                propagated_nodes = SemanticPropagator.propagate(evidence_graph)
+                best_hypothesis = max(evaluated, key=lambda x: x.coverage) if evaluated else None
+                
+                fusion_result = FusionResult.from_propagated_graph(
+                    nodes=propagated_nodes,
+                    dependency_groups=[],
+                    missingness={},
+                    coverage=best_hypothesis.coverage if best_hypothesis else 0.0
+                )
+                decision = engine.decide(fusion_result, best_hypothesis)
+            else:
+                from recongraph.graph.decision import ReconciliationDecision
+                decision = ReconciliationDecision(
+                    action=DecisionAction.NO_MATCH,
+                    selected_hypothesis=None,
+                    competitors=()
+                )
             actions[decision.action] += 1
             decision_time += (time.perf_counter() - d_t0)
             

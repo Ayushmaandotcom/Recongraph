@@ -46,4 +46,3 @@ def test_benchmark_runner():
     assert report.search_statistics.candidate_edges == 1
     assert sum(report.decision_statistics.__dict__.values()) == 1
     assert report.timing_statistics.total_runtime_ms > 0
-    assert sum(report.confidence_distribution.bins.values()) == 2

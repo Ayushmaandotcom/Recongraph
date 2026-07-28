@@ -3,7 +3,7 @@ from decimal import Decimal
 from datetime import date
 from recongraph.domain.records import PurchaseRecord, GSTRecord
 from recongraph.engine import ReconGraphEngine
-from recongraph.config import ReconGraphConfig, DecisionConfig, DecisionPolicy, DecisionMode
+from recongraph.config import ReconGraphConfig, DecisionConfig, DecisionPolicy
 from recongraph.plugins.core_providers import (
     FinancialEvidenceProvider,
     TemporalEvidenceProvider,
@@ -27,10 +27,11 @@ def test_json_roundtrip():
         policy=ReferenceEvidencePolicy()
     )
     
-    config = ReconGraphConfig(decision_config=DecisionConfig(
-        decision_mode=DecisionMode.LEGACY,
-        policy=DecisionPolicy(auto_match_threshold=0.85)
-    ))
+    config = ReconGraphConfig(
+        decision_config=DecisionConfig(
+            policy=DecisionPolicy(minimum_coverage_threshold=0.85)
+        )
+    )
     
     providers = [
         VendorEvidenceProvider(vendor_context),

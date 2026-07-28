@@ -9,8 +9,6 @@ from recongraph.matching.purchase_gst_semantics import (
     SemanticFinding
 )
 from recongraph.matching.reference_evidence import ReferenceEvidenceContext, compute_reference_interpretation
-from recongraph.matching.pair_scorers import PURCHASE_TO_GST_POLICY, PURCHASE_TO_GST_MAX_DAYS
-from recongraph.matching.scoring import RelationshipPolicy
 
 from recongraph.plugins.provider import EvidenceProvider
 
@@ -18,9 +16,8 @@ class HypothesisEvaluator:
     """
     Evaluates a structural hypothesis by delegating to EvidenceProviders.
     """
-    def __init__(self, evidence_providers: Iterable[EvidenceProvider], policy: RelationshipPolicy):
+    def __init__(self, evidence_providers: Iterable[EvidenceProvider]):
         self.evidence_providers = tuple(evidence_providers)
-        self.policy = policy
 
     def evaluate(self, graph: CandidateGraph, hypothesis: Hypothesis) -> EvaluatedHypothesis:
         if not hypothesis.matched_nodes:
@@ -55,30 +52,25 @@ class HypothesisEvaluator:
                 violations=frozenset([SemanticFinding.MISSING_COUNTERPARTY])
             )
             
-        from recongraph.matching.pair_scorers import score_purchase_to_gst
         from recongraph.matching.scoring import ScoringEvidence
         
-        scored_pair = score_purchase_to_gst(
-            purchases=purchases,
-            gsts=gsts,
-            providers=self.evidence_providers,
-            policy=self.policy
-        )
-        
-        eligibility = EligibilityStatus.ELIGIBLE if scored_pair.is_eligible else EligibilityStatus.INELIGIBLE
-        
+        contributions = {}
+        for provider in self.evidence_providers:
+            contrib = provider.evaluate(purchases, gsts)
+            contributions[provider.get_name()] = contrib
+            
         supporting_evidence = ScoringEvidence(
-            signals=scored_pair.signals,
-            relationship=scored_pair.relationship,
-            metadata=scored_pair.supporting_metadata,
-            contributions=scored_pair.contributions
+            signals={}, # Legacy
+            relationship=None, # Legacy
+            metadata={}, # Legacy
+            contributions=contributions
         )
 
         return EvaluatedHypothesis(
             hypothesis=hypothesis,
-            score=scored_pair.score,
-            coverage=scored_pair.coverage,
-            eligibility=eligibility,
+            score=0.0, # Handled by fusion later
+            coverage=len(hypothesis.matched_nodes) / max(1, len(hypothesis.component_nodes)),
+            eligibility=EligibilityStatus.ELIGIBLE, # We defer constraints to fusion
             supporting_evidence=supporting_evidence,
-            violations=scored_pair.violations
+            violations=frozenset()
         )

@@ -6,20 +6,9 @@ from recongraph.matching.reference_evidence import ReferenceEvidencePolicy
 class ReferenceConfig:
     policy: ReferenceEvidencePolicy = field(default_factory=ReferenceEvidencePolicy)
 
-from enum import Enum
-from recongraph.matching.scoring import RelationshipPolicy
-from recongraph.matching.pair_scorers import PURCHASE_TO_GST_POLICY
-
-class DecisionMode(Enum):
-    LEGACY = "LEGACY"
-    SHADOW = "SHADOW"
-    FUSION = "FUSION"
-
 @dataclass(frozen=True)
 class DecisionConfig:
     policy: DecisionPolicy = field(default_factory=DecisionPolicy)
-    relationship_policy: RelationshipPolicy = field(default_factory=lambda: PURCHASE_TO_GST_POLICY)
-    decision_mode: DecisionMode = DecisionMode.LEGACY
 
 @dataclass(frozen=True)
 class ReviewConfig:
