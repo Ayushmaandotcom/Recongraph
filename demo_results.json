@@ -1,0 +1,2600 @@
+{
+  "auto_matches": [],
+  "review_packets": [
+    {
+      "packet_id": "RP-00001",
+      "action": "review_weak",
+      "purchases": [
+        {
+          "record_id": "CP001",
+          "vendor_name": "ABC Steel Private Limited",
+          "reference": "INV-1042",
+          "amount": "118000.00",
+          "record_date": "2026-06-12",
+          "tax_identity": "07ABCDE1234F1Z5",
+          "description": null,
+          "filing_period": null,
+          "net_amount": null,
+          "tax_amount": null,
+          "tax_rate": null,
+          "currency": "USD",
+          "sign": 1,
+          "layout_artifact": null,
+          "ocr_confidence_report": null,
+          "reliability_envelope": null
+        }
+      ],
+      "gsts": [
+        {
+          "record_id": "CG002",
+          "vendor_name": "ABC STEELS PVT. LTD.",
+          "reference": "AB/1042",
+          "amount": "118000.00",
+          "record_date": "2026-06-13",
+          "tax_identity": "27ZZZZZ9999Z9Z9",
+          "description": null,
+          "filing_period": null,
+          "net_amount": null,
+          "tax_amount": null,
+          "tax_rate": null,
+          "currency": "USD",
+          "sign": -1,
+          "layout_artifact": null,
+          "ocr_confidence_report": null,
+          "reliability_envelope": null
+        }
+      ],
+      "explanation": null,
+      "competitors": [
+        {
+          "hypothesis": {
+            "component_nodes": [
+              "urn:recongraph:purchase:CP001",
+              "urn:recongraph:gst:CG001",
+              "urn:recongraph:gst:CG002"
+            ],
+            "proposed_edges": [
+              [
+                "urn:recongraph:purchase:CP001",
+                "urn:recongraph:gst:CG001"
+              ]
+            ]
+          },
+          "score": 0.6335839598997494,
+          "coverage": 0.75,
+          "eligibility": "eligible",
+          "supporting_evidence": {
+            "signals": {
+              "amount": 0.0,
+              "temporal": 0.8571428571428572,
+              "tax_identity": null,
+              "entity": 0.9473684210526315,
+              "reference": 1.0
+            },
+            "relationship": {
+              "score": 0.6335839598997494,
+              "base_score": 0.6335839598997494,
+              "coverage": 0.75
+            },
+            "metadata": {
+              "amount": {
+                "interpretation": {
+                  "equality": "UNEQUAL",
+                  "magnitude_relation": "RIGHT_GREATER",
+                  "currency_relation": "SAME",
+                  "sign_relation": "OPPOSITE",
+                  "amount_a": "118000.00",
+                  "amount_b": "236000.00",
+                  "absolute_difference": "118000.00",
+                  "relative_difference": "0.5",
+                  "residual": "-118000.00",
+                  "is_multiple": true,
+                  "multiple_factor": 2,
+                  "compatibility_flags": [
+                    "OUTSIDE_TOLERANCE_RIGHT_GREATER"
+                  ],
+                  "comparison_basis": "Gross Amount",
+                  "notes": [],
+                  "assumptions": [],
+                  "provenance": "FinancialEvidencePipeline"
+                },
+                "projection": {
+                  "similarity": 0.0,
+                  "projection_version": "v2",
+                  "assumptions": [
+                    "Projected using AmountSimilarityProjection.V2"
+                  ],
+                  "warnings": [
+                    "AMOUNT_MULTIPLE"
+                  ]
+                }
+              },
+              "temporal": {
+                "temporal_projection": {
+                  "score": 0.8571428571428572,
+                  "violations": [],
+                  "metadata": {
+                    "projection_version": "1.0",
+                    "projection_boundary": "TemporalV1ScalarProjection"
+                  }
+                },
+                "assertions": [
+                  {
+                    "proposition": {
+                      "claim": {
+                        "claim_id": {
+                          "value": "temporal.same_fiscal_period"
+                        },
+                        "semantic_version": {
+                          "value": 1
+                        },
+                        "symmetry": "symmetric",
+                        "allowed_scope_kinds": [
+                          "record_pair"
+                        ]
+                      },
+                      "subject": {
+                        "claim_id": "temporal.same_fiscal_period",
+                        "claim_semantic_version": 1,
+                        "kind": "record_pair",
+                        "left": [
+                          {
+                            "urn": "urn:gst"
+                          }
+                        ],
+                        "right": [
+                          {
+                            "urn": "urn:purchase"
+                          }
+                        ]
+                      }
+                    },
+                    "polarity": "support",
+                    "magnitude": 1.0,
+                    "authority": {
+                      "basis": {
+                        "value": "temporal_model"
+                      }
+                    },
+                    "ancestry": {
+                      "identity": {
+                        "domain": {
+                          "value": "recongraph.observation_occurrence"
+                        },
+                        "schema": {
+                          "value": "recongraph.observation_occurrence.v1"
+                        },
+                        "digest": {
+                          "value": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                        }
+                      }
+                    },
+                    "payload": null,
+                    "identity": {
+                      "digest": "sha256:cad20ef64b43d3ede01d922cd22805268fc106998ddc6c090327fe650a4d0335"
+                    }
+                  }
+                ]
+              },
+              "tax_identity": {
+                "assertions": []
+              },
+              "entity": {
+                "vendor_interpretation": {
+                  "left_artifact_identity": {
+                    "digest": "sha256:d648d42db342f42c17adc4eac780b6342f7ce81f89a9f0355105cde0c56e70e8"
+                  },
+                  "right_artifact_identity": {
+                    "digest": "sha256:314c31e60907f1a5d65a0f8ea94ce083b0d935a7f7bf96f688eae5b1ffe8c6fb"
+                  },
+                  "context_identity": "sha256:dc06f690d4008fbc088f364795c67711bd4f2ce547a284adc2e1cb31b4b5cafc",
+                  "gst_registration_relation": {
+                    "state": 1,
+                    "left_value": null,
+                    "right_value": null
+                  },
+                  "pan_relation": {
+                    "state": 1,
+                    "dependence": null,
+                    "left_value": null,
+                    "right_value": null
+                  },
+                  "lexical_relation": {
+                    "state": 4,
+                    "similarity_score": 0.9473684210526315,
+                    "shared_tokens": [
+                      "ABC"
+                    ]
+                  },
+                  "legal_form_relation": {
+                    "state": 4,
+                    "left_category": 1,
+                    "right_category": 1
+                  },
+                  "corpus_distinctiveness": {
+                    "state": 3,
+                    "most_distinctive_token": null,
+                    "document_frequency": null
+                  },
+                  "organizational_relation": {
+                    "state": 5
+                  },
+                  "warnings": []
+                },
+                "vendor_projection": {
+                  "similarity": 0.9473684210526315,
+                  "policy_identity": "VendorProjectionPolicyV1_1.0.0",
+                  "source_interpretation_identity": "sha256:dc06f690d4008fbc088f364795c67711bd4f2ce547a284adc2e1cb31b4b5cafc",
+                  "considered_factors": [
+                    "lexical_relation",
+                    "legal_form_relation"
+                  ],
+                  "missing_factors": [
+                    "gst_registration_relation",
+                    "pan_relation"
+                  ],
+                  "uninterpretable_factors": [],
+                  "dependence_groups": [],
+                  "contradiction_markers": [],
+                  "warnings": []
+                },
+                "assertions": []
+              },
+              "reference": {
+                "reference_projection": {
+                  "score": 1.0,
+                  "violations": [],
+                  "metadata": {
+                    "projection_version": "1.0",
+                    "projection_boundary": "ReferenceV1ScalarProjection"
+                  }
+                }
+              }
+            },
+            "contributions": {
+              "amount": {
+                "provider_name": "amount",
+                "score": 0.0,
+                "violations": [
+                  "SEVERE_AMOUNT_CONFLICT",
+                  "AMOUNT_MULTIPLE"
+                ],
+                "metadata": {
+                  "interpretation": {
+                    "equality": "UNEQUAL",
+                    "magnitude_relation": "RIGHT_GREATER",
+                    "currency_relation": "SAME",
+                    "sign_relation": "OPPOSITE",
+                    "amount_a": "118000.00",
+                    "amount_b": "236000.00",
+                    "absolute_difference": "118000.00",
+                    "relative_difference": "0.5",
+                    "residual": "-118000.00",
+                    "is_multiple": true,
+                    "multiple_factor": 2,
+                    "compatibility_flags": [
+                      "OUTSIDE_TOLERANCE_RIGHT_GREATER"
+                    ],
+                    "comparison_basis": "Gross Amount",
+                    "notes": [],
+                    "assumptions": [],
+                    "provenance": "FinancialEvidencePipeline"
+                  },
+                  "projection": {
+                    "similarity": 0.0,
+                    "projection_version": "v2",
+                    "assumptions": [
+                      "Projected using AmountSimilarityProjection.V2"
+                    ],
+                    "warnings": [
+                      "AMOUNT_MULTIPLE"
+                    ]
+                  }
+                }
+              },
+              "temporal": {
+                "provider_name": "temporal",
+                "score": 0.8571428571428572,
+                "violations": [],
+                "metadata": {
+                  "temporal_projection": {
+                    "score": 0.8571428571428572,
+                    "violations": [],
+                    "metadata": {
+                      "projection_version": "1.0",
+                      "projection_boundary": "TemporalV1ScalarProjection"
+                    }
+                  },
+                  "assertions": [
+                    {
+                      "proposition": {
+                        "claim": {
+                          "claim_id": {
+                            "value": "temporal.same_fiscal_period"
+                          },
+                          "semantic_version": {
+                            "value": 1
+                          },
+                          "symmetry": "symmetric",
+                          "allowed_scope_kinds": [
+                            "record_pair"
+                          ]
+                        },
+                        "subject": {
+                          "claim_id": "temporal.same_fiscal_period",
+                          "claim_semantic_version": 1,
+                          "kind": "record_pair",
+                          "left": [
+                            {
+                              "urn": "urn:gst"
+                            }
+                          ],
+                          "right": [
+                            {
+                              "urn": "urn:purchase"
+                            }
+                          ]
+                        }
+                      },
+                      "polarity": "support",
+                      "magnitude": 1.0,
+                      "authority": {
+                        "basis": {
+                          "value": "temporal_model"
+                        }
+                      },
+                      "ancestry": {
+                        "identity": {
+                          "domain": {
+                            "value": "recongraph.observation_occurrence"
+                          },
+                          "schema": {
+                            "value": "recongraph.observation_occurrence.v1"
+                          },
+                          "digest": {
+                            "value": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                          }
+                        }
+                      },
+                      "payload": null,
+                      "identity": {
+                        "digest": "sha256:cad20ef64b43d3ede01d922cd22805268fc106998ddc6c090327fe650a4d0335"
+                      }
+                    }
+                  ]
+                }
+              },
+              "tax_identity": {
+                "provider_name": "tax_identity",
+                "score": null,
+                "violations": [],
+                "metadata": {
+                  "assertions": []
+                }
+              },
+              "entity": {
+                "provider_name": "entity",
+                "score": 0.9473684210526315,
+                "violations": [],
+                "metadata": {
+                  "vendor_interpretation": {
+                    "left_artifact_identity": {
+                      "digest": "sha256:d648d42db342f42c17adc4eac780b6342f7ce81f89a9f0355105cde0c56e70e8"
+                    },
+                    "right_artifact_identity": {
+                      "digest": "sha256:314c31e60907f1a5d65a0f8ea94ce083b0d935a7f7bf96f688eae5b1ffe8c6fb"
+                    },
+                    "context_identity": "sha256:dc06f690d4008fbc088f364795c67711bd4f2ce547a284adc2e1cb31b4b5cafc",
+                    "gst_registration_relation": {
+                      "state": 1,
+                      "left_value": null,
+                      "right_value": null
+                    },
+                    "pan_relation": {
+                      "state": 1,
+                      "dependence": null,
+                      "left_value": null,
+                      "right_value": null
+                    },
+                    "lexical_relation": {
+                      "state": 4,
+                      "similarity_score": 0.9473684210526315,
+                      "shared_tokens": [
+                        "ABC"
+                      ]
+                    },
+                    "legal_form_relation": {
+                      "state": 4,
+                      "left_category": 1,
+                      "right_category": 1
+                    },
+                    "corpus_distinctiveness": {
+                      "state": 3,
+                      "most_distinctive_token": null,
+                      "document_frequency": null
+                    },
+                    "organizational_relation": {
+                      "state": 5
+                    },
+                    "warnings": []
+                  },
+                  "vendor_projection": {
+                    "similarity": 0.9473684210526315,
+                    "policy_identity": "VendorProjectionPolicyV1_1.0.0",
+                    "source_interpretation_identity": "sha256:dc06f690d4008fbc088f364795c67711bd4f2ce547a284adc2e1cb31b4b5cafc",
+                    "considered_factors": [
+                      "lexical_relation",
+                      "legal_form_relation"
+                    ],
+                    "missing_factors": [
+                      "gst_registration_relation",
+                      "pan_relation"
+                    ],
+                    "uninterpretable_factors": [],
+                    "dependence_groups": [],
+                    "contradiction_markers": [],
+                    "warnings": []
+                  },
+                  "assertions": []
+                }
+              },
+              "reference": {
+                "provider_name": "reference",
+                "score": 1.0,
+                "violations": [],
+                "metadata": {
+                  "reference_projection": {
+                    "score": 1.0,
+                    "violations": [],
+                    "metadata": {
+                      "projection_version": "1.0",
+                      "projection_boundary": "ReferenceV1ScalarProjection"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "violations": [
+            "SEVERE_AMOUNT_CONFLICT",
+            "AMOUNT_MULTIPLE"
+          ]
+        },
+        {
+          "hypothesis": {
+            "component_nodes": [
+              "urn:recongraph:purchase:CP001",
+              "urn:recongraph:gst:CG001",
+              "urn:recongraph:gst:CG002"
+            ],
+            "proposed_edges": [
+              [
+                "urn:recongraph:purchase:CP001",
+                "urn:recongraph:gst:CG002"
+              ],
+              [
+                "urn:recongraph:purchase:CP001",
+                "urn:recongraph:gst:CG001"
+              ]
+            ]
+          },
+          "score": 0.6335839598997494,
+          "coverage": 0.75,
+          "eligibility": "eligible",
+          "supporting_evidence": {
+            "signals": {
+              "amount": 0.0,
+              "temporal": 0.8571428571428572,
+              "tax_identity": null,
+              "entity": 0.9473684210526315,
+              "reference": 1.0
+            },
+            "relationship": {
+              "score": 0.6335839598997494,
+              "base_score": 0.6335839598997494,
+              "coverage": 0.75
+            },
+            "metadata": {
+              "amount": {
+                "interpretation": {
+                  "equality": "UNEQUAL",
+                  "magnitude_relation": "RIGHT_GREATER",
+                  "currency_relation": "SAME",
+                  "sign_relation": "OPPOSITE",
+                  "amount_a": "118000.00",
+                  "amount_b": "354000.00",
+                  "absolute_difference": "236000.00",
+                  "relative_difference": "0.6666666666666666666666666667",
+                  "residual": "-236000.00",
+                  "is_multiple": true,
+                  "multiple_factor": 3,
+                  "compatibility_flags": [
+                    "OUTSIDE_TOLERANCE_RIGHT_GREATER"
+                  ],
+                  "comparison_basis": "Gross Amount",
+                  "notes": [],
+                  "assumptions": [],
+                  "provenance": "FinancialEvidencePipeline"
+                },
+                "projection": {
+                  "similarity": 0.0,
+                  "projection_version": "v2",
+                  "assumptions": [
+                    "Projected using AmountSimilarityProjection.V2"
+                  ],
+                  "warnings": [
+                    "AMOUNT_MULTIPLE"
+                  ]
+                }
+              },
+              "temporal": {
+                "temporal_projection": {
+                  "score": 0.8571428571428572,
+                  "violations": [],
+                  "metadata": {
+                    "projection_version": "1.0",
+                    "projection_boundary": "TemporalV1ScalarProjection"
+                  }
+                },
+                "assertions": [
+                  {
+                    "proposition": {
+                      "claim": {
+                        "claim_id": {
+                          "value": "temporal.same_fiscal_period"
+                        },
+                        "semantic_version": {
+                          "value": 1
+                        },
+                        "symmetry": "symmetric",
+                        "allowed_scope_kinds": [
+                          "record_pair"
+                        ]
+                      },
+                      "subject": {
+                        "claim_id": "temporal.same_fiscal_period",
+                        "claim_semantic_version": 1,
+                        "kind": "record_pair",
+                        "left": [
+                          {
+                            "urn": "urn:gst"
+                          }
+                        ],
+                        "right": [
+                          {
+                            "urn": "urn:purchase"
+                          }
+                        ]
+                      }
+                    },
+                    "polarity": "support",
+                    "magnitude": 1.0,
+                    "authority": {
+                      "basis": {
+                        "value": "temporal_model"
+                      }
+                    },
+                    "ancestry": {
+                      "identity": {
+                        "domain": {
+                          "value": "recongraph.observation_occurrence"
+                        },
+                        "schema": {
+                          "value": "recongraph.observation_occurrence.v1"
+                        },
+                        "digest": {
+                          "value": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                        }
+                      }
+                    },
+                    "payload": null,
+                    "identity": {
+                      "digest": "sha256:cad20ef64b43d3ede01d922cd22805268fc106998ddc6c090327fe650a4d0335"
+                    }
+                  },
+                  {
+                    "proposition": {
+                      "claim": {
+                        "claim_id": {
+                          "value": "temporal.same_fiscal_period"
+                        },
+                        "semantic_version": {
+                          "value": 1
+                        },
+                        "symmetry": "symmetric",
+                        "allowed_scope_kinds": [
+                          "record_pair"
+                        ]
+                      },
+                      "subject": {
+                        "claim_id": "temporal.same_fiscal_period",
+                        "claim_semantic_version": 1,
+                        "kind": "record_pair",
+                        "left": [
+                          {
+                            "urn": "urn:gst"
+                          }
+                        ],
+                        "right": [
+                          {
+                            "urn": "urn:purchase"
+                          }
+                        ]
+                      }
+                    },
+                    "polarity": "support",
+                    "magnitude": 1.0,
+                    "authority": {
+                      "basis": {
+                        "value": "temporal_model"
+                      }
+                    },
+                    "ancestry": {
+                      "identity": {
+                        "domain": {
+                          "value": "recongraph.observation_occurrence"
+                        },
+                        "schema": {
+                          "value": "recongraph.observation_occurrence.v1"
+                        },
+                        "digest": {
+                          "value": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                        }
+                      }
+                    },
+                    "payload": null,
+                    "identity": {
+                      "digest": "sha256:cad20ef64b43d3ede01d922cd22805268fc106998ddc6c090327fe650a4d0335"
+                    }
+                  }
+                ]
+              },
+              "tax_identity": {
+                "assertions": []
+              },
+              "entity": {
+                "vendor_interpretation": {
+                  "left_artifact_identity": {
+                    "digest": "sha256:d648d42db342f42c17adc4eac780b6342f7ce81f89a9f0355105cde0c56e70e8"
+                  },
+                  "right_artifact_identity": {
+                    "digest": "sha256:314c31e60907f1a5d65a0f8ea94ce083b0d935a7f7bf96f688eae5b1ffe8c6fb"
+                  },
+                  "context_identity": "sha256:dc06f690d4008fbc088f364795c67711bd4f2ce547a284adc2e1cb31b4b5cafc",
+                  "gst_registration_relation": {
+                    "state": 1,
+                    "left_value": null,
+                    "right_value": null
+                  },
+                  "pan_relation": {
+                    "state": 1,
+                    "dependence": null,
+                    "left_value": null,
+                    "right_value": null
+                  },
+                  "lexical_relation": {
+                    "state": 4,
+                    "similarity_score": 0.9473684210526315,
+                    "shared_tokens": [
+                      "ABC"
+                    ]
+                  },
+                  "legal_form_relation": {
+                    "state": 4,
+                    "left_category": 1,
+                    "right_category": 1
+                  },
+                  "corpus_distinctiveness": {
+                    "state": 3,
+                    "most_distinctive_token": null,
+                    "document_frequency": null
+                  },
+                  "organizational_relation": {
+                    "state": 5
+                  },
+                  "warnings": []
+                },
+                "vendor_projection": {
+                  "similarity": 0.9473684210526315,
+                  "policy_identity": "VendorProjectionPolicyV1_1.0.0",
+                  "source_interpretation_identity": "sha256:dc06f690d4008fbc088f364795c67711bd4f2ce547a284adc2e1cb31b4b5cafc",
+                  "considered_factors": [
+                    "lexical_relation",
+                    "legal_form_relation"
+                  ],
+                  "missing_factors": [
+                    "gst_registration_relation",
+                    "pan_relation"
+                  ],
+                  "uninterpretable_factors": [],
+                  "dependence_groups": [],
+                  "contradiction_markers": [],
+                  "warnings": []
+                },
+                "assertions": []
+              },
+              "reference": {
+                "reference_projection": {
+                  "score": 1.0,
+                  "violations": [],
+                  "metadata": {
+                    "projection_version": "1.0",
+                    "projection_boundary": "ReferenceV1ScalarProjection"
+                  }
+                }
+              }
+            },
+            "contributions": {
+              "amount": {
+                "provider_name": "amount",
+                "score": 0.0,
+                "violations": [
+                  "SEVERE_AMOUNT_CONFLICT",
+                  "AMOUNT_MULTIPLE"
+                ],
+                "metadata": {
+                  "interpretation": {
+                    "equality": "UNEQUAL",
+                    "magnitude_relation": "RIGHT_GREATER",
+                    "currency_relation": "SAME",
+                    "sign_relation": "OPPOSITE",
+                    "amount_a": "118000.00",
+                    "amount_b": "354000.00",
+                    "absolute_difference": "236000.00",
+                    "relative_difference": "0.6666666666666666666666666667",
+                    "residual": "-236000.00",
+                    "is_multiple": true,
+                    "multiple_factor": 3,
+                    "compatibility_flags": [
+                      "OUTSIDE_TOLERANCE_RIGHT_GREATER"
+                    ],
+                    "comparison_basis": "Gross Amount",
+                    "notes": [],
+                    "assumptions": [],
+                    "provenance": "FinancialEvidencePipeline"
+                  },
+                  "projection": {
+                    "similarity": 0.0,
+                    "projection_version": "v2",
+                    "assumptions": [
+                      "Projected using AmountSimilarityProjection.V2"
+                    ],
+                    "warnings": [
+                      "AMOUNT_MULTIPLE"
+                    ]
+                  }
+                }
+              },
+              "temporal": {
+                "provider_name": "temporal",
+                "score": 0.8571428571428572,
+                "violations": [],
+                "metadata": {
+                  "temporal_projection": {
+                    "score": 0.8571428571428572,
+                    "violations": [],
+                    "metadata": {
+                      "projection_version": "1.0",
+                      "projection_boundary": "TemporalV1ScalarProjection"
+                    }
+                  },
+                  "assertions": [
+                    {
+                      "proposition": {
+                        "claim": {
+                          "claim_id": {
+                            "value": "temporal.same_fiscal_period"
+                          },
+                          "semantic_version": {
+                            "value": 1
+                          },
+                          "symmetry": "symmetric",
+                          "allowed_scope_kinds": [
+                            "record_pair"
+                          ]
+                        },
+                        "subject": {
+                          "claim_id": "temporal.same_fiscal_period",
+                          "claim_semantic_version": 1,
+                          "kind": "record_pair",
+                          "left": [
+                            {
+                              "urn": "urn:gst"
+                            }
+                          ],
+                          "right": [
+                            {
+                              "urn": "urn:purchase"
+                            }
+                          ]
+                        }
+                      },
+                      "polarity": "support",
+                      "magnitude": 1.0,
+                      "authority": {
+                        "basis": {
+                          "value": "temporal_model"
+                        }
+                      },
+                      "ancestry": {
+                        "identity": {
+                          "domain": {
+                            "value": "recongraph.observation_occurrence"
+                          },
+                          "schema": {
+                            "value": "recongraph.observation_occurrence.v1"
+                          },
+                          "digest": {
+                            "value": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                          }
+                        }
+                      },
+                      "payload": null,
+                      "identity": {
+                        "digest": "sha256:cad20ef64b43d3ede01d922cd22805268fc106998ddc6c090327fe650a4d0335"
+                      }
+                    },
+                    {
+                      "proposition": {
+                        "claim": {
+                          "claim_id": {
+                            "value": "temporal.same_fiscal_period"
+                          },
+                          "semantic_version": {
+                            "value": 1
+                          },
+                          "symmetry": "symmetric",
+                          "allowed_scope_kinds": [
+                            "record_pair"
+                          ]
+                        },
+                        "subject": {
+                          "claim_id": "temporal.same_fiscal_period",
+                          "claim_semantic_version": 1,
+                          "kind": "record_pair",
+                          "left": [
+                            {
+                              "urn": "urn:gst"
+                            }
+                          ],
+                          "right": [
+                            {
+                              "urn": "urn:purchase"
+                            }
+                          ]
+                        }
+                      },
+                      "polarity": "support",
+                      "magnitude": 1.0,
+                      "authority": {
+                        "basis": {
+                          "value": "temporal_model"
+                        }
+                      },
+                      "ancestry": {
+                        "identity": {
+                          "domain": {
+                            "value": "recongraph.observation_occurrence"
+                          },
+                          "schema": {
+                            "value": "recongraph.observation_occurrence.v1"
+                          },
+                          "digest": {
+                            "value": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                          }
+                        }
+                      },
+                      "payload": null,
+                      "identity": {
+                        "digest": "sha256:cad20ef64b43d3ede01d922cd22805268fc106998ddc6c090327fe650a4d0335"
+                      }
+                    }
+                  ]
+                }
+              },
+              "tax_identity": {
+                "provider_name": "tax_identity",
+                "score": null,
+                "violations": [],
+                "metadata": {
+                  "assertions": []
+                }
+              },
+              "entity": {
+                "provider_name": "entity",
+                "score": 0.9473684210526315,
+                "violations": [],
+                "metadata": {
+                  "vendor_interpretation": {
+                    "left_artifact_identity": {
+                      "digest": "sha256:d648d42db342f42c17adc4eac780b6342f7ce81f89a9f0355105cde0c56e70e8"
+                    },
+                    "right_artifact_identity": {
+                      "digest": "sha256:314c31e60907f1a5d65a0f8ea94ce083b0d935a7f7bf96f688eae5b1ffe8c6fb"
+                    },
+                    "context_identity": "sha256:dc06f690d4008fbc088f364795c67711bd4f2ce547a284adc2e1cb31b4b5cafc",
+                    "gst_registration_relation": {
+                      "state": 1,
+                      "left_value": null,
+                      "right_value": null
+                    },
+                    "pan_relation": {
+                      "state": 1,
+                      "dependence": null,
+                      "left_value": null,
+                      "right_value": null
+                    },
+                    "lexical_relation": {
+                      "state": 4,
+                      "similarity_score": 0.9473684210526315,
+                      "shared_tokens": [
+                        "ABC"
+                      ]
+                    },
+                    "legal_form_relation": {
+                      "state": 4,
+                      "left_category": 1,
+                      "right_category": 1
+                    },
+                    "corpus_distinctiveness": {
+                      "state": 3,
+                      "most_distinctive_token": null,
+                      "document_frequency": null
+                    },
+                    "organizational_relation": {
+                      "state": 5
+                    },
+                    "warnings": []
+                  },
+                  "vendor_projection": {
+                    "similarity": 0.9473684210526315,
+                    "policy_identity": "VendorProjectionPolicyV1_1.0.0",
+                    "source_interpretation_identity": "sha256:dc06f690d4008fbc088f364795c67711bd4f2ce547a284adc2e1cb31b4b5cafc",
+                    "considered_factors": [
+                      "lexical_relation",
+                      "legal_form_relation"
+                    ],
+                    "missing_factors": [
+                      "gst_registration_relation",
+                      "pan_relation"
+                    ],
+                    "uninterpretable_factors": [],
+                    "dependence_groups": [],
+                    "contradiction_markers": [],
+                    "warnings": []
+                  },
+                  "assertions": []
+                }
+              },
+              "reference": {
+                "provider_name": "reference",
+                "score": 1.0,
+                "violations": [],
+                "metadata": {
+                  "reference_projection": {
+                    "score": 1.0,
+                    "violations": [],
+                    "metadata": {
+                      "projection_version": "1.0",
+                      "projection_boundary": "ReferenceV1ScalarProjection"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "violations": [
+            "SEVERE_AMOUNT_CONFLICT",
+            "AMOUNT_MULTIPLE"
+          ]
+        },
+        {
+          "hypothesis": {
+            "component_nodes": [
+              "urn:recongraph:purchase:CP001",
+              "urn:recongraph:gst:CG001",
+              "urn:recongraph:gst:CG002"
+            ],
+            "proposed_edges": []
+          },
+          "score": 0.0,
+          "coverage": 0.0,
+          "eligibility": "ineligible",
+          "supporting_evidence": {
+            "signals": {},
+            "relationship": null,
+            "metadata": {},
+            "contributions": {}
+          },
+          "violations": [
+            "EMPTY_HYPOTHESIS"
+          ]
+        }
+      ],
+      "checklist": [
+        "General manual review"
+      ],
+      "headline": "Weak evidence: INV-1042 \u2194 AB/1042 \u2014 score 0.63 below threshold",
+      "highlight_regions": [],
+      "ocr_warnings": []
+    },
+    {
+      "packet_id": "RP-00002",
+      "action": "no_match",
+      "purchases": [],
+      "gsts": [
+        {
+          "record_id": "CG001",
+          "vendor_name": "ABC STEELS PVT. LTD.",
+          "reference": "AB/1042",
+          "amount": "236000.00",
+          "record_date": "2026-06-13",
+          "tax_identity": "07ABCDE1234F1Z5",
+          "description": null,
+          "filing_period": null,
+          "net_amount": null,
+          "tax_amount": null,
+          "tax_rate": null,
+          "currency": "USD",
+          "sign": -1,
+          "layout_artifact": null,
+          "ocr_confidence_report": null,
+          "reliability_envelope": null
+        }
+      ],
+      "explanation": null,
+      "competitors": [],
+      "checklist": [
+        "Review unmatched record"
+      ],
+      "headline": "No match: GST AB/1042 \u2014 no candidate purchase record found",
+      "highlight_regions": [],
+      "ocr_warnings": []
+    },
+    {
+      "packet_id": "RP-00003",
+      "action": "no_match",
+      "purchases": [],
+      "gsts": [
+        {
+          "record_id": "CG003",
+          "vendor_name": "CLOUDLEDGER SOFTWARE PVT LTD",
+          "reference": "CL-JUL-2026",
+          "amount": "25000.00",
+          "record_date": "2026-07-05",
+          "tax_identity": "07CLOUD1234A1Z1",
+          "description": null,
+          "filing_period": null,
+          "net_amount": null,
+          "tax_amount": null,
+          "tax_rate": null,
+          "currency": "USD",
+          "sign": -1,
+          "layout_artifact": null,
+          "ocr_confidence_report": null,
+          "reliability_envelope": null
+        }
+      ],
+      "explanation": null,
+      "competitors": [],
+      "checklist": [
+        "Review unmatched record"
+      ],
+      "headline": "No match: GST CL-JUL-2026 \u2014 no candidate purchase record found",
+      "highlight_regions": [],
+      "ocr_warnings": []
+    },
+    {
+      "packet_id": "RP-00004",
+      "action": "no_match",
+      "purchases": [
+        {
+          "record_id": "CP002",
+          "vendor_name": "CloudLedger Software Private Limited",
+          "reference": "CL-JUN-2026",
+          "amount": "25000.00",
+          "record_date": "2026-06-05",
+          "tax_identity": "07CLOUD1234A1Z1",
+          "description": null,
+          "filing_period": null,
+          "net_amount": null,
+          "tax_amount": null,
+          "tax_rate": null,
+          "currency": "USD",
+          "sign": 1,
+          "layout_artifact": null,
+          "ocr_confidence_report": null,
+          "reliability_envelope": null
+        }
+      ],
+      "gsts": [],
+      "explanation": null,
+      "competitors": [],
+      "checklist": [
+        "Review unmatched record"
+      ],
+      "headline": "No match: purchase CL-JUN-2026 \u2014 no candidate GST record found",
+      "highlight_regions": [],
+      "ocr_warnings": []
+    },
+    {
+      "packet_id": "RP-00005",
+      "action": "review_weak",
+      "purchases": [
+        {
+          "record_id": "CP003",
+          "vendor_name": "Orion Medical Devices Private Limited",
+          "reference": "OMD-001",
+          "amount": "75000.00",
+          "record_date": "2026-06-20",
+          "tax_identity": "07ORION5678B1Z2",
+          "description": null,
+          "filing_period": null,
+          "net_amount": null,
+          "tax_amount": null,
+          "tax_rate": null,
+          "currency": "USD",
+          "sign": 1,
+          "layout_artifact": null,
+          "ocr_confidence_report": null,
+          "reliability_envelope": null
+        }
+      ],
+      "gsts": [
+        {
+          "record_id": "CG004",
+          "vendor_name": "Nova Surgical Systems Private Limited",
+          "reference": "NSS-001",
+          "amount": "75000.00",
+          "record_date": "2026-06-20",
+          "tax_identity": "29NOVAS9876D1Z4",
+          "description": null,
+          "filing_period": null,
+          "net_amount": null,
+          "tax_amount": null,
+          "tax_rate": null,
+          "currency": "USD",
+          "sign": -1,
+          "layout_artifact": null,
+          "ocr_confidence_report": null,
+          "reliability_envelope": null
+        }
+      ],
+      "explanation": null,
+      "competitors": [
+        {
+          "hypothesis": {
+            "component_nodes": [
+              "urn:recongraph:gst:CG004",
+              "urn:recongraph:purchase:CP003"
+            ],
+            "proposed_edges": []
+          },
+          "score": 0.0,
+          "coverage": 0.0,
+          "eligibility": "ineligible",
+          "supporting_evidence": {
+            "signals": {},
+            "relationship": null,
+            "metadata": {},
+            "contributions": {}
+          },
+          "violations": [
+            "EMPTY_HYPOTHESIS"
+          ]
+        }
+      ],
+      "checklist": [
+        "General manual review"
+      ],
+      "headline": "Weak evidence: OMD-001 \u2194 NSS-001 \u2014 score 0.00 below threshold",
+      "highlight_regions": [],
+      "ocr_warnings": []
+    },
+    {
+      "packet_id": "RP-00006",
+      "action": "review_weak",
+      "purchases": [
+        {
+          "record_id": "CP004",
+          "vendor_name": "Apex Industrial Supplies",
+          "reference": "AIS-9001",
+          "amount": "100000.00",
+          "record_date": "2026-06-25",
+          "tax_identity": "07APEXS1234C1Z3",
+          "description": null,
+          "filing_period": null,
+          "net_amount": null,
+          "tax_amount": null,
+          "tax_rate": null,
+          "currency": "USD",
+          "sign": 1,
+          "layout_artifact": null,
+          "ocr_confidence_report": null,
+          "reliability_envelope": null
+        }
+      ],
+      "gsts": [
+        {
+          "record_id": "CG006",
+          "vendor_name": "APEX INDUSTRIAL SUPPLIES",
+          "reference": "AIS/9001-B",
+          "amount": "50000.00",
+          "record_date": "2026-06-25",
+          "tax_identity": "07APEXS1234C1Z3",
+          "description": null,
+          "filing_period": null,
+          "net_amount": null,
+          "tax_amount": null,
+          "tax_rate": null,
+          "currency": "USD",
+          "sign": -1,
+          "layout_artifact": null,
+          "ocr_confidence_report": null,
+          "reliability_envelope": null
+        },
+        {
+          "record_id": "CG005",
+          "vendor_name": "APEX INDUSTRIAL SUPPLIES",
+          "reference": "AIS/9001-A",
+          "amount": "50000.00",
+          "record_date": "2026-06-25",
+          "tax_identity": "07APEXS1234C1Z3",
+          "description": null,
+          "filing_period": null,
+          "net_amount": null,
+          "tax_amount": null,
+          "tax_rate": null,
+          "currency": "USD",
+          "sign": -1,
+          "layout_artifact": null,
+          "ocr_confidence_report": null,
+          "reliability_envelope": null
+        }
+      ],
+      "explanation": null,
+      "competitors": [
+        {
+          "hypothesis": {
+            "component_nodes": [
+              "urn:recongraph:purchase:CP004",
+              "urn:recongraph:gst:CG006",
+              "urn:recongraph:gst:CG005"
+            ],
+            "proposed_edges": [
+              [
+                "urn:recongraph:purchase:CP004",
+                "urn:recongraph:gst:CG006"
+              ]
+            ]
+          },
+          "score": 0.6666666666666666,
+          "coverage": 0.75,
+          "eligibility": "eligible",
+          "supporting_evidence": {
+            "signals": {
+              "amount": 0.0,
+              "temporal": 1.0,
+              "tax_identity": null,
+              "entity": 1.0,
+              "reference": 1.0
+            },
+            "relationship": {
+              "score": 0.6666666666666666,
+              "base_score": 0.6666666666666666,
+              "coverage": 0.75
+            },
+            "metadata": {
+              "amount": {
+                "interpretation": {
+                  "equality": "UNEQUAL",
+                  "magnitude_relation": "LEFT_GREATER",
+                  "currency_relation": "SAME",
+                  "sign_relation": "OPPOSITE",
+                  "amount_a": "100000.00",
+                  "amount_b": "50000.00",
+                  "absolute_difference": "50000.00",
+                  "relative_difference": "0.5",
+                  "residual": "50000.00",
+                  "is_multiple": true,
+                  "multiple_factor": 2,
+                  "compatibility_flags": [
+                    "OUTSIDE_TOLERANCE_LEFT_GREATER"
+                  ],
+                  "comparison_basis": "Gross Amount",
+                  "notes": [],
+                  "assumptions": [],
+                  "provenance": "FinancialEvidencePipeline"
+                },
+                "projection": {
+                  "similarity": 0.0,
+                  "projection_version": "v2",
+                  "assumptions": [
+                    "Projected using AmountSimilarityProjection.V2"
+                  ],
+                  "warnings": [
+                    "AMOUNT_MULTIPLE"
+                  ]
+                }
+              },
+              "temporal": {
+                "temporal_projection": {
+                  "score": 1.0,
+                  "violations": [],
+                  "metadata": {
+                    "projection_version": "1.0",
+                    "projection_boundary": "TemporalV1ScalarProjection"
+                  }
+                },
+                "assertions": [
+                  {
+                    "proposition": {
+                      "claim": {
+                        "claim_id": {
+                          "value": "temporal.same_fiscal_period"
+                        },
+                        "semantic_version": {
+                          "value": 1
+                        },
+                        "symmetry": "symmetric",
+                        "allowed_scope_kinds": [
+                          "record_pair"
+                        ]
+                      },
+                      "subject": {
+                        "claim_id": "temporal.same_fiscal_period",
+                        "claim_semantic_version": 1,
+                        "kind": "record_pair",
+                        "left": [
+                          {
+                            "urn": "urn:gst"
+                          }
+                        ],
+                        "right": [
+                          {
+                            "urn": "urn:purchase"
+                          }
+                        ]
+                      }
+                    },
+                    "polarity": "support",
+                    "magnitude": 1.0,
+                    "authority": {
+                      "basis": {
+                        "value": "temporal_model"
+                      }
+                    },
+                    "ancestry": {
+                      "identity": {
+                        "domain": {
+                          "value": "recongraph.observation_occurrence"
+                        },
+                        "schema": {
+                          "value": "recongraph.observation_occurrence.v1"
+                        },
+                        "digest": {
+                          "value": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                        }
+                      }
+                    },
+                    "payload": null,
+                    "identity": {
+                      "digest": "sha256:cad20ef64b43d3ede01d922cd22805268fc106998ddc6c090327fe650a4d0335"
+                    }
+                  }
+                ]
+              },
+              "tax_identity": {
+                "assertions": []
+              },
+              "entity": {
+                "vendor_interpretation": {
+                  "left_artifact_identity": {
+                    "digest": "sha256:b56f9c74c7da7c37692791b68e2978f09fd1290d95f03af7e2eb9f437c20f589"
+                  },
+                  "right_artifact_identity": {
+                    "digest": "sha256:2503317ebd0657b2e4ab1a52af8d9197d373adff79ae32d6e68d4eec67a27dad"
+                  },
+                  "context_identity": "sha256:dc06f690d4008fbc088f364795c67711bd4f2ce547a284adc2e1cb31b4b5cafc",
+                  "gst_registration_relation": {
+                    "state": 1,
+                    "left_value": null,
+                    "right_value": null
+                  },
+                  "pan_relation": {
+                    "state": 1,
+                    "dependence": null,
+                    "left_value": null,
+                    "right_value": null
+                  },
+                  "lexical_relation": {
+                    "state": 1,
+                    "similarity_score": 1.0,
+                    "shared_tokens": [
+                      "APEX",
+                      "INDUSTRIAL",
+                      "SUPPLIES"
+                    ]
+                  },
+                  "legal_form_relation": {
+                    "state": 1,
+                    "left_category": null,
+                    "right_category": null
+                  },
+                  "corpus_distinctiveness": {
+                    "state": 3,
+                    "most_distinctive_token": null,
+                    "document_frequency": null
+                  },
+                  "organizational_relation": {
+                    "state": 1
+                  },
+                  "warnings": []
+                },
+                "vendor_projection": {
+                  "similarity": 1.0,
+                  "policy_identity": "VendorProjectionPolicyV1_1.0.0",
+                  "source_interpretation_identity": "sha256:dc06f690d4008fbc088f364795c67711bd4f2ce547a284adc2e1cb31b4b5cafc",
+                  "considered_factors": [
+                    "lexical_relation",
+                    "organizational_relation"
+                  ],
+                  "missing_factors": [
+                    "legal_form_relation",
+                    "gst_registration_relation",
+                    "pan_relation"
+                  ],
+                  "uninterpretable_factors": [],
+                  "dependence_groups": [],
+                  "contradiction_markers": [],
+                  "warnings": []
+                },
+                "assertions": [
+                  {
+                    "proposition": {
+                      "claim": {
+                        "claim_id": {
+                          "value": "vendor.alias_match"
+                        },
+                        "semantic_version": {
+                          "value": 1
+                        },
+                        "symmetry": "symmetric",
+                        "allowed_scope_kinds": [
+                          "record_pair"
+                        ]
+                      },
+                      "subject": {
+                        "claim_id": "vendor.alias_match",
+                        "claim_semantic_version": 1,
+                        "kind": "record_pair",
+                        "left": [
+                          {
+                            "urn": "urn:gst"
+                          }
+                        ],
+                        "right": [
+                          {
+                            "urn": "urn:purchase"
+                          }
+                        ]
+                      }
+                    },
+                    "polarity": "support",
+                    "magnitude": 1.0,
+                    "authority": {
+                      "basis": {
+                        "value": "vendor_model"
+                      }
+                    },
+                    "ancestry": {
+                      "identity": {
+                        "domain": {
+                          "value": "recongraph.observation_occurrence"
+                        },
+                        "schema": {
+                          "value": "recongraph.observation_occurrence.v1"
+                        },
+                        "digest": {
+                          "value": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                        }
+                      }
+                    },
+                    "payload": null,
+                    "identity": {
+                      "digest": "sha256:b4c4a5fb8238bfea8b97b8e356389707d2ece861492da6ef2b52c82fd43795da"
+                    }
+                  },
+                  {
+                    "proposition": {
+                      "claim": {
+                        "claim_id": {
+                          "value": "vendor.same_economic_entity"
+                        },
+                        "semantic_version": {
+                          "value": 1
+                        },
+                        "symmetry": "symmetric",
+                        "allowed_scope_kinds": [
+                          "record_pair"
+                        ]
+                      },
+                      "subject": {
+                        "claim_id": "vendor.same_economic_entity",
+                        "claim_semantic_version": 1,
+                        "kind": "record_pair",
+                        "left": [
+                          {
+                            "urn": "urn:gst"
+                          }
+                        ],
+                        "right": [
+                          {
+                            "urn": "urn:purchase"
+                          }
+                        ]
+                      }
+                    },
+                    "polarity": "support",
+                    "magnitude": 1.0,
+                    "authority": {
+                      "basis": {
+                        "value": "vendor_model"
+                      }
+                    },
+                    "ancestry": {
+                      "identity": {
+                        "domain": {
+                          "value": "recongraph.observation_occurrence"
+                        },
+                        "schema": {
+                          "value": "recongraph.observation_occurrence.v1"
+                        },
+                        "digest": {
+                          "value": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                        }
+                      }
+                    },
+                    "payload": null,
+                    "identity": {
+                      "digest": "sha256:c655d8f4a8b80101f9a16bc6e6330c22ad49bd77603003b9b3704c8698cc2969"
+                    }
+                  }
+                ]
+              },
+              "reference": {
+                "reference_projection": {
+                  "score": 1.0,
+                  "violations": [],
+                  "metadata": {
+                    "projection_version": "1.0",
+                    "projection_boundary": "ReferenceV1ScalarProjection"
+                  }
+                }
+              }
+            },
+            "contributions": {
+              "amount": {
+                "provider_name": "amount",
+                "score": 0.0,
+                "violations": [
+                  "SEVERE_AMOUNT_CONFLICT",
+                  "AMOUNT_MULTIPLE"
+                ],
+                "metadata": {
+                  "interpretation": {
+                    "equality": "UNEQUAL",
+                    "magnitude_relation": "LEFT_GREATER",
+                    "currency_relation": "SAME",
+                    "sign_relation": "OPPOSITE",
+                    "amount_a": "100000.00",
+                    "amount_b": "50000.00",
+                    "absolute_difference": "50000.00",
+                    "relative_difference": "0.5",
+                    "residual": "50000.00",
+                    "is_multiple": true,
+                    "multiple_factor": 2,
+                    "compatibility_flags": [
+                      "OUTSIDE_TOLERANCE_LEFT_GREATER"
+                    ],
+                    "comparison_basis": "Gross Amount",
+                    "notes": [],
+                    "assumptions": [],
+                    "provenance": "FinancialEvidencePipeline"
+                  },
+                  "projection": {
+                    "similarity": 0.0,
+                    "projection_version": "v2",
+                    "assumptions": [
+                      "Projected using AmountSimilarityProjection.V2"
+                    ],
+                    "warnings": [
+                      "AMOUNT_MULTIPLE"
+                    ]
+                  }
+                }
+              },
+              "temporal": {
+                "provider_name": "temporal",
+                "score": 1.0,
+                "violations": [],
+                "metadata": {
+                  "temporal_projection": {
+                    "score": 1.0,
+                    "violations": [],
+                    "metadata": {
+                      "projection_version": "1.0",
+                      "projection_boundary": "TemporalV1ScalarProjection"
+                    }
+                  },
+                  "assertions": [
+                    {
+                      "proposition": {
+                        "claim": {
+                          "claim_id": {
+                            "value": "temporal.same_fiscal_period"
+                          },
+                          "semantic_version": {
+                            "value": 1
+                          },
+                          "symmetry": "symmetric",
+                          "allowed_scope_kinds": [
+                            "record_pair"
+                          ]
+                        },
+                        "subject": {
+                          "claim_id": "temporal.same_fiscal_period",
+                          "claim_semantic_version": 1,
+                          "kind": "record_pair",
+                          "left": [
+                            {
+                              "urn": "urn:gst"
+                            }
+                          ],
+                          "right": [
+                            {
+                              "urn": "urn:purchase"
+                            }
+                          ]
+                        }
+                      },
+                      "polarity": "support",
+                      "magnitude": 1.0,
+                      "authority": {
+                        "basis": {
+                          "value": "temporal_model"
+                        }
+                      },
+                      "ancestry": {
+                        "identity": {
+                          "domain": {
+                            "value": "recongraph.observation_occurrence"
+                          },
+                          "schema": {
+                            "value": "recongraph.observation_occurrence.v1"
+                          },
+                          "digest": {
+                            "value": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                          }
+                        }
+                      },
+                      "payload": null,
+                      "identity": {
+                        "digest": "sha256:cad20ef64b43d3ede01d922cd22805268fc106998ddc6c090327fe650a4d0335"
+                      }
+                    }
+                  ]
+                }
+              },
+              "tax_identity": {
+                "provider_name": "tax_identity",
+                "score": null,
+                "violations": [],
+                "metadata": {
+                  "assertions": []
+                }
+              },
+              "entity": {
+                "provider_name": "entity",
+                "score": 1.0,
+                "violations": [],
+                "metadata": {
+                  "vendor_interpretation": {
+                    "left_artifact_identity": {
+                      "digest": "sha256:b56f9c74c7da7c37692791b68e2978f09fd1290d95f03af7e2eb9f437c20f589"
+                    },
+                    "right_artifact_identity": {
+                      "digest": "sha256:2503317ebd0657b2e4ab1a52af8d9197d373adff79ae32d6e68d4eec67a27dad"
+                    },
+                    "context_identity": "sha256:dc06f690d4008fbc088f364795c67711bd4f2ce547a284adc2e1cb31b4b5cafc",
+                    "gst_registration_relation": {
+                      "state": 1,
+                      "left_value": null,
+                      "right_value": null
+                    },
+                    "pan_relation": {
+                      "state": 1,
+                      "dependence": null,
+                      "left_value": null,
+                      "right_value": null
+                    },
+                    "lexical_relation": {
+                      "state": 1,
+                      "similarity_score": 1.0,
+                      "shared_tokens": [
+                        "APEX",
+                        "INDUSTRIAL",
+                        "SUPPLIES"
+                      ]
+                    },
+                    "legal_form_relation": {
+                      "state": 1,
+                      "left_category": null,
+                      "right_category": null
+                    },
+                    "corpus_distinctiveness": {
+                      "state": 3,
+                      "most_distinctive_token": null,
+                      "document_frequency": null
+                    },
+                    "organizational_relation": {
+                      "state": 1
+                    },
+                    "warnings": []
+                  },
+                  "vendor_projection": {
+                    "similarity": 1.0,
+                    "policy_identity": "VendorProjectionPolicyV1_1.0.0",
+                    "source_interpretation_identity": "sha256:dc06f690d4008fbc088f364795c67711bd4f2ce547a284adc2e1cb31b4b5cafc",
+                    "considered_factors": [
+                      "lexical_relation",
+                      "organizational_relation"
+                    ],
+                    "missing_factors": [
+                      "legal_form_relation",
+                      "gst_registration_relation",
+                      "pan_relation"
+                    ],
+                    "uninterpretable_factors": [],
+                    "dependence_groups": [],
+                    "contradiction_markers": [],
+                    "warnings": []
+                  },
+                  "assertions": [
+                    {
+                      "proposition": {
+                        "claim": {
+                          "claim_id": {
+                            "value": "vendor.alias_match"
+                          },
+                          "semantic_version": {
+                            "value": 1
+                          },
+                          "symmetry": "symmetric",
+                          "allowed_scope_kinds": [
+                            "record_pair"
+                          ]
+                        },
+                        "subject": {
+                          "claim_id": "vendor.alias_match",
+                          "claim_semantic_version": 1,
+                          "kind": "record_pair",
+                          "left": [
+                            {
+                              "urn": "urn:gst"
+                            }
+                          ],
+                          "right": [
+                            {
+                              "urn": "urn:purchase"
+                            }
+                          ]
+                        }
+                      },
+                      "polarity": "support",
+                      "magnitude": 1.0,
+                      "authority": {
+                        "basis": {
+                          "value": "vendor_model"
+                        }
+                      },
+                      "ancestry": {
+                        "identity": {
+                          "domain": {
+                            "value": "recongraph.observation_occurrence"
+                          },
+                          "schema": {
+                            "value": "recongraph.observation_occurrence.v1"
+                          },
+                          "digest": {
+                            "value": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                          }
+                        }
+                      },
+                      "payload": null,
+                      "identity": {
+                        "digest": "sha256:b4c4a5fb8238bfea8b97b8e356389707d2ece861492da6ef2b52c82fd43795da"
+                      }
+                    },
+                    {
+                      "proposition": {
+                        "claim": {
+                          "claim_id": {
+                            "value": "vendor.same_economic_entity"
+                          },
+                          "semantic_version": {
+                            "value": 1
+                          },
+                          "symmetry": "symmetric",
+                          "allowed_scope_kinds": [
+                            "record_pair"
+                          ]
+                        },
+                        "subject": {
+                          "claim_id": "vendor.same_economic_entity",
+                          "claim_semantic_version": 1,
+                          "kind": "record_pair",
+                          "left": [
+                            {
+                              "urn": "urn:gst"
+                            }
+                          ],
+                          "right": [
+                            {
+                              "urn": "urn:purchase"
+                            }
+                          ]
+                        }
+                      },
+                      "polarity": "support",
+                      "magnitude": 1.0,
+                      "authority": {
+                        "basis": {
+                          "value": "vendor_model"
+                        }
+                      },
+                      "ancestry": {
+                        "identity": {
+                          "domain": {
+                            "value": "recongraph.observation_occurrence"
+                          },
+                          "schema": {
+                            "value": "recongraph.observation_occurrence.v1"
+                          },
+                          "digest": {
+                            "value": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                          }
+                        }
+                      },
+                      "payload": null,
+                      "identity": {
+                        "digest": "sha256:c655d8f4a8b80101f9a16bc6e6330c22ad49bd77603003b9b3704c8698cc2969"
+                      }
+                    }
+                  ]
+                }
+              },
+              "reference": {
+                "provider_name": "reference",
+                "score": 1.0,
+                "violations": [],
+                "metadata": {
+                  "reference_projection": {
+                    "score": 1.0,
+                    "violations": [],
+                    "metadata": {
+                      "projection_version": "1.0",
+                      "projection_boundary": "ReferenceV1ScalarProjection"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "violations": [
+            "SEVERE_AMOUNT_CONFLICT",
+            "AMOUNT_MULTIPLE"
+          ]
+        },
+        {
+          "hypothesis": {
+            "component_nodes": [
+              "urn:recongraph:purchase:CP004",
+              "urn:recongraph:gst:CG006",
+              "urn:recongraph:gst:CG005"
+            ],
+            "proposed_edges": [
+              [
+                "urn:recongraph:purchase:CP004",
+                "urn:recongraph:gst:CG005"
+              ]
+            ]
+          },
+          "score": 0.6666666666666666,
+          "coverage": 0.75,
+          "eligibility": "eligible",
+          "supporting_evidence": {
+            "signals": {
+              "amount": 0.0,
+              "temporal": 1.0,
+              "tax_identity": null,
+              "entity": 1.0,
+              "reference": 1.0
+            },
+            "relationship": {
+              "score": 0.6666666666666666,
+              "base_score": 0.6666666666666666,
+              "coverage": 0.75
+            },
+            "metadata": {
+              "amount": {
+                "interpretation": {
+                  "equality": "UNEQUAL",
+                  "magnitude_relation": "LEFT_GREATER",
+                  "currency_relation": "SAME",
+                  "sign_relation": "OPPOSITE",
+                  "amount_a": "100000.00",
+                  "amount_b": "50000.00",
+                  "absolute_difference": "50000.00",
+                  "relative_difference": "0.5",
+                  "residual": "50000.00",
+                  "is_multiple": true,
+                  "multiple_factor": 2,
+                  "compatibility_flags": [
+                    "OUTSIDE_TOLERANCE_LEFT_GREATER"
+                  ],
+                  "comparison_basis": "Gross Amount",
+                  "notes": [],
+                  "assumptions": [],
+                  "provenance": "FinancialEvidencePipeline"
+                },
+                "projection": {
+                  "similarity": 0.0,
+                  "projection_version": "v2",
+                  "assumptions": [
+                    "Projected using AmountSimilarityProjection.V2"
+                  ],
+                  "warnings": [
+                    "AMOUNT_MULTIPLE"
+                  ]
+                }
+              },
+              "temporal": {
+                "temporal_projection": {
+                  "score": 1.0,
+                  "violations": [],
+                  "metadata": {
+                    "projection_version": "1.0",
+                    "projection_boundary": "TemporalV1ScalarProjection"
+                  }
+                },
+                "assertions": [
+                  {
+                    "proposition": {
+                      "claim": {
+                        "claim_id": {
+                          "value": "temporal.same_fiscal_period"
+                        },
+                        "semantic_version": {
+                          "value": 1
+                        },
+                        "symmetry": "symmetric",
+                        "allowed_scope_kinds": [
+                          "record_pair"
+                        ]
+                      },
+                      "subject": {
+                        "claim_id": "temporal.same_fiscal_period",
+                        "claim_semantic_version": 1,
+                        "kind": "record_pair",
+                        "left": [
+                          {
+                            "urn": "urn:gst"
+                          }
+                        ],
+                        "right": [
+                          {
+                            "urn": "urn:purchase"
+                          }
+                        ]
+                      }
+                    },
+                    "polarity": "support",
+                    "magnitude": 1.0,
+                    "authority": {
+                      "basis": {
+                        "value": "temporal_model"
+                      }
+                    },
+                    "ancestry": {
+                      "identity": {
+                        "domain": {
+                          "value": "recongraph.observation_occurrence"
+                        },
+                        "schema": {
+                          "value": "recongraph.observation_occurrence.v1"
+                        },
+                        "digest": {
+                          "value": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                        }
+                      }
+                    },
+                    "payload": null,
+                    "identity": {
+                      "digest": "sha256:cad20ef64b43d3ede01d922cd22805268fc106998ddc6c090327fe650a4d0335"
+                    }
+                  }
+                ]
+              },
+              "tax_identity": {
+                "assertions": []
+              },
+              "entity": {
+                "vendor_interpretation": {
+                  "left_artifact_identity": {
+                    "digest": "sha256:b56f9c74c7da7c37692791b68e2978f09fd1290d95f03af7e2eb9f437c20f589"
+                  },
+                  "right_artifact_identity": {
+                    "digest": "sha256:2503317ebd0657b2e4ab1a52af8d9197d373adff79ae32d6e68d4eec67a27dad"
+                  },
+                  "context_identity": "sha256:dc06f690d4008fbc088f364795c67711bd4f2ce547a284adc2e1cb31b4b5cafc",
+                  "gst_registration_relation": {
+                    "state": 1,
+                    "left_value": null,
+                    "right_value": null
+                  },
+                  "pan_relation": {
+                    "state": 1,
+                    "dependence": null,
+                    "left_value": null,
+                    "right_value": null
+                  },
+                  "lexical_relation": {
+                    "state": 1,
+                    "similarity_score": 1.0,
+                    "shared_tokens": [
+                      "APEX",
+                      "INDUSTRIAL",
+                      "SUPPLIES"
+                    ]
+                  },
+                  "legal_form_relation": {
+                    "state": 1,
+                    "left_category": null,
+                    "right_category": null
+                  },
+                  "corpus_distinctiveness": {
+                    "state": 3,
+                    "most_distinctive_token": null,
+                    "document_frequency": null
+                  },
+                  "organizational_relation": {
+                    "state": 1
+                  },
+                  "warnings": []
+                },
+                "vendor_projection": {
+                  "similarity": 1.0,
+                  "policy_identity": "VendorProjectionPolicyV1_1.0.0",
+                  "source_interpretation_identity": "sha256:dc06f690d4008fbc088f364795c67711bd4f2ce547a284adc2e1cb31b4b5cafc",
+                  "considered_factors": [
+                    "lexical_relation",
+                    "organizational_relation"
+                  ],
+                  "missing_factors": [
+                    "legal_form_relation",
+                    "gst_registration_relation",
+                    "pan_relation"
+                  ],
+                  "uninterpretable_factors": [],
+                  "dependence_groups": [],
+                  "contradiction_markers": [],
+                  "warnings": []
+                },
+                "assertions": [
+                  {
+                    "proposition": {
+                      "claim": {
+                        "claim_id": {
+                          "value": "vendor.alias_match"
+                        },
+                        "semantic_version": {
+                          "value": 1
+                        },
+                        "symmetry": "symmetric",
+                        "allowed_scope_kinds": [
+                          "record_pair"
+                        ]
+                      },
+                      "subject": {
+                        "claim_id": "vendor.alias_match",
+                        "claim_semantic_version": 1,
+                        "kind": "record_pair",
+                        "left": [
+                          {
+                            "urn": "urn:gst"
+                          }
+                        ],
+                        "right": [
+                          {
+                            "urn": "urn:purchase"
+                          }
+                        ]
+                      }
+                    },
+                    "polarity": "support",
+                    "magnitude": 1.0,
+                    "authority": {
+                      "basis": {
+                        "value": "vendor_model"
+                      }
+                    },
+                    "ancestry": {
+                      "identity": {
+                        "domain": {
+                          "value": "recongraph.observation_occurrence"
+                        },
+                        "schema": {
+                          "value": "recongraph.observation_occurrence.v1"
+                        },
+                        "digest": {
+                          "value": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                        }
+                      }
+                    },
+                    "payload": null,
+                    "identity": {
+                      "digest": "sha256:b4c4a5fb8238bfea8b97b8e356389707d2ece861492da6ef2b52c82fd43795da"
+                    }
+                  },
+                  {
+                    "proposition": {
+                      "claim": {
+                        "claim_id": {
+                          "value": "vendor.same_economic_entity"
+                        },
+                        "semantic_version": {
+                          "value": 1
+                        },
+                        "symmetry": "symmetric",
+                        "allowed_scope_kinds": [
+                          "record_pair"
+                        ]
+                      },
+                      "subject": {
+                        "claim_id": "vendor.same_economic_entity",
+                        "claim_semantic_version": 1,
+                        "kind": "record_pair",
+                        "left": [
+                          {
+                            "urn": "urn:gst"
+                          }
+                        ],
+                        "right": [
+                          {
+                            "urn": "urn:purchase"
+                          }
+                        ]
+                      }
+                    },
+                    "polarity": "support",
+                    "magnitude": 1.0,
+                    "authority": {
+                      "basis": {
+                        "value": "vendor_model"
+                      }
+                    },
+                    "ancestry": {
+                      "identity": {
+                        "domain": {
+                          "value": "recongraph.observation_occurrence"
+                        },
+                        "schema": {
+                          "value": "recongraph.observation_occurrence.v1"
+                        },
+                        "digest": {
+                          "value": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                        }
+                      }
+                    },
+                    "payload": null,
+                    "identity": {
+                      "digest": "sha256:c655d8f4a8b80101f9a16bc6e6330c22ad49bd77603003b9b3704c8698cc2969"
+                    }
+                  }
+                ]
+              },
+              "reference": {
+                "reference_projection": {
+                  "score": 1.0,
+                  "violations": [],
+                  "metadata": {
+                    "projection_version": "1.0",
+                    "projection_boundary": "ReferenceV1ScalarProjection"
+                  }
+                }
+              }
+            },
+            "contributions": {
+              "amount": {
+                "provider_name": "amount",
+                "score": 0.0,
+                "violations": [
+                  "SEVERE_AMOUNT_CONFLICT",
+                  "AMOUNT_MULTIPLE"
+                ],
+                "metadata": {
+                  "interpretation": {
+                    "equality": "UNEQUAL",
+                    "magnitude_relation": "LEFT_GREATER",
+                    "currency_relation": "SAME",
+                    "sign_relation": "OPPOSITE",
+                    "amount_a": "100000.00",
+                    "amount_b": "50000.00",
+                    "absolute_difference": "50000.00",
+                    "relative_difference": "0.5",
+                    "residual": "50000.00",
+                    "is_multiple": true,
+                    "multiple_factor": 2,
+                    "compatibility_flags": [
+                      "OUTSIDE_TOLERANCE_LEFT_GREATER"
+                    ],
+                    "comparison_basis": "Gross Amount",
+                    "notes": [],
+                    "assumptions": [],
+                    "provenance": "FinancialEvidencePipeline"
+                  },
+                  "projection": {
+                    "similarity": 0.0,
+                    "projection_version": "v2",
+                    "assumptions": [
+                      "Projected using AmountSimilarityProjection.V2"
+                    ],
+                    "warnings": [
+                      "AMOUNT_MULTIPLE"
+                    ]
+                  }
+                }
+              },
+              "temporal": {
+                "provider_name": "temporal",
+                "score": 1.0,
+                "violations": [],
+                "metadata": {
+                  "temporal_projection": {
+                    "score": 1.0,
+                    "violations": [],
+                    "metadata": {
+                      "projection_version": "1.0",
+                      "projection_boundary": "TemporalV1ScalarProjection"
+                    }
+                  },
+                  "assertions": [
+                    {
+                      "proposition": {
+                        "claim": {
+                          "claim_id": {
+                            "value": "temporal.same_fiscal_period"
+                          },
+                          "semantic_version": {
+                            "value": 1
+                          },
+                          "symmetry": "symmetric",
+                          "allowed_scope_kinds": [
+                            "record_pair"
+                          ]
+                        },
+                        "subject": {
+                          "claim_id": "temporal.same_fiscal_period",
+                          "claim_semantic_version": 1,
+                          "kind": "record_pair",
+                          "left": [
+                            {
+                              "urn": "urn:gst"
+                            }
+                          ],
+                          "right": [
+                            {
+                              "urn": "urn:purchase"
+                            }
+                          ]
+                        }
+                      },
+                      "polarity": "support",
+                      "magnitude": 1.0,
+                      "authority": {
+                        "basis": {
+                          "value": "temporal_model"
+                        }
+                      },
+                      "ancestry": {
+                        "identity": {
+                          "domain": {
+                            "value": "recongraph.observation_occurrence"
+                          },
+                          "schema": {
+                            "value": "recongraph.observation_occurrence.v1"
+                          },
+                          "digest": {
+                            "value": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                          }
+                        }
+                      },
+                      "payload": null,
+                      "identity": {
+                        "digest": "sha256:cad20ef64b43d3ede01d922cd22805268fc106998ddc6c090327fe650a4d0335"
+                      }
+                    }
+                  ]
+                }
+              },
+              "tax_identity": {
+                "provider_name": "tax_identity",
+                "score": null,
+                "violations": [],
+                "metadata": {
+                  "assertions": []
+                }
+              },
+              "entity": {
+                "provider_name": "entity",
+                "score": 1.0,
+                "violations": [],
+                "metadata": {
+                  "vendor_interpretation": {
+                    "left_artifact_identity": {
+                      "digest": "sha256:b56f9c74c7da7c37692791b68e2978f09fd1290d95f03af7e2eb9f437c20f589"
+                    },
+                    "right_artifact_identity": {
+                      "digest": "sha256:2503317ebd0657b2e4ab1a52af8d9197d373adff79ae32d6e68d4eec67a27dad"
+                    },
+                    "context_identity": "sha256:dc06f690d4008fbc088f364795c67711bd4f2ce547a284adc2e1cb31b4b5cafc",
+                    "gst_registration_relation": {
+                      "state": 1,
+                      "left_value": null,
+                      "right_value": null
+                    },
+                    "pan_relation": {
+                      "state": 1,
+                      "dependence": null,
+                      "left_value": null,
+                      "right_value": null
+                    },
+                    "lexical_relation": {
+                      "state": 1,
+                      "similarity_score": 1.0,
+                      "shared_tokens": [
+                        "APEX",
+                        "INDUSTRIAL",
+                        "SUPPLIES"
+                      ]
+                    },
+                    "legal_form_relation": {
+                      "state": 1,
+                      "left_category": null,
+                      "right_category": null
+                    },
+                    "corpus_distinctiveness": {
+                      "state": 3,
+                      "most_distinctive_token": null,
+                      "document_frequency": null
+                    },
+                    "organizational_relation": {
+                      "state": 1
+                    },
+                    "warnings": []
+                  },
+                  "vendor_projection": {
+                    "similarity": 1.0,
+                    "policy_identity": "VendorProjectionPolicyV1_1.0.0",
+                    "source_interpretation_identity": "sha256:dc06f690d4008fbc088f364795c67711bd4f2ce547a284adc2e1cb31b4b5cafc",
+                    "considered_factors": [
+                      "lexical_relation",
+                      "organizational_relation"
+                    ],
+                    "missing_factors": [
+                      "legal_form_relation",
+                      "gst_registration_relation",
+                      "pan_relation"
+                    ],
+                    "uninterpretable_factors": [],
+                    "dependence_groups": [],
+                    "contradiction_markers": [],
+                    "warnings": []
+                  },
+                  "assertions": [
+                    {
+                      "proposition": {
+                        "claim": {
+                          "claim_id": {
+                            "value": "vendor.alias_match"
+                          },
+                          "semantic_version": {
+                            "value": 1
+                          },
+                          "symmetry": "symmetric",
+                          "allowed_scope_kinds": [
+                            "record_pair"
+                          ]
+                        },
+                        "subject": {
+                          "claim_id": "vendor.alias_match",
+                          "claim_semantic_version": 1,
+                          "kind": "record_pair",
+                          "left": [
+                            {
+                              "urn": "urn:gst"
+                            }
+                          ],
+                          "right": [
+                            {
+                              "urn": "urn:purchase"
+                            }
+                          ]
+                        }
+                      },
+                      "polarity": "support",
+                      "magnitude": 1.0,
+                      "authority": {
+                        "basis": {
+                          "value": "vendor_model"
+                        }
+                      },
+                      "ancestry": {
+                        "identity": {
+                          "domain": {
+                            "value": "recongraph.observation_occurrence"
+                          },
+                          "schema": {
+                            "value": "recongraph.observation_occurrence.v1"
+                          },
+                          "digest": {
+                            "value": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                          }
+                        }
+                      },
+                      "payload": null,
+                      "identity": {
+                        "digest": "sha256:b4c4a5fb8238bfea8b97b8e356389707d2ece861492da6ef2b52c82fd43795da"
+                      }
+                    },
+                    {
+                      "proposition": {
+                        "claim": {
+                          "claim_id": {
+                            "value": "vendor.same_economic_entity"
+                          },
+                          "semantic_version": {
+                            "value": 1
+                          },
+                          "symmetry": "symmetric",
+                          "allowed_scope_kinds": [
+                            "record_pair"
+                          ]
+                        },
+                        "subject": {
+                          "claim_id": "vendor.same_economic_entity",
+                          "claim_semantic_version": 1,
+                          "kind": "record_pair",
+                          "left": [
+                            {
+                              "urn": "urn:gst"
+                            }
+                          ],
+                          "right": [
+                            {
+                              "urn": "urn:purchase"
+                            }
+                          ]
+                        }
+                      },
+                      "polarity": "support",
+                      "magnitude": 1.0,
+                      "authority": {
+                        "basis": {
+                          "value": "vendor_model"
+                        }
+                      },
+                      "ancestry": {
+                        "identity": {
+                          "domain": {
+                            "value": "recongraph.observation_occurrence"
+                          },
+                          "schema": {
+                            "value": "recongraph.observation_occurrence.v1"
+                          },
+                          "digest": {
+                            "value": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+                          }
+                        }
+                      },
+                      "payload": null,
+                      "identity": {
+                        "digest": "sha256:c655d8f4a8b80101f9a16bc6e6330c22ad49bd77603003b9b3704c8698cc2969"
+                      }
+                    }
+                  ]
+                }
+              },
+              "reference": {
+                "provider_name": "reference",
+                "score": 1.0,
+                "violations": [],
+                "metadata": {
+                  "reference_projection": {
+                    "score": 1.0,
+                    "violations": [],
+                    "metadata": {
+                      "projection_version": "1.0",
+                      "projection_boundary": "ReferenceV1ScalarProjection"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "violations": [
+            "SEVERE_AMOUNT_CONFLICT",
+            "AMOUNT_MULTIPLE"
+          ]
+        },
+        {
+          "hypothesis": {
+            "component_nodes": [
+              "urn:recongraph:purchase:CP004",
+              "urn:recongraph:gst:CG006",
+              "urn:recongraph:gst:CG005"
+            ],
+            "proposed_edges": []
+          },
+          "score": 0.0,
+          "coverage": 0.0,
+          "eligibility": "ineligible",
+          "supporting_evidence": {
+            "signals": {},
+            "relationship": null,
+            "metadata": {},
+            "contributions": {}
+          },
+          "violations": [
+            "EMPTY_HYPOTHESIS"
+          ]
+        }
+      ],
+      "checklist": [
+        "General manual review"
+      ],
+      "headline": "Weak evidence: AIS-9001 \u2194 AIS/9001-B, AIS/9001-A \u2014 score 0.67 below threshold",
+      "highlight_regions": [],
+      "ocr_warnings": []
+    }
+  ],
+  "traces": [
+    {
+      "trace_id": "sha256:7627ee775b320179baab625b3d78f20b54dbeff782c88413b02a5baef3c50689",
+      "engine_version": "0.9.0",
+      "config_hash": "3ab5c111177a0a6c3c203719f6acaf10",
+      "events": []
+    },
+    {
+      "trace_id": "sha256:f2289a07a7ef5860b85a349ee61dd9fb4084c57ee5e4637e65264cf6286fc5d6",
+      "engine_version": "0.9.0",
+      "config_hash": "3ab5c111177a0a6c3c203719f6acaf10",
+      "events": []
+    },
+    {
+      "trace_id": "sha256:6c24cfe43b4d42c9717400d540f3b2eb9f6e1317a73a76c467312de5f6e1cd0c",
+      "engine_version": "0.9.0",
+      "config_hash": "3ab5c111177a0a6c3c203719f6acaf10",
+      "events": []
+    },
+    {
+      "trace_id": "sha256:678117553b29017c745d6b624bad13ab958ce51e775fc37f14d18e71f7d5fed6",
+      "engine_version": "0.9.0",
+      "config_hash": "3ab5c111177a0a6c3c203719f6acaf10",
+      "events": []
+    }
+  ],
+  "engine_version": "0.9.0",
+  "differential_results": []
+}

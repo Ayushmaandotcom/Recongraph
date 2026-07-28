@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* Custom Color Palette */
+  --color-background: #0f1115; /* Deep slate */
+  --color-surface: #181b21;
+  --color-surface-hover: #1e2229;
+  --color-surface-elevated: #232730;
+  
+  --color-primary: #3b82f6; /* Vibrant electric blue */
+  --color-primary-hover: #60a5fa;
+  --color-primary-muted: rgba(59, 130, 246, 0.15);
+  
+  --color-success: #10b981; /* Matches */
+  --color-success-muted: rgba(16, 185, 129, 0.15);
+  
+  --color-warning: #f59e0b; /* Amber for reviews */
+  --color-warning-muted: rgba(245, 158, 11, 0.15);
+  
+  --color-danger: #ef4444; /* Conflict */
+  --color-danger-muted: rgba(239, 68, 68, 0.15);
+  
+  --color-unknown: #4b5563; /* Grey for unknown/missing */
+  
+  --color-text: #f3f4f6;
+  --color-text-muted: #9ca3af;
+  
+  --color-border: #2d323e;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+  }
+}
+
+/* Custom utilities */
+.glass-panel {
+  background: rgba(24, 27, 33, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border);
+}
