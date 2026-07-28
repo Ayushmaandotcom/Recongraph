@@ -26,8 +26,11 @@ jobs:
       - name: Run test suite
         run: pytest -q
 
+      - name: Run challenge referee
+        run: python -m pytest tests/test_challenge_referee.py -v
+
       - name: Run quickstart (proves README)
         run: python quickstart.py
 
       - name: Type check critical modules
-        run: mypy src/recongraph/graph src/recongraph/matching --ignore-missing-imports
+        run: mypy src/recongraph

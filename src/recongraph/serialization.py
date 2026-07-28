@@ -11,7 +11,7 @@ class ReconEncoder(json.JSONEncoder):
     Serializes dataclasses, Enums, Decimals, dates, datetimes, and frozensets.
     """
     def default(self, obj: Any) -> Any:
-        if dataclasses.is_dataclass(obj):
+        if dataclasses.is_dataclass(obj) and not isinstance(obj, type):
             return dataclasses.asdict(obj)
         elif isinstance(obj, Decimal):
             return str(obj)

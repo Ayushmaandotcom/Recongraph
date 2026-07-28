@@ -1,6 +1,7 @@
 import time
 from typing import Sequence, Any
 from recongraph.domain.records import PurchaseRecord, GSTRecord
+from recongraph.plugins.provider import EvidenceProvider
 from recongraph.matching.reference_evidence import ReferenceCorpusProfile, ReferenceEvidenceContext, ReferenceEvidencePolicy
 from recongraph.graph.decision import DecisionPolicy, DecisionEngine, DecisionAction
 from recongraph.graph.candidate import CandidateGraphBuilder, build_purchase_urn, build_gst_urn
@@ -20,7 +21,7 @@ class BenchmarkRunner:
         dataset_id: str,
         purchases: Sequence[PurchaseRecord],
         gsts: Sequence[GSTRecord],
-        providers: Sequence[Any],
+        providers: Sequence[EvidenceProvider],
         decision_policy: DecisionPolicy,
     ):
         self.dataset_id = dataset_id
@@ -140,11 +141,11 @@ class BenchmarkRunner:
             )
         )
 
-def execute_reconbench(size: int = 1000, enable_faf: bool = False) -> int:
+def execute_reconbench(size: int = 1000) -> int:
     import json
+    from typing import cast, Any
     from recongraph.synthetic.reconbench import generate_reconbench_dataset
     from recongraph.benchmark.evaluator import evaluate_results
-    from recongraph.benchmark.faf import generate_faf_report
     from recongraph.plugins.core_providers import FinancialEvidenceProvider, TemporalEvidenceProvider, TaxEvidenceProvider, VendorEvidenceProvider, ReferenceEvidenceProvider
     from recongraph.matching.reference_evidence import ReferenceCorpusProfile, ReferenceEvidenceContext, ReferenceEvidencePolicy
     from recongraph.domain.vendor.context import VendorIdentityContext, VendorCorpusProfile
@@ -165,7 +166,7 @@ def execute_reconbench(size: int = 1000, enable_faf: bool = False) -> int:
         fuzzy_threshold=0.85
     )
     
-    providers = [
+    providers: list[EvidenceProvider] = [
         FinancialEvidenceProvider(),
         TemporalEvidenceProvider(),
         TaxEvidenceProvider(),
@@ -189,26 +190,14 @@ def execute_reconbench(size: int = 1000, enable_faf: bool = False) -> int:
         purchases = list(spec.base_purchases)
         gsts = list(spec.base_gsts)
         for idx, op in spec.purchase_mutations:
-            purchases[idx] = op.apply(purchases[idx])
+            op_any = cast(Any, op)
+            purchases[idx] = op_any.apply(purchases[idx])
         for idx, op in spec.gst_mutations:
-            gsts[idx] = op.apply(gsts[idx])
+            op_any = cast(Any, op)
+            gsts[idx] = op_any.apply(gsts[idx])
             
         result = engine.reconcile(purchases, gsts)
         results.append((result, spec.expected_outcome))
-        
-        if enable_faf:
-            from recongraph.graph.decision import DecisionAction
-            matched = len(result.auto_matches) > 0
-            reviewed = len(result.review_packets) > 0
-            
-            expected = spec.expected_outcome.expected_decision
-            actual = DecisionAction.AUTO_MATCH if matched else (DecisionAction.REVIEW_WEAK if reviewed else DecisionAction.NO_MATCH)
-            
-            # Identify Failure: (simplistic check for FAF)
-            if expected == DecisionAction.AUTO_MATCH and not matched:
-                generate_faf_report(spec, purchases, gsts, result, actual)
-            elif expected != DecisionAction.AUTO_MATCH and matched:
-                generate_faf_report(spec, purchases, gsts, result, actual)
         
     print("Evaluating metrics...")
     metrics = evaluate_results(results)

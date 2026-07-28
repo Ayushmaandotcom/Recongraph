@@ -1,3 +1,4 @@
+from typing import Any
 from recongraph.domain.document.layout import OcrConfidenceReport
 from .dimensions import ExtractionQuality, ParserQuality, Completeness, VerificationState, ConfidenceProvenance
 from .reasons import ReliabilityReason
@@ -30,7 +31,7 @@ def convert_ocr_report_to_envelope(report: OcrConfidenceReport) -> ReliabilityEn
             ext_quality = ExtractionQuality.FAILED
             reason = ReliabilityReason.OCR_UNREADABLE
             
-        audit_metadata = {"confidence": score}
+        audit_metadata: dict[str, Any] = {"confidence": score}
         
         if prov.box:
             audit_metadata["box"] = prov.box

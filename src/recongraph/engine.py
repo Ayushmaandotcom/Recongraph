@@ -33,15 +33,17 @@ class ReconciliationResult:
     engine_version: str
     differential_results: list['DifferentialResult'] = field(default_factory=list)
     
+try:
+    from importlib.metadata import version as _get_version
+    VERSION = _get_version("recongraph")
+    del _get_version
+except Exception:
+    # Fallback for editable installs or missing metadata.
+    # Must stay in sync with pyproject.toml [project] version.
+    VERSION = "0.9.0"
+
 class ReconGraphEngine:
-    try:
-        from importlib.metadata import version as _get_version
-        VERSION = _get_version("recongraph")
-        del _get_version
-    except Exception:
-        # Fallback for editable installs or missing metadata.
-        # Must stay in sync with pyproject.toml [project] version.
-        VERSION = "0.9.0"
+    VERSION = VERSION
 
     def __init__(self, config: ReconGraphConfig, providers: Sequence[EvidenceProvider]):
         self.config = config
@@ -179,7 +181,7 @@ class ReconGraphEngine:
                     differential_results.append(diff_result)
         
                 # Determine which nodes were "consumed" by the primary action
-                consumed_nodes = frozenset()
+                consumed_nodes: frozenset[str] = frozenset()
 
                 # Action Mapping
                 if decision.action == DecisionAction.AUTO_MATCH:

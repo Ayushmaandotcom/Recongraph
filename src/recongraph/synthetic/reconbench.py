@@ -32,7 +32,8 @@ def generate_reconbench_dataset(size: int, seed: int = 42) -> list[ScenarioSpeci
             k=1
         )[0]
         
-        gst_mutations = []
+        from typing import Any
+        gst_mutations: list[tuple[int, Any]] = []
         expected_decision = DecisionAction.AUTO_MATCH
         
         if scenario_type == "OCR_NOISE":

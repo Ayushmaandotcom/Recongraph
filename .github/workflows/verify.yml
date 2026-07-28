@@ -27,8 +27,12 @@ jobs:
         
     - name: Run mypy
       run: |
-        mypy src/
+        mypy src/recongraph
         
+    - name: Run challenge referee
+      run: |
+        python -m pytest tests/test_challenge_referee.py -v
+
     - name: Run tests
       run: |
-        pytest
+        pytest -q

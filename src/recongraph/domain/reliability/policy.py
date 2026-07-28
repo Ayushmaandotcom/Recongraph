@@ -27,7 +27,7 @@ class AttenuationPolicy:
         If `lowest_quality` is None, applies no attenuation.
         """
         weight = 1.0
-        violations = []
+        violations: list[str] = []
         
         if lowest_quality is None:
             return weight, violations
