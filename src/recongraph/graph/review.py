@@ -26,6 +26,8 @@ class ReviewPacket:
     Stage 8G additions:
       - highlight_regions: Bounding boxes of low-confidence OCR zones to surface in the UI.
       - ocr_warnings: Human-readable warnings derived from OCR provenance analysis.
+
+    headline: One-line human-readable summary of the decision — feeds the review queue UI.
     """
     packet_id: str
     action: DecisionAction
@@ -34,6 +36,7 @@ class ReviewPacket:
     explanation: ExplanationArtifact | None
     competitors: tuple[EvaluatedHypothesis, ...]
     checklist: tuple[str, ...]
+    headline: str = ""
     highlight_regions: "tuple[BoundingBox, ...]" = ()
     ocr_warnings: tuple[str, ...] = ()
 
@@ -77,6 +80,32 @@ class ReviewPacketBuilder:
 
     def __init__(self) -> None:
         self._counter = 0
+
+    def _generate_headline(self, action: DecisionAction, purchases: list[PurchaseRecord],
+                           gsts: list[GSTRecord], competitors: tuple) -> str:
+        """Produce a one-line human-readable summary for the review queue UI."""
+        p_refs = ", ".join(p.reference or p.record_id for p in purchases[:2])
+        g_refs = ", ".join(g.reference or g.record_id for g in gsts[:2])
+        top_score = competitors[0].score if competitors else None
+        score_str = f"{top_score:.2f}" if top_score is not None else "?"
+
+        if action == DecisionAction.REVIEW_AMBIGUOUS:
+            return f"Ambiguous: {p_refs} ↔ {g_refs} — competing hypotheses within margin"
+        elif action == DecisionAction.REVIEW_WEAK:
+            violations = competitors[0].violations if competitors else frozenset()
+            if "tax_identity_conflict" in violations:
+                return f"Tax conflict: {p_refs} ↔ {g_refs} — GSTIN identity mismatch (score {score_str})"
+            elif "severe_amount_conflict" in violations:
+                return f"Amount mismatch: {p_refs} ↔ {g_refs} — significant amount discrepancy (score {score_str})"
+            else:
+                return f"Weak evidence: {p_refs} ↔ {g_refs} — score {score_str} below threshold"
+        elif action == DecisionAction.NO_MATCH:
+            if purchases:
+                return f"No match: purchase {p_refs} — no candidate GST record found"
+            else:
+                return f"No match: GST {g_refs} — no candidate purchase record found"
+        else:
+            return f"Review required: {p_refs} ↔ {g_refs}"
 
     def _generate_checklist(self, explanation: ExplanationArtifact | None, ocr_warnings: tuple[str, ...] = ()) -> tuple[str, ...]:
         checklist = []
@@ -140,6 +169,7 @@ class ReviewPacketBuilder:
 
         checklist = self._generate_checklist(explanation, ocr_warnings)
         curated_competitors = decision.competitors[:3]
+        headline = self._generate_headline(decision.action, purchases, gsts, curated_competitors)
 
         return ReviewPacket(
             packet_id=packet_id,
@@ -149,6 +179,7 @@ class ReviewPacketBuilder:
             explanation=explanation,
             competitors=curated_competitors,
             checklist=checklist,
+            headline=headline,
             highlight_regions=highlight_regions,
             ocr_warnings=ocr_warnings,
         )
@@ -168,6 +199,7 @@ class ReviewPacketBuilder:
         if not purchases and not gsts:
             return None
 
+        headline = self._generate_headline(DecisionAction.NO_MATCH, purchases, gsts, ())
         return ReviewPacket(
             packet_id=packet_id,
             action=DecisionAction.NO_MATCH,
@@ -176,6 +208,7 @@ class ReviewPacketBuilder:
             explanation=None,
             competitors=(),
             checklist=("Review unmatched record",),
+            headline=headline,
             highlight_regions=(),
             ocr_warnings=(),
         )

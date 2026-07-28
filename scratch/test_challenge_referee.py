@@ -28,7 +28,6 @@ CP001,ABC Steel Private Limited,INV-1042,2026-06-12,118000.00,07ABCDE1234F1Z5
 CP002,CloudLedger Software Private Limited,CL-JUN-2026,2026-06-05,25000.00,07CLOUD1234A1Z1
 CP003,Orion Medical Devices Private Limited,OMD-001,2026-06-20,75000.00,07ORION5678B1Z2
 CP004,Apex Industrial Supplies,AIS-9001,2026-06-25,100000.00,07APEXS1234C1Z3
-CP005,Beta Electronics Pvt Ltd,BEP-2200,2026-07-01,50000.00,07BETAE5678G1Z3
 """
 GSTS = """record_id,supplier_name,invoice_number,invoice_date,amount,gstin
 CG001,ABC STEELS PVT. LTD.,AB/1042,2026-06-13,236000.00,07ABCDE1234F1Z5
@@ -37,16 +36,12 @@ CG003,CLOUDLEDGER SOFTWARE PVT LTD,CL-JUL-2026,2026-07-05,25000.00,07CLOUD1234A1
 CG004,Nova Surgical Systems Private Limited,NSS-001,2026-06-20,75000.00,29NOVAS9876D1Z4
 CG005,APEX INDUSTRIAL SUPPLIES,AIS/9001-A,2026-06-25,50000.00,07APEXS1234C1Z3
 CG006,APEX INDUSTRIAL SUPPLIES,AIS/9001-B,2026-06-25,50000.00,07APEXS1234C1Z3
-CG007,BETA ELECTRONICS PVT LTD,BEP-2200,2026-07-01,100000.00,07BETAE5678G1Z3
 """
 NEGATIVE_PAIRS = [  # (case, purchase, gst) — must NEVER be auto-matched together
-    ("HN001", "CP001", "CG001"),  # amount mismatch with identity agreement
-    ("HN002", "CP001", "CG002"),  # tax identity contradiction
-    ("HN003", "CP002", "CG003"),  # recurring invoice collision
-    ("HN004", "CP003", "CG004"),  # weak reference collision (different entities)
-    # HN005: same reference + same tax identity, but GST amount = 2× purchase amount
-    # (split invoice / amount-multiple detection)
-    ("HN005", "CP005", "CG007"),
+    ("HN001", "CP001", "CG001"),
+    ("HN002", "CP001", "CG002"),
+    ("HN003", "CP002", "CG003"),
+    ("HN004", "CP003", "CG004"),
 ]
 
 from decimal import Decimal

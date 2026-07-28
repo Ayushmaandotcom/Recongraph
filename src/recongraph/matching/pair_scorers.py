@@ -145,6 +145,16 @@ def score_purchase_to_gst(
     
     if "TEMPORAL_MAX_DAYS_EXCEEDED" in violations:
         is_eligible = False
+
+    # Also check provider-emitted violations (e.g. AMOUNT_MULTIPLE from financial pipeline)
+    # against the blocking set — they do not come through analyze_purchase_gst_semantics
+    # but must still gate eligibility.
+    from recongraph.matching.purchase_gst_semantics import (
+        ONE_TO_ONE_BLOCKING_FINDINGS, SemanticFinding
+    )
+    blocking_values = {f.value for f in ONE_TO_ONE_BLOCKING_FINDINGS}
+    if any(v in blocking_values for v in violations):
+        is_eligible = False
         
     return ScoredPair(
         score=relationship.score if relationship.score is not None else 0.0,

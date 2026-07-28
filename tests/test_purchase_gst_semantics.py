@@ -118,7 +118,15 @@ def test_one_to_one_eligibility_preserves_multiple_blocking_findings():
     assert result == EligibilityResult(status=OneToOneEligibility.INELIGIBLE, blocking_findings=findings)
 
 def test_one_to_one_blocking_findings_are_explicit():
-    assert ONE_TO_ONE_BLOCKING_FINDINGS == frozenset({SemanticFinding.SEVERE_AMOUNT_CONFLICT, SemanticFinding.TAX_IDENTITY_CONFLICT, SemanticFinding.DISTINCT_EVENT_IDENTITY_EVIDENCE, SemanticFinding.PAN_IDENTIFIER_CONFLICT, SemanticFinding.LEGAL_FORM_LEXICAL_DIFFERENCE})
+    # AMOUNT_MULTIPLE added 2026-07-29 (HN005 — split invoice / amount-multiple detection)
+    assert ONE_TO_ONE_BLOCKING_FINDINGS == frozenset({
+        SemanticFinding.SEVERE_AMOUNT_CONFLICT,
+        SemanticFinding.TAX_IDENTITY_CONFLICT,
+        SemanticFinding.DISTINCT_EVENT_IDENTITY_EVIDENCE,
+        SemanticFinding.PAN_IDENTIFIER_CONFLICT,
+        SemanticFinding.LEGAL_FORM_LEXICAL_DIFFERENCE,
+        SemanticFinding.AMOUNT_MULTIPLE,
+    })
 
 def test_one_to_one_eligibility_deduplicates_blocking_findings():
     result = evaluate_purchase_gst_one_to_one_eligibility((SemanticFinding.SEVERE_AMOUNT_CONFLICT, SemanticFinding.SEVERE_AMOUNT_CONFLICT))

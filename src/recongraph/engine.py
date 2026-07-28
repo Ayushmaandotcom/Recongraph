@@ -32,7 +32,20 @@ class ReconciliationResult:
     traces: list[DecisionTrace]
     engine_version: str
     differential_results: list['DifferentialResult'] = field(default_factory=list)
-    
+
+    def to_dict(self) -> dict:
+        """Produce a JSON-safe dictionary representation of the reconciliation result.
+
+        The schema is intentionally flat and human-readable — designed for the UI API
+        layer and the CLI --out flag. All nested domain objects are recursively
+        serialized. Use recongraph.serialization.ReconEncoder for json.dumps.
+        """
+        import json
+        from recongraph.serialization import ReconEncoder
+        # Round-trip through the encoder to produce a clean nested dict
+        raw_json = json.dumps(self, cls=ReconEncoder)
+        return json.loads(raw_json)
+
 try:
     from importlib.metadata import version as _get_version
     VERSION = _get_version("recongraph")

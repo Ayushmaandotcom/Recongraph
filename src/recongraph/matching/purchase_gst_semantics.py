@@ -107,6 +107,10 @@ class EligibilityResult:
 # Is LEGAL_FORM_LEXICAL_DIFFERENCE universally blocking for Purchase <-> GST 1:1 reconciliation?
 # Current V1 policy: YES
 # Status: CONSERVATIVE POLICY — NOT YET EMPIRICALLY CALIBRATED
+#
+# AMOUNT_MULTIPLE: A pair where one amount is an integer multiple of the other (k∈{2,3},
+# within 1% tolerance) with reference/tax agreement is a split-invoice candidate — it
+# cannot be auto-matched as a 1:1 pair without human confirmation. Added 2026-07-29 (HN005).
 ONE_TO_ONE_BLOCKING_FINDINGS = frozenset(
     {
         SemanticFinding.SEVERE_AMOUNT_CONFLICT,
@@ -114,6 +118,7 @@ ONE_TO_ONE_BLOCKING_FINDINGS = frozenset(
         SemanticFinding.DISTINCT_EVENT_IDENTITY_EVIDENCE,
         SemanticFinding.PAN_IDENTIFIER_CONFLICT,
         SemanticFinding.LEGAL_FORM_LEXICAL_DIFFERENCE,
+        SemanticFinding.AMOUNT_MULTIPLE,
     }
 )
 

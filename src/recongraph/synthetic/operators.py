@@ -32,3 +32,13 @@ class AmountMutationOperator(MutationOperator):
 
     def apply(self, record: TRecord) -> TRecord:
         return dataclasses.replace(record, amount=Decimal(str(self.new_amount)))
+
+from datetime import date as _date
+
+@dataclasses.dataclass
+class DateMutationOperator(MutationOperator):
+    """Apply a record-date mutation (e.g., ±1–3 day date drift for noisy-positive scenarios)."""
+    new_date: _date
+
+    def apply(self, record: TRecord) -> TRecord:
+        return dataclasses.replace(record, record_date=self.new_date)
