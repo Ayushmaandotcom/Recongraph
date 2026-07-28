@@ -128,6 +128,18 @@ def test_one_to_one_blocking_findings_are_explicit():
         SemanticFinding.AMOUNT_MULTIPLE,
     })
 
+def test_legal_form_difference_blocks_even_with_gstin_match():
+    """
+    Documents current V1 behaviour (ADR-009): LEGAL_FORM_LEXICAL_DIFFERENCE blocks 
+    auto-matching even if the tax identity (GSTIN) perfectly matches.
+    Future refinement may downgrade this to a warning if GSTIN is strictly valid.
+    """
+    findings = (SemanticFinding.LEGAL_FORM_LEXICAL_DIFFERENCE,)
+    result = evaluate_purchase_gst_one_to_one_eligibility(findings)
+    assert result.status == OneToOneEligibility.INELIGIBLE
+    assert SemanticFinding.LEGAL_FORM_LEXICAL_DIFFERENCE in result.blocking_findings
+
+
 def test_one_to_one_eligibility_deduplicates_blocking_findings():
     result = evaluate_purchase_gst_one_to_one_eligibility((SemanticFinding.SEVERE_AMOUNT_CONFLICT, SemanticFinding.SEVERE_AMOUNT_CONFLICT))
     assert result.blocking_findings == (SemanticFinding.SEVERE_AMOUNT_CONFLICT,)

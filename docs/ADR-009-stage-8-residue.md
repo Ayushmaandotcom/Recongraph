@@ -22,6 +22,9 @@ To secure the V1 release, the V2 fusion pipeline and Stage 8 architecture were r
 
 3. **Codebase Preservation:** The suspended modules will remain in the repository (not deleted) to preserve the research and domain modeling work for a potential V3 architecture, but they are strictly isolated from V1 execution paths.
 
+4. **Future V1 Refinements (Policy Guardrails):**
+   - **Legal Form Blocking:** `LEGAL_FORM_LEXICAL_DIFFERENCE` currently routes a pair to manual review (as a member of `ONE_TO_ONE_BLOCKING_FINDINGS`) even if the tax identity (GSTIN) is structurally valid and perfectly matching. Future refinement will conditionally downgrade this finding to a non-blocking warning when `gstin_valid=True`, as same-GSTIN + different legal suffix is overwhelmingly data noise rather than distinct legal entities. For now, the over-conservative routing is preserved.
+
 ## Consequences
 - The engine guarantees V1 stability and deterministic 1:1 matching.
 - The UI review queue can still surface OCR layout highlighting without the engine depending on the complex `contrib/kernel` derivations.

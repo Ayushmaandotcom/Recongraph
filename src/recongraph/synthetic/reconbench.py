@@ -171,7 +171,7 @@ def generate_reconbench_dataset(size: int, seed: int = 42) -> list[ScenarioSpeci
             expected_decision = DecisionAction.AUTO_MATCH
 
         scenarios.append(ScenarioSpecification(
-            scenario_id=f"BENCH-{i:05d}",
+            scenario_id=f"BENCH-{scenario_type}-{i:05d}",
             difficulty=Difficulty.MEDIUM,
             base_purchases=(p,),
             base_gsts=(g,),

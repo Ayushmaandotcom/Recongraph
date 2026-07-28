@@ -106,6 +106,26 @@ def test_no_negative_pair_is_auto_matched():
         assert not any({p, g} <= s for s in auto), \
             f"{case}: labeled-negative pair {p}->{g} was AUTO-MATCHED"
 
+def test_group_hypothesis_survives_amount_multiple():
+    """Verify that group hypotheses don't falsely inherit pairwise AMOUNT_MULTIPLE blocks."""
+    result, _, _ = _run()
+    
+    # CP004 should be reviewed together with CG005 and CG006
+    # because they sum up to 100,000 (CP004) = 50,000 (CG005) + 50,000 (CG006)
+    # If the group hypothesis incorrectly inherits AMOUNT_MULTIPLE from the pairs 
+    # (since 100k = 2 * 50k), it would be broken apart or rendered ineligible.
+    
+    found = False
+    for pkt in result.review_packets:
+        p_ids = {r.record_id for r in pkt.purchases}
+        g_ids = {r.record_id for r in pkt.gsts}
+        
+        if "CP004" in p_ids and "CG005" in g_ids and "CG006" in g_ids:
+            found = True
+            break
+            
+    assert found, "CP004 -> CG005+CG006 group hypothesis was broken! (Check if AMOUNT_MULTIPLE blocked it at the group level)"
+
 if __name__ == "__main__":
     result, P, G = _run()
     print(f"auto_matches={len(result.auto_matches)} review_packets={len(result.review_packets)}")
@@ -115,3 +135,4 @@ if __name__ == "__main__":
     for pkt in result.review_packets:
         print(f"  {pkt.packet_id} [{pkt.action}] P={[r.record_id for r in pkt.purchases]} "
               f"G={[r.record_id for r in pkt.gsts]}")
+
