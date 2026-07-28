@@ -1,106 +1,35 @@
-# ReconGraph
+# ReconGraph: V1 Certified Core
 
-[![Tests](https://github.com/Ayushmaandotcom/Recongraph/actions/workflows/test.yml/badge.svg)](https://github.com/Ayushmaandotcom/Recongraph/actions/workflows/test.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-![Version](https://img.shields.io/badge/version-0.9.0-blue)
+ReconGraph is a deterministic, graph-based reconciliation engine for Indian GST compliance. It processes Purchase Registers (PR) and GST Returns (GSTR-2B) to find exact matches and categorize mismatches into a human review queue based on a "missing vs contradictory" semantic paradigm.
 
-**A deterministic, graph-based evidence reasoning framework for financial reconciliation.**
+## V1 Certification Status
+The engine core is officially **V1 Certified**.
+- All mathematical proofs pass.
+- Challenge Referee (Adversarial Negatives) is green with 0 False Positives.
+- Default Auto-Match Threshold is calibrated at `0.95`, keeping adversarial recall tight while maximizing throughput on noisy real-world gaps (±₹1 rounding, minor date drifts).
+- Strict conservation bounds: `input records == output records`. No data loss.
 
-ReconGraph frames reconciliation as a formal reasoning problem. Instead of opaque scalar similarity scores, it builds a structured evidence graph, evaluates competing hypotheses, and routes decisions it cannot confidently resolve to human review.
+## Running the UI Dashboard
 
-## How It Works
-
-1. **Records** — Purchase invoices and GST filings are ingested as typed domain objects.
-2. **Blocking** — Records sharing common keys (reference, tax identity) are grouped into candidate pairs.
-3. **Evidence Providers** — Five independent providers evaluate each pair: Financial (amount), Temporal (date proximity), Tax Identity, Vendor Name (fuzzy), and Reference (rarity-weighted).
-4. **Hypothesis Evaluation** — Connected components are partitioned into hypotheses and scored under a configurable `RelationshipPolicy`.
-5. **Decision Routing** — High-confidence matches are auto-approved. Weak or ambiguous matches produce `ReviewPacket` objects for human triage. **No record is ever silently dropped** (the conservation invariant is tested in CI).
-
-## Quick Start
-
-### Prerequisites
-
-- Python 3.11+
-
-### Installation
+ReconGraph ships with a React/Next.js dashboard to visualize the review queue and engine rationale.
 
 ```bash
-git clone https://github.com/Ayushmaandotcom/Recongraph.git
-cd Recongraph
-pip install -e ".[dev]"
+# Terminal 1: Next.js Frontend
+cd recongraph-ui
+npm install
+npm run dev
+# The UI will load at http://localhost:3000
 ```
 
-### Running the Engine
+The UI includes a static demo fallback so you can instantly view the adversarial Challenge Dataset without starting the Python backend.
 
-See [`quickstart.py`](quickstart.py) for a complete, runnable example. This script is executed in CI on every push — if it fails, the docs are wrong.
-
-```python
-from datetime import date
-from decimal import Decimal
-from recongraph.engine import ReconGraphEngine
-from recongraph.config import ReconGraphConfig
-from recongraph.domain.records import PurchaseRecord, GSTRecord
-from recongraph.plugins.core_providers import (
-    FinancialEvidenceProvider, TemporalEvidenceProvider,
-    TaxEvidenceProvider, VendorEvidenceProvider, ReferenceEvidenceProvider
-)
-from recongraph.domain.vendor.context import VendorIdentityContext, VendorCorpusProfile
-from recongraph.matching.reference_evidence import (
-    ReferenceEvidenceContext, ReferenceCorpusProfile, ReferenceEvidencePolicy
-)
-
-# Create records
-purchase = PurchaseRecord(
-    record_id="P-001", vendor_name="TechCorp Private Limited",
-    reference="INV-2026-A", amount=Decimal("15000.00"),
-    record_date=date(2026, 1, 15), tax_identity="07TECHC1234A1Z5",
-)
-gst = GSTRecord(
-    record_id="G-001", vendor_name="TECHCORP PVT LTD",
-    reference="INV-2026-A", amount=Decimal("15000.00"),
-    record_date=date(2026, 1, 16), tax_identity="07TECHC1234A1Z5",
-)
-
-# Setup providers (see quickstart.py for full context setup)
-# ...
-
-result = ReconGraphEngine(ReconGraphConfig(), providers).reconcile([purchase], [gst])
-
-if result.auto_matches:
-    print("AUTO_MATCH:", result.auto_matches[0].rationale)
-elif result.review_packets:
-    print(f"REVIEW: {result.review_packets[0].checklist}")
-```
-
-### Running Tests
-
+To process new datasets, you may start the FastAPI backend:
 ```bash
-pytest tests/ -q
-python quickstart.py
+# Terminal 2: FastAPI Backend
+pip install -r recongraph-api/requirements.txt
+python -m uvicorn recongraph-api.app.main:app --reload
 ```
 
-## ReconBench
-
-ReconGraph ships with **ReconBench**, a built-in benchmark suite that generates synthetic invoice datasets and measures engine accuracy:
-
-```bash
-python -m recongraph.cli benchmark --size 100
-```
-
-Use `--faf` to enable the Failure Analysis Framework, which produces detailed forensic reports for every misclassification.
-
-## Project Status
-
-ReconGraph is at **v0.9.0**. The core engine (candidate generation, hypothesis evaluation, decision routing, conservation invariant) is stable and tested (690+ tests). Areas under active development:
-
-- Bipolar evidence model (support vs. conflict)
-- ReconBench expansion and real-world validation
-- Interactive pipeline visualization
-
-## Contributing
-
-We welcome contributions. Please ensure `pytest tests/` and `python quickstart.py` both pass before submitting a PR.
-
-## License
-
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+## Documentation
+- [BENCHMARKS.md](BENCHMARKS.md): Precision/Recall characteristics on synthetic and adversarial corpora.
+- [ADR-009 Stage 8 Residue](docs/ADR-009-stage-8-residue.md): Documentation of module isolation and engine boundaries.
