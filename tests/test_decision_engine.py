@@ -15,6 +15,13 @@ def create_mock_hypothesis(score: float, eligibility: EligibilityStatus) -> Eval
         violations=frozenset()
     )
 
+def test_default_policy_calibration():
+    # The default auto_match_threshold MUST equal 0.85 based on the calibration table.
+    # Calibrated on synthetic corpus v1, seed 42 (experiments/calibration_results_table.md).
+    # This prevents silent regression of the operational boundary.
+    policy = DecisionPolicy()
+    assert policy.auto_match_threshold == 0.85
+
 def test_decision_case_1():
     # Case 1: One eligible hypothesis, no competitors -> AUTO_MATCH
     h1 = create_mock_hypothesis(0.98, EligibilityStatus.ELIGIBLE)

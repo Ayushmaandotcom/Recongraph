@@ -23,6 +23,8 @@ Using grid-search threshold optimization (`experiments/calibrate_thresholds.py`)
 - **Recall:** `0.9021`
 - **F1 Score:** `0.9074`
 
+*Epistemic Caveat: The FP floor of exactly 37 at every threshold is a property of the synthetic generator's noise model, not of real data. This default of 0.85 is calibrated explicitly on synthetic corpus v1, seed 42.*
+
 *Note on Scale Execution:*
 During scale experiments, the graph dynamically limits component traversal for subsets exceeding 15 candidate edges to prevent O(2^N) backtracking explosion on highly entangled clusters. These dense clusters immediately degrade to `REVIEW_AMBIGUOUS` packets, ensuring deterministic completion time.
 
