@@ -510,6 +510,34 @@ class ReferenceEvidencePipeline(EvidencePipeline[ReferenceObservation, tuple[Ref
 
     def contribute(self, interpretation: tuple[ReferencePairInterpretation, ...]) -> EvidenceContributionV2[tuple[ReferencePairInterpretation, ...]]:
         from recongraph.domain.reference.projection import ReferenceV1ProjectionContract
+        from recongraph.contrib.kernel.assertions import EvidenceAssertion, AssertionPolarity, EvidenceAncestryRef
+        from recongraph.contrib.kernel.scopes import Proposition, ScopeKind, SubjectRef
+        from recongraph.contrib.kernel.authority import AuthorityDescriptor, AuthorityBasisId
+        from recongraph.contrib.kernel.identity import KernelIdentityRef, IdentityDomainId, IdentitySchemaId, IdentityDigest
+        from recongraph.domain.reference.claims import SHARED_REFERENCE_CLAIM
+        from recongraph.domain.reference.factors import ReferenceRelationState
+        
+        mock_ancestry = EvidenceAncestryRef(
+            identity=KernelIdentityRef(
+                domain=IdentityDomainId("recongraph.observation_occurrence"),
+                schema=IdentitySchemaId("recongraph.observation_occurrence.v1"),
+                digest=IdentityDigest("sha256:0000000000000000000000000000000000000000000000000000000000000000")
+            )
+        )
+
+        assertions = []
+        for interp in interpretation:
+            state = interp.relation.state
+            if state == ReferenceRelationState.EXACT_MATCH:
+                assertions.append(EvidenceAssertion(
+                    proposition=Proposition.create(claim=SHARED_REFERENCE_CLAIM, kind=ScopeKind.RECORD_PAIR, left=[SubjectRef("urn:purchase")], right=[SubjectRef("urn:gst")]),
+                    polarity=AssertionPolarity.SUPPORT, magnitude=1.0, authority=AuthorityDescriptor(basis=AuthorityBasisId("reference_model")), ancestry=mock_ancestry
+                ))
+            elif state == ReferenceRelationState.DISTINCT:
+                assertions.append(EvidenceAssertion(
+                    proposition=Proposition.create(claim=SHARED_REFERENCE_CLAIM, kind=ScopeKind.RECORD_PAIR, left=[SubjectRef("urn:purchase")], right=[SubjectRef("urn:gst")]),
+                    polarity=AssertionPolarity.CONFLICT, magnitude=1.0, authority=AuthorityDescriptor(basis=AuthorityBasisId("reference_model")), ancestry=mock_ancestry
+                ))
         
         projection = ReferenceV1ProjectionContract.project(interpretation)
             
@@ -517,7 +545,7 @@ class ReferenceEvidencePipeline(EvidencePipeline[ReferenceObservation, tuple[Ref
             provider_name=SignalName.REFERENCE,
             score=projection.score,
             violations=projection.violations,
-            metadata={"reference_projection": projection},
+            metadata={"reference_projection": projection, "assertions": tuple(assertions)},
             interpretation=interpretation
         )
 

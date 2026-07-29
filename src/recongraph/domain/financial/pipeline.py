@@ -216,7 +216,56 @@ class FinancialEvidencePipeline(EvidencePipeline[FinancialObservation, AmountInt
 
     def contribute(self, interpretation: AmountInterpretation) -> EvidenceContributionV2[AmountInterpretation]:
         from recongraph.domain.financial.amount_projection import project_amount_similarity
+        from recongraph.contrib.kernel.assertions import EvidenceAssertion, AssertionPolarity, EvidenceAncestryRef
+        from recongraph.contrib.kernel.scopes import Proposition, ScopeKind, SubjectRef
+        from recongraph.contrib.kernel.authority import AuthorityDescriptor, AuthorityBasisId
+        from recongraph.contrib.kernel.identity import KernelIdentityRef, IdentityDomainId, IdentitySchemaId, IdentityDigest
+        from recongraph.domain.financial.claims import SAME_AMOUNT_CLAIM, WITHIN_FEE_TOLERANCE_CLAIM, CURRENCY_CONSISTENCY_CLAIM
         
+        mock_ancestry = EvidenceAncestryRef(
+            identity=KernelIdentityRef(
+                domain=IdentityDomainId("recongraph.observation_occurrence"),
+                schema=IdentitySchemaId("recongraph.observation_occurrence.v1"),
+                digest=IdentityDigest("sha256:0000000000000000000000000000000000000000000000000000000000000000")
+            )
+        )
+
+        assertions = []
+        
+        # 1. Amount Assertions
+        if interpretation.equality.value == "EQUAL":
+            assertions.append(EvidenceAssertion(
+                proposition=Proposition.create(claim=SAME_AMOUNT_CLAIM, kind=ScopeKind.RECORD_PAIR, left=[SubjectRef("urn:purchase")], right=[SubjectRef("urn:gst")]),
+                polarity=AssertionPolarity.SUPPORT, magnitude=1.0, authority=AuthorityDescriptor(basis=AuthorityBasisId("financial_model")), ancestry=mock_ancestry
+            ))
+        elif CompatibilityFlag.WITHIN_STRICT_TOLERANCE in interpretation.compatibility_flags:
+            assertions.append(EvidenceAssertion(
+                proposition=Proposition.create(claim=SAME_AMOUNT_CLAIM, kind=ScopeKind.RECORD_PAIR, left=[SubjectRef("urn:purchase")], right=[SubjectRef("urn:gst")]),
+                polarity=AssertionPolarity.SUPPORT, magnitude=0.9, authority=AuthorityDescriptor(basis=AuthorityBasisId("financial_model")), ancestry=mock_ancestry
+            ))
+        elif CompatibilityFlag.WITHIN_RELAXED_TOLERANCE in interpretation.compatibility_flags:
+            assertions.append(EvidenceAssertion(
+                proposition=Proposition.create(claim=WITHIN_FEE_TOLERANCE_CLAIM, kind=ScopeKind.RECORD_PAIR, left=[SubjectRef("urn:purchase")], right=[SubjectRef("urn:gst")]),
+                polarity=AssertionPolarity.SUPPORT, magnitude=1.0, authority=AuthorityDescriptor(basis=AuthorityBasisId("financial_model")), ancestry=mock_ancestry
+            ))
+        else:
+            assertions.append(EvidenceAssertion(
+                proposition=Proposition.create(claim=SAME_AMOUNT_CLAIM, kind=ScopeKind.RECORD_PAIR, left=[SubjectRef("urn:purchase")], right=[SubjectRef("urn:gst")]),
+                polarity=AssertionPolarity.CONFLICT, magnitude=1.0, authority=AuthorityDescriptor(basis=AuthorityBasisId("financial_model")), ancestry=mock_ancestry
+            ))
+
+        # 2. Currency Assertions
+        if interpretation.currency_relation.value == "SAME":
+            assertions.append(EvidenceAssertion(
+                proposition=Proposition.create(claim=CURRENCY_CONSISTENCY_CLAIM, kind=ScopeKind.RECORD_PAIR, left=[SubjectRef("urn:purchase")], right=[SubjectRef("urn:gst")]),
+                polarity=AssertionPolarity.SUPPORT, magnitude=1.0, authority=AuthorityDescriptor(basis=AuthorityBasisId("financial_model")), ancestry=mock_ancestry
+            ))
+        elif interpretation.currency_relation.value == "DIFFERENT":
+            assertions.append(EvidenceAssertion(
+                proposition=Proposition.create(claim=CURRENCY_CONSISTENCY_CLAIM, kind=ScopeKind.RECORD_PAIR, left=[SubjectRef("urn:purchase")], right=[SubjectRef("urn:gst")]),
+                polarity=AssertionPolarity.CONFLICT, magnitude=1.0, authority=AuthorityDescriptor(basis=AuthorityBasisId("financial_model")), ancestry=mock_ancestry
+            ))
+
         projection = project_amount_similarity(interpretation)
         violations = set(projection.warnings)
         if interpretation.currency_relation.value == "DIFFERENT":
@@ -230,9 +279,11 @@ class FinancialEvidencePipeline(EvidencePipeline[FinancialObservation, AmountInt
             violations=frozenset(violations),
             metadata={
                 "interpretation": interpretation,
-                "projection": projection
+                "projection": projection,
+                "assertions": tuple(assertions)
             },
             interpretation=interpretation
         )
+
         
 

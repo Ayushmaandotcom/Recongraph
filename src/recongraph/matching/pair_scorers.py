@@ -73,6 +73,7 @@ class ScoredPair:
     contributions: dict[str, Any]
     signals: dict[str, float | None]
     relationship: RelationshipScore
+    assertions: tuple[Any, ...] = ()
 
 
 def score_purchase_to_gst(
@@ -85,6 +86,7 @@ def score_purchase_to_gst(
     violations: set[str] = set()
     supporting_metadata = {}
     contributions = {}
+    all_assertions = []
     
     # 1. Collect ReliabilityEnvelopes
     envelopes = []
@@ -102,6 +104,8 @@ def score_purchase_to_gst(
         violations.update(contrib.violations)
         if contrib.metadata:
             supporting_metadata[contrib.provider_name] = contrib.metadata
+            if "assertions" in contrib.metadata:
+                all_assertions.extend(contrib.metadata["assertions"])
             
     # 3. Apply Attenuation Policy
     if hasattr(policy, "attenuation_policy"):
@@ -164,5 +168,6 @@ def score_purchase_to_gst(
         supporting_metadata=supporting_metadata,
         contributions=contributions,
         signals=signals,
-        relationship=relationship
+        relationship=relationship,
+        assertions=tuple(all_assertions)
     )
