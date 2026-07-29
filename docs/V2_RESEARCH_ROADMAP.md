@@ -1,5 +1,16 @@
 # ReconGraph: V2 Research Roadmap & Vision
 
+> **ReconGraph does not ask "How similar are these records?" It asks "What independent evidence exists about the relationship between these records, how was that evidence produced, and what conclusions does it legitimately support?"**
+
+### Core Design Principles for V2
+Before writing the first line of V2 code, evaluate every proposed feature (embeddings, OCR, temporal reasoning) against one question: *Is this producing a new observation, a new interpretation, or is it prematurely making a decision?*
+
+1. **Observations are facts; assertions are interpretations.**
+2. **Every semantic conclusion must carry reproducible provenance.**
+3. **Fusion is the only place where independent evidence becomes a decision.**
+
+---
+
 This document outlines the strategic transition of ReconGraph from a V1 deterministic production engine into a research-grade platform. The focus shifts from feature construction to evolving the core evidence pipeline: **Observation → Interpretation → Assertion → Fusion → Decision**.
 
 ## The Real Reasoning Pipeline
