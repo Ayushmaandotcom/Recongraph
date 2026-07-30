@@ -99,26 +99,34 @@ class DecisionEngine:
             )
 
 from recongraph.graph.fusion_result import FusionResult
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from recongraph.graph.dempster_shafer import MassFunction
 
 class FusionDecisionEngine:
     """
-    Translates a descriptive FusionResult into an actionable DecisionAction.
+    Translates a descriptive FusionResult and a Dempster-Shafer MassFunction into an actionable DecisionAction.
     Used in SHADOW and FUSION modes.
     """
-    def decide(self, fusion_result: FusionResult, fallback_hypothesis: EvaluatedHypothesis | None = None) -> ReconciliationDecision:
-        if fusion_result.contradictions:
-            # If there are explicit contradictions, it's ambiguous
-            action = DecisionAction.REVIEW_AMBIGUOUS
-        elif not fusion_result.independent_support and not fusion_result.derived_support:
+    def decide(self, fusion_result: FusionResult, fused_mass: 'MassFunction', fallback_hypothesis: EvaluatedHypothesis | None = None) -> ReconciliationDecision:
+        print(f"FUSED MASS: belief={fused_mass.belief}, no_match={fused_mass.no_match}, uncertainty={fused_mass.uncertainty}")
+        # If contradiction is absolute (e.g. MassFunction returns total uncertainty from k >= 1.0)
+        # or we have explicitly propagated contradictions.
+        if fusion_result.contradictions or fused_mass.no_match > 0.5:
             action = DecisionAction.NO_MATCH
-        elif len(fusion_result.independent_support) >= 2:
+        elif fused_mass.belief >= 0.8:
             action = DecisionAction.AUTO_MATCH
-        else:
+        elif fused_mass.plausibility >= 0.8 and fused_mass.uncertainty > 0.2:
+            action = DecisionAction.REVIEW_AMBIGUOUS
+        elif fused_mass.belief >= 0.5:
             action = DecisionAction.REVIEW_WEAK
+        else:
+            action = DecisionAction.NO_MATCH
             
         return ReconciliationDecision(
             action=action,
             selected_hypothesis=fallback_hypothesis,
             competitors=(),
-            rationale="Decision derived via Semantic Fusion Engine"
+            rationale=f"DS Fusion: Belief={fused_mass.belief:.3f}, Plausibility={fused_mass.plausibility:.3f}, Uncertainty={fused_mass.uncertainty:.3f}"
         )

@@ -105,6 +105,7 @@ def score_purchase_to_gst(
         if contrib.metadata:
             supporting_metadata[contrib.provider_name] = contrib.metadata
             if "assertions" in contrib.metadata:
+                print(f"EXTRACTED {len(contrib.metadata['assertions'])} ASSERTIONS FROM {contrib.provider_name}")
                 all_assertions.extend(contrib.metadata["assertions"])
             
     # 3. Apply Attenuation Policy

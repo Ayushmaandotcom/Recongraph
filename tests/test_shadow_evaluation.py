@@ -23,9 +23,47 @@ class DummyProvider(EvidenceProvider):
         return [TaxIdentityBlocker()]
         
     def evaluate(self, purchases: Sequence[PurchaseRecord], gsts: Sequence[GSTRecord]) -> EvidenceContribution:
+        from recongraph.contrib.kernel.assertions import EvidenceAssertion, AssertionPolarity, EvidenceAncestryRef
+        from recongraph.contrib.kernel.scopes import Proposition, ScopeKind, SubjectRef
+        from recongraph.contrib.kernel.authority import AuthorityDescriptor, AuthorityBasisId
+        from recongraph.contrib.kernel.identity import KernelIdentityRef, IdentityDomainId, IdentitySchemaId, IdentityDigest
+        from recongraph.contrib.kernel.claims import ClaimDescriptor, ClaimId, ClaimSemanticVersion, ClaimSymmetry
+        
+        mock_ancestry = EvidenceAncestryRef(
+            identity=KernelIdentityRef(
+                domain=IdentityDomainId("recongraph.observation_occurrence"),
+                schema=IdentitySchemaId("recongraph.observation_occurrence.v1"),
+                digest=IdentityDigest("sha256:0000000000000000000000000000000000000000000000000000000000000000")
+            )
+        )
+        dummy_claim = ClaimDescriptor(
+            claim_id=ClaimId("dummy.claim"),
+            semantic_version=ClaimSemanticVersion(1),
+            symmetry=ClaimSymmetry.SYMMETRIC,
+            allowed_scope_kinds=frozenset({ScopeKind.RECORD_PAIR})
+        )
+        assertions = []
+        if self.score_value > 0.8:
+            assertions.append(EvidenceAssertion(
+                proposition=Proposition.create(claim=dummy_claim, kind=ScopeKind.RECORD_PAIR, left=[SubjectRef("urn:left")], right=[SubjectRef("urn:right")]),
+                polarity=AssertionPolarity.SUPPORT,
+                magnitude=self.score_value,
+                authority=AuthorityDescriptor(basis=AuthorityBasisId(self.name)),
+                ancestry=mock_ancestry
+            ))
+        elif self.score_value < 0.3:
+            assertions.append(EvidenceAssertion(
+                proposition=Proposition.create(claim=dummy_claim, kind=ScopeKind.RECORD_PAIR, left=[SubjectRef("urn:left")], right=[SubjectRef("urn:right")]),
+                polarity=AssertionPolarity.CONFLICT,
+                magnitude=1.0 - self.score_value,
+                authority=AuthorityDescriptor(basis=AuthorityBasisId(self.name)),
+                ancestry=mock_ancestry
+            ))
+            
         return EvidenceContribution(
             provider_name=self.name,
-            score=self.score_value
+            score=self.score_value,
+            metadata={"assertions": tuple(assertions)}
         )
 
 @pytest.fixture
@@ -57,6 +95,8 @@ def test_shadow_evaluation_baseline_match(test_engine):
     assert len(result.differential_results) == 1
     diff = result.differential_results[0]
     
+    print(diff.fusion_decision)
+    print(diff.fusion_explanation)
     assert diff.legacy_decision == DecisionAction.AUTO_MATCH
     assert diff.fusion_decision == DecisionAction.AUTO_MATCH
     assert diff.classification == DifferenceType.EQUIVALENT

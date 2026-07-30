@@ -126,19 +126,29 @@ class ReconGraphEngine:
                         # Build EvidenceGraph from EvaluatedHypotheses
                         evidence_graph = EvidenceGraph()
                         for h in evaluated:
-                            contributions = h.supporting_evidence.contributions
-                            for provider_name, contrib in contributions.items():
-                                # We must convert EvidenceContribution to EvidenceContributionV2
-                                contrib_v2: EvidenceContributionV2[Any] = EvidenceContributionV2(
-                                    provider_name=contrib.provider_name,
-                                    score=contrib.score,
-                                    violations=contrib.violations,
-                                    metadata=contrib.metadata
-                                )
-                                node = FusionNode.from_contribution(contrib_v2)
+                            print(f"DEBUG ASSERTIONS: {h.supporting_evidence.assertions}")
+                            for assertion in h.supporting_evidence.assertions:
+                                node = FusionNode.from_assertion(assertion)
                                 evidence_graph.add_node(node)
                                 
+                        print(f"EVIDENCE GRAPH SIZE: {len(evidence_graph.nodes)}")
+                        # Propagate dependencies and contradictions
                         propagated_nodes = SemanticPropagator.propagate(evidence_graph)
+                        print(f"PROPAGATED NODES SIZE: {len(propagated_nodes)}")
+                        
+                        # Apply Dempster-Shafer fusion
+                        from recongraph.graph.dempster_shafer import MassFunction
+                        from recongraph.graph.calibration import CalibrationEngine
+                        
+                        calibration_engine = CalibrationEngine(self.config.decision_config.calibration_policy)
+                        fused_mass = MassFunction(match=0.0, no_match=0.0, uncertainty=1.0)
+                        
+                        # We only fuse independent support nodes or those successfully propagated
+                        for node_id, p_node in propagated_nodes.items():
+                            from recongraph.graph.propagation import PropagationStatus
+                            if p_node.status in (PropagationStatus.SUPPORTED, PropagationStatus.UNAFFECTED, PropagationStatus.CONTRADICTED):
+                                node_mass = calibration_engine.calibrate(p_node.original_node.assertion)
+                                fused_mass = fused_mass.combine(node_mass)
                         
                         fusion_result = FusionResult.from_propagated_graph(
                             nodes=propagated_nodes,
@@ -148,7 +158,8 @@ class ReconGraphEngine:
                         )
                         
                         fusion_engine = FusionDecisionEngine()
-                        fusion_decision = fusion_engine.decide(fusion_result, decision.selected_hypothesis)
+                        # FusionDecisionEngine will now take fused_mass as an argument
+                        fusion_decision = fusion_engine.decide(fusion_result, fused_mass, decision.selected_hypothesis)
                         fusion_time = time.time() - t1
                         
                         if self.config.decision_config.decision_mode == DecisionMode.FUSION:

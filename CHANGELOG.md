@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-07-29
+
+### Added
+- **Plugin Marketplace (Stage 8N)**: Introduced dynamic entry-point based plugin architecture. Core evidence providers are now loaded dynamically via the `PluginManager`, with full sandboxing to prevent third-party exceptions from crashing the deterministic engine.
+- **Learning Layer (Stage 8O)**: Implemented closed-loop passive AI feedback mechanisms. Added `VendorAliasLearner` to capture human approval of low-confidence vendor matches as new aliases, and `CalibrationLearner` to adjust confidence buckets based on human empirical accuracy.
+- **Evidence Framework**: Migrated to the Advanced Evidence Framework, breaking away from scalar-only scoring. Implemented cryptographic lineage for all evidence using `KernelIdentityRef`.
+
+### Changed
+- Refactored all core matching algorithms (Financial, Temporal, Tax, Reference, Vendor) to comply with the new `EvidenceProviderV2` protocol.
+- Calibration is now strictly monotonic and decoupled from the scoring algorithm via the `CalibrationEngine`.
+
 ## [1.0.0] - 2026-07-27
 
 ### Added

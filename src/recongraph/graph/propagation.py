@@ -39,12 +39,14 @@ class SemanticPropagator:
     """
     @staticmethod
     def propagate(graph: EvidenceGraph) -> Mapping[str, PropagatedNode]:
+        from recongraph.contrib.kernel.assertions import AssertionPolarity
+        
         propagated = {}
         for node_id, node in graph.nodes.items():
             status = PropagationStatus.UNAFFECTED
-            if node.contribution.violations:
+            if node.assertion.polarity == AssertionPolarity.CONFLICT:
                 status = PropagationStatus.CONTRADICTED
-            elif node.contribution.score is None or node.contribution.score <= 0.0:
+            elif node.assertion.magnitude <= 0.0:
                 status = PropagationStatus.INVALIDATED
                 
             propagated[node_id] = PropagatedNode(node, status=status)

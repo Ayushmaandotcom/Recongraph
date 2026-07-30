@@ -1,63 +1,63 @@
 import pytest
 from recongraph.graph.fusion import FusionNode, EvidenceGraph, DependencyEdge, ContradictionEdge
-from recongraph.plugins.provider_v2 import EvidenceContributionV2
+from recongraph.contrib.kernel.assertions import EvidenceAssertion, AssertionPolarity, EvidenceAncestryRef
+from recongraph.contrib.kernel.scopes import Proposition, ScopeKind, SubjectRef
+from recongraph.contrib.kernel.authority import AuthorityDescriptor, AuthorityBasisId
+from recongraph.contrib.kernel.identity import KernelIdentityRef, IdentityDomainId, IdentitySchemaId, IdentityDigest
+from recongraph.contrib.kernel.claims import ClaimDescriptor, ClaimId, ClaimSemanticVersion, ClaimSymmetry
+
+def make_dummy_assertion(basis_name: str, magnitude: float = 1.0, polarity: AssertionPolarity = AssertionPolarity.SUPPORT) -> EvidenceAssertion:
+    mock_ancestry = EvidenceAncestryRef(
+        identity=KernelIdentityRef(
+            domain=IdentityDomainId("recongraph.observation_occurrence"),
+            schema=IdentitySchemaId("recongraph.observation_occurrence.v1"),
+            digest=IdentityDigest("sha256:0000000000000000000000000000000000000000000000000000000000000000")
+        )
+    )
+    dummy_claim = ClaimDescriptor(
+        claim_id=ClaimId("dummy.claim"),
+        semantic_version=ClaimSemanticVersion(1),
+        symmetry=ClaimSymmetry.SYMMETRIC,
+        allowed_scope_kinds=frozenset({ScopeKind.RECORD_PAIR})
+    )
+    return EvidenceAssertion(
+        proposition=Proposition.create(claim=dummy_claim, kind=ScopeKind.RECORD_PAIR, left=[SubjectRef("urn:left")], right=[SubjectRef("urn:right")]),
+        polarity=polarity,
+        magnitude=magnitude,
+        authority=AuthorityDescriptor(basis=AuthorityBasisId(basis_name)),
+        ancestry=mock_ancestry
+    )
 
 def test_fusion_node_determinism():
-    contrib1 = EvidenceContributionV2(
-        provider_name="TAX_IDENTITY",
-        score=1.0,
-        metadata={},
-        interpretation="GSTIN_EXACT_MATCH"
-    )
+    assert1 = make_dummy_assertion("TAX_IDENTITY")
+    assert2 = make_dummy_assertion("TAX_IDENTITY")
     
-    contrib2 = EvidenceContributionV2(
-        provider_name="TAX_IDENTITY",
-        score=1.0,
-        metadata={},
-        interpretation="GSTIN_EXACT_MATCH"
-    )
+    node1 = FusionNode.from_assertion(assert1)
+    node2 = FusionNode.from_assertion(assert2)
     
-    node1 = FusionNode.from_contribution(contrib1)
-    node2 = FusionNode.from_contribution(contrib2)
-    
-    # Deterministic hashing ensures identical evidence produces the same node ID
     assert node1.node_id == node2.node_id
     
 def test_fusion_node_distinct():
-    contrib1 = EvidenceContributionV2(
-        provider_name="TAX_IDENTITY",
-        score=1.0,
-        metadata={},
-        interpretation="GSTIN_EXACT_MATCH"
-    )
+    assert1 = make_dummy_assertion("TAX_IDENTITY")
+    assert2 = make_dummy_assertion("VENDOR_IDENTITY")
     
-    contrib2 = EvidenceContributionV2(
-        provider_name="VENDOR_IDENTITY",
-        score=1.0,
-        metadata={},
-        interpretation="GSTIN_EXACT_MATCH"
-    )
-    
-    node1 = FusionNode.from_contribution(contrib1)
-    node2 = FusionNode.from_contribution(contrib2)
+    node1 = FusionNode.from_assertion(assert1)
+    node2 = FusionNode.from_assertion(assert2)
     
     assert node1.node_id != node2.node_id
 
 def test_evidence_graph_permutation_invariance():
-    contrib_tax = EvidenceContributionV2(provider_name="TAX", score=1.0, interpretation="EXACT")
-    contrib_ven = EvidenceContributionV2(provider_name="VENDOR", score=0.9, interpretation="FUZZY")
-    contrib_fin = EvidenceContributionV2(provider_name="FINANCIAL", score=1.0, interpretation="EXACT")
+    assert_tax = make_dummy_assertion("TAX")
+    assert_ven = make_dummy_assertion("VENDOR", magnitude=0.9)
+    assert_fin = make_dummy_assertion("FINANCIAL")
     
-    node_tax = FusionNode.from_contribution(contrib_tax)
-    node_ven = FusionNode.from_contribution(contrib_ven)
-    node_fin = FusionNode.from_contribution(contrib_fin)
+    node_tax = FusionNode.from_assertion(assert_tax)
+    node_ven = FusionNode.from_assertion(assert_ven)
+    node_fin = FusionNode.from_assertion(assert_fin)
     
-    # Tax derives Vendor
     dep_edge = DependencyEdge(_source_id=node_tax.node_id, _target_id=node_ven.node_id)
-    # Tax contradicts Financial (example)
     con_edge = ContradictionEdge(node_a=node_tax.node_id, node_b=node_fin.node_id)
     
-    # Graph A (Insertion order 1)
     graph_a = EvidenceGraph()
     graph_a.add_node(node_tax)
     graph_a.add_node(node_ven)
@@ -65,7 +65,6 @@ def test_evidence_graph_permutation_invariance():
     graph_a.add_edge(dep_edge)
     graph_a.add_edge(con_edge)
     
-    # Graph B (Insertion order 2)
     graph_b = EvidenceGraph()
     graph_b.add_node(node_fin)
     graph_b.add_node(node_tax)
@@ -78,9 +77,8 @@ def test_evidence_graph_permutation_invariance():
     assert len(graph_a.edges) == 2
 
 def test_evidence_graph_missing_node_edge():
-    node = FusionNode.from_contribution(EvidenceContributionV2(provider_name="TAX", score=1.0, interpretation="X"))
+    node = FusionNode.from_assertion(make_dummy_assertion("TAX"))
     graph = EvidenceGraph()
     
     with pytest.raises(ValueError, match="Cannot add edge"):
-        # Target node not in graph
         graph.add_edge(DependencyEdge(_source_id=node.node_id, _target_id="fake_id"))

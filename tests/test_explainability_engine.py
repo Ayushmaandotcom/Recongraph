@@ -31,64 +31,88 @@ def mock_decision():
     )
 
 @pytest.fixture
-def mock_fusion_result():
-    return FusionResult(
-        independent_support=frozenset(["TAX_NODE", "FINANCIAL_NODE"]),
-        derived_support=frozenset(["VENDOR_NODE"]),
-        contradictions=frozenset([]),
-        dependency_groups=(),
-        missingness={"TEMPORAL_NODE": "missing_record"},
-        propagation_status={
-            "TAX_NODE": PropagationStatus.SUPPORTED,
-            "FINANCIAL_NODE": PropagationStatus.SUPPORTED,
-            "VENDOR_NODE": PropagationStatus.SUPPORTED
-        },
-        coverage=0.9
-    )
+def mock_graph_and_result():
+    from recongraph.contrib.kernel.assertions import EvidenceAssertion, AssertionPolarity, EvidenceAncestryRef
+    from recongraph.contrib.kernel.scopes import Proposition, ScopeKind, SubjectRef
+    from recongraph.contrib.kernel.authority import AuthorityDescriptor, AuthorityBasisId
+    from recongraph.contrib.kernel.identity import KernelIdentityRef, IdentityDomainId, IdentitySchemaId, IdentityDigest
+    from recongraph.contrib.kernel.claims import ClaimDescriptor, ClaimId, ClaimSemanticVersion, ClaimSymmetry
+    from recongraph.graph.fusion import DependencyEdge, CorroborationEdge
+    
+    def make_dummy(name: str, magnitude: float = 1.0, polarity: AssertionPolarity = AssertionPolarity.SUPPORT):
+        mock_ancestry = EvidenceAncestryRef(
+            identity=KernelIdentityRef(
+                domain=IdentityDomainId("recongraph.observation_occurrence"),
+                schema=IdentitySchemaId("recongraph.observation_occurrence.v1"),
+                digest=IdentityDigest("sha256:0000000000000000000000000000000000000000000000000000000000000000")
+            )
+        )
+        dummy_claim = ClaimDescriptor(claim_id=ClaimId(f"dummy.{name.lower()}"), semantic_version=ClaimSemanticVersion(1), symmetry=ClaimSymmetry.SYMMETRIC, allowed_scope_kinds=frozenset({ScopeKind.RECORD_PAIR}))
+        return EvidenceAssertion(
+            proposition=Proposition.create(claim=dummy_claim, kind=ScopeKind.RECORD_PAIR, left=[SubjectRef("urn:left")], right=[SubjectRef("urn:right")]),
+            polarity=polarity, magnitude=magnitude, authority=AuthorityDescriptor(basis=AuthorityBasisId(name)), ancestry=mock_ancestry
+        )
 
-@pytest.fixture
-def mock_evidence_graph():
     graph = EvidenceGraph()
-    
-    contrib1 = EvidenceContributionV2(provider_name="TAX", score=1.0)
-    node1 = FusionNode(node_id="TAX_NODE", contribution=contrib1)
-    
-    contrib2 = EvidenceContributionV2(provider_name="FINANCIAL", score=1.0)
-    node2 = FusionNode(node_id="FINANCIAL_NODE", contribution=contrib2)
-    
-    contrib3 = EvidenceContributionV2(provider_name="VENDOR", score=0.9)
-    node3 = FusionNode(node_id="VENDOR_NODE", contribution=contrib3)
+    node1 = FusionNode.from_assertion(make_dummy("TAX"))
+    node2 = FusionNode.from_assertion(make_dummy("VENDOR", magnitude=0.9))
+    node3 = FusionNode.from_assertion(make_dummy("AMOUNT"))
+    node4 = FusionNode.from_assertion(make_dummy("TEMPORAL", magnitude=0.8))
     
     graph.add_node(node1)
     graph.add_node(node2)
     graph.add_node(node3)
-    return graph
+    graph.add_node(node4)
+    
+    # Simulate some propagation structure
+    graph.add_edge(DependencyEdge(_source_id=node1.node_id, _target_id=node2.node_id))
+    graph.add_edge(CorroborationEdge(node_a=node2.node_id, node_b=node3.node_id))
+    
+    fusion_result = FusionResult(
+        independent_support=frozenset([node1.node_id, node3.node_id]),
+        derived_support=frozenset([node2.node_id]),
+        contradictions=frozenset([]),
+        dependency_groups=(),
+        missingness={node4.node_id: "missing_record"},
+        propagation_status={
+            node1.node_id: PropagationStatus.SUPPORTED,
+            node2.node_id: PropagationStatus.SUPPORTED,
+            node3.node_id: PropagationStatus.SUPPORTED,
+            node4.node_id: PropagationStatus.UNAFFECTED
+        },
+        coverage=0.9
+    )
+    
+    return graph, fusion_result
 
-def test_determinism_audit(mock_trace, mock_evidence_graph, mock_fusion_result, mock_decision):
-    generator = ExplanationGenerator(mock_trace, mock_evidence_graph, mock_fusion_result, mock_decision)
+def test_determinism_audit(mock_trace, mock_graph_and_result, mock_decision):
+    graph, fusion_result = mock_graph_and_result
+    generator = ExplanationGenerator(mock_trace, graph, fusion_result, mock_decision)
     artifact1 = generator.generate()
     artifact2 = generator.generate()
     
     assert artifact1.executive_summary == artifact2.executive_summary
     assert artifact1.audit_nodes.keys() == artifact2.audit_nodes.keys()
 
-def test_completeness_audit(mock_trace, mock_evidence_graph, mock_fusion_result, mock_decision):
-    generator = ExplanationGenerator(mock_trace, mock_evidence_graph, mock_fusion_result, mock_decision)
+def test_completeness_audit(mock_trace, mock_graph_and_result, mock_decision):
+    graph, fusion_result = mock_graph_and_result
+    generator = ExplanationGenerator(mock_trace, graph, fusion_result, mock_decision)
     artifact = generator.generate()
     
-    # Verify no orphan nodes: every node in the evidence graph should have a corresponding contribution node
-    for node_id in mock_evidence_graph.nodes:
-        assert f"CONTRIBUTION_{node_id}" in artifact.audit_nodes
+    # Verify all graph nodes are accounted for in audit
+    for node_id in graph.nodes.keys():
+        assert f"PROPAGATION_{node_id}" in artifact.audit_nodes
 
-def test_mermaid_export(mock_trace, mock_evidence_graph, mock_fusion_result, mock_decision):
-    generator = ExplanationGenerator(mock_trace, mock_evidence_graph, mock_fusion_result, mock_decision)
+def test_mermaid_export(mock_trace, mock_graph_and_result, mock_decision):
+    from recongraph.graph.mermaid_exporter import MermaidExporter
+    graph, fusion_result = mock_graph_and_result
+    generator = ExplanationGenerator(mock_trace, graph, fusion_result, mock_decision)
     artifact = generator.generate()
     
     exporter = MermaidExporter()
-    mermaid_output = exporter.export(artifact)
-    
-    assert "graph TD" in mermaid_output
-    assert "subgraph Evidence Contributions" in mermaid_output
-    assert "subgraph Semantic Propagation" in mermaid_output
-    assert "FUSION_NODE" in mermaid_output
-    assert "DECISION_NODE" in mermaid_output
+    mermaid_str = exporter.export(artifact)
+    assert "graph TD" in mermaid_str
+    assert "classDef support fill:#e6fffa,stroke:#38b2ac,stroke-width:2px" in mermaid_str
+    assert "DECISION_NODE" in mermaid_str
+    assert "subgraph Semantic Propagation" in mermaid_str
+    assert "FUSION_NODE" in mermaid_str

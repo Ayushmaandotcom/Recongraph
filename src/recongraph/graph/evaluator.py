@@ -71,7 +71,8 @@ class HypothesisEvaluator:
             signals=scored_pair.signals,
             relationship=scored_pair.relationship,
             metadata=scored_pair.supporting_metadata,
-            contributions=scored_pair.contributions
+            contributions=scored_pair.contributions,
+            assertions=scored_pair.assertions
         )
 
         return EvaluatedHypothesis(

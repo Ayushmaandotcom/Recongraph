@@ -1,67 +1,54 @@
 from dataclasses import dataclass, field
 import hashlib
 from typing import Mapping, Sequence, TypeVar, Generic, Iterable, Any
-from recongraph.plugins.provider_v2 import EvidenceContributionV2
+from recongraph.contrib.kernel.assertions import EvidenceAssertion
 
 @dataclass(frozen=True)
 class FusionNode:
     """
-    A vertex in the EvidenceGraph representing a single domain's contribution.
+    A vertex in the EvidenceGraph representing a single typed evidence assertion.
     """
     node_id: str
-    contribution: EvidenceContributionV2[Any]
+    assertion: EvidenceAssertion
     
     @property
     def domain(self) -> str:
-        return self.contribution.provider_name
+        return str(self.assertion.authority.basis.value)
         
     @property
     def version(self) -> str:
-        return "1.0.0" # Assuming fixed version for now or extracted from metadata
+        return str(self.assertion.proposition.claim.semantic_version.value)
         
     @property
     def provenance(self) -> str:
-        return self.contribution.provider_name
+        return str(self.assertion.authority.basis.value)
         
     @property
     def dependencies(self) -> list[str]:
-        # This will be populated by graph traversal in SemanticPropagator, 
-        # or we return an empty list here as a baseline property.
         return []
 
     def to_dict(self) -> dict[str, Any]:
+        import json
+        from recongraph.serialization import ReconEncoder
         return {
             "node_id": self.node_id,
-            "provider_name": self.contribution.provider_name,
-            "score": self.contribution.score,
-            "interpretation_repr": repr(self.contribution.interpretation) if self.contribution.interpretation is not None else None
+            "assertion": json.loads(json.dumps(self.assertion, cls=ReconEncoder))
         }
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> 'FusionNode':
-        contrib: EvidenceContributionV2[Any] = EvidenceContributionV2(
-            provider_name=data["provider_name"],
-            score=data["score"],
-            metadata={},
-            interpretation=data["interpretation_repr"]  # We restore the string repr for hashing consistency
-        )
-        return cls(node_id=data["node_id"], contribution=contrib)
+        raise NotImplementedError("from_dict is deprecated for FusionNode until ReconDecoder is implemented")
 
     @classmethod
-    def from_contribution(cls, contribution: EvidenceContributionV2[Any]) -> 'FusionNode':
+    def from_assertion(cls, assertion: EvidenceAssertion) -> 'FusionNode':
         h = hashlib.sha256()
-        h.update(contribution.provider_name.encode('utf-8'))
-        if contribution.interpretation is not None:
-            # We assume interpretation has a deterministic __repr__ or identity
-            h.update(repr(contribution.interpretation).encode('utf-8'))
-        else:
-            h.update(b'none')
-            
-        if contribution.score is not None:
-            h.update(str(round(contribution.score, 6)).encode('utf-8'))
+        h.update(str(assertion.authority.basis.value).encode('utf-8'))
+        h.update(str(assertion.proposition.claim.claim_id.value).encode('utf-8'))
+        h.update(str(assertion.polarity.value).encode('utf-8'))
+        h.update(str(round(assertion.magnitude, 6)).encode('utf-8'))
             
         node_id = f"fn_{h.hexdigest()[:16]}"
-        return cls(node_id=node_id, contribution=contribution)
+        return cls(node_id=node_id, assertion=assertion)
 
 class EvidenceEdge:
     """Base class for topological links between FusionNodes."""

@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from recongraph.graph.decision import DecisionPolicy
 from recongraph.matching.reference_evidence import ReferenceEvidencePolicy
+from recongraph.graph.calibration import CalibrationPolicy
 
 @dataclass(frozen=True)
 class ReferenceConfig:
@@ -20,6 +21,8 @@ class DecisionConfig:
     policy: DecisionPolicy = field(default_factory=DecisionPolicy)
     relationship_policy: RelationshipPolicy = field(default_factory=lambda: PURCHASE_TO_GST_POLICY)
     decision_mode: DecisionMode = DecisionMode.LEGACY
+    calibration_policy: CalibrationPolicy = field(default_factory=lambda: CalibrationPolicy({}))
+    explanation_template_path: str | None = None
 
 @dataclass(frozen=True)
 class ReviewConfig:

@@ -11,7 +11,7 @@ from recongraph.graph.search import HypothesisSearcher
 from recongraph.graph.evaluator import HypothesisEvaluator
 from recongraph.benchmark.models import (
     BenchmarkReport, DatasetMetadata, DecisionStatistics, SearchStatistics,
-    EvidenceStatistics, ConfidenceDistribution, TimingStatistics
+    EvidenceStatistics, ConfidenceDistribution, TimingStatistics, QualityStatistics, SearchQualityMetrics
 )
 
 class BenchmarkRunner:
@@ -130,6 +130,8 @@ class BenchmarkRunner:
                 candidate_reduction_ratio=reduction_ratio,
                 total_hypotheses_evaluated=total_hypotheses_evaluated
             ),
+            quality_statistics=QualityStatistics(0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+            search_quality_metrics=SearchQualityMetrics(0.0, 0.0),
             evidence_statistics=EvidenceStatistics({}),
             confidence_distribution=ConfidenceDistribution(bins),
             timing_statistics=TimingStatistics(
@@ -166,14 +168,26 @@ def execute_reconbench(size: int = 1000) -> int:
         fuzzy_threshold=0.85
     )
     
-    providers: list[EvidenceProvider] = [
-        FinancialEvidenceProvider(),
-        TemporalEvidenceProvider(),
-        TaxEvidenceProvider(),
-        VendorEvidenceProvider(vendor_context),
-        ReferenceEvidenceProvider(ref_context)
-    ]
+    from recongraph.plugins.manager import PluginManager
+    plugin_manager = PluginManager()
     
+    # Load plugins via marketplace
+    providers: list[EvidenceProvider] = []
+    
+    fin = plugin_manager.load_plugin("financial")
+    if fin: providers.append(fin)
+    
+    temp = plugin_manager.load_plugin("temporal")
+    if temp: providers.append(temp)
+    
+    tax = plugin_manager.load_plugin("tax")
+    if tax: providers.append(tax)
+    
+    vend = plugin_manager.load_plugin("vendor", context=vendor_context)
+    if vend: providers.append(vend)
+    
+    ref = plugin_manager.load_plugin("reference", context=ref_context)
+    if ref: providers.append(ref)
     from recongraph.config import ReconGraphConfig, DecisionConfig, DecisionMode
     
     config = ReconGraphConfig(decision_config=DecisionConfig(decision_mode=DecisionMode.FUSION))
@@ -203,14 +217,13 @@ def execute_reconbench(size: int = 1000) -> int:
     metrics = evaluate_results(results)
     
     print("\n================ ReconBench Results ================")
-    print(f"Total Scenarios:    {metrics.total_scenarios}")
-    print(f"True Positives:     {metrics.true_positives}")
-    print(f"False Positives:    {metrics.false_positives}")
-    print(f"False Negatives:    {metrics.false_negatives}")
+    print(f"Total Scenarios:    {len(results)}")
     print(f"Precision:          {metrics.precision:.4f}")
     print(f"Recall:             {metrics.recall:.4f}")
-    print(f"Review Rate:        {metrics.review_rate:.2%}")
-    print(f"Exact Match Rate:   {metrics.exact_match_rate:.2%}")
+    print(f"F1 Score:           {metrics.f1_score:.4f}")
+    print(f"Brier Score:        {metrics.brier_score:.4f}")
+    print(f"ECE (Calibration):  {metrics.expected_calibration_error:.4f}")
+    print(f"Human Agreement:    {metrics.human_agreement_rate:.2%}")
     print("==================================================\n")
     
     # Return 0 on success (or if precision/recall are decent), 1 on catastrophic failure

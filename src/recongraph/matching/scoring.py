@@ -109,4 +109,5 @@ class ScoringEvidence:
     relationship: RelationshipScore | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
     contributions: dict[str, Any] = field(default_factory=dict)
+    assertions: tuple[Any, ...] = ()
 

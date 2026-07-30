@@ -24,6 +24,20 @@ class SearchStatistics:
     total_hypotheses_evaluated: int
 
 @dataclass(frozen=True)
+class QualityStatistics:
+    precision: float
+    recall: float
+    f1_score: float
+    brier_score: float
+    expected_calibration_error: float
+    human_agreement_rate: float
+
+@dataclass(frozen=True)
+class SearchQualityMetrics:
+    blocking_recall: float
+    hypothesis_explosion_rate: float
+
+@dataclass(frozen=True)
 class EvidenceStatistics:
     signal_distributions: Mapping[str, float]
 
@@ -45,6 +59,8 @@ class BenchmarkReport:
     dataset_metadata: DatasetMetadata
     decision_statistics: DecisionStatistics
     search_statistics: SearchStatistics
+    quality_statistics: QualityStatistics
+    search_quality_metrics: SearchQualityMetrics
     evidence_statistics: EvidenceStatistics
     confidence_distribution: ConfidenceDistribution
     timing_statistics: TimingStatistics
