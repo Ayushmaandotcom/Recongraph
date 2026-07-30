@@ -15,13 +15,14 @@ class CandidateEdge:
     shared_blocking_keys: frozenset[str]
 
 from recongraph.plugins.provider import EvidenceProvider
+from recongraph.plugins.provider_v2 import EvidenceProviderV2
 
 class CandidateGenerator:
     """
     Orchestrates the blocking and indexing strategy to yield CandidateEdges
     in sub-quadratic time by eliminating records with disjoint blocking keys.
     """
-    def __init__(self, providers: Iterable[EvidenceProvider]):
+    def __init__(self, providers: Iterable[EvidenceProvider | EvidenceProviderV2]):
         blockers: list[Any] = []
         for provider in providers:
             blockers.extend(provider.get_blockers())

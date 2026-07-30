@@ -23,7 +23,7 @@ from recongraph.graph.decision import FusionDecisionEngine
 from recongraph.graph.fusion import EvidenceGraph, FusionNode
 from recongraph.graph.propagation import SemanticPropagator
 from recongraph.graph.fusion_result import FusionResult
-from recongraph.plugins.provider_v2 import EvidenceContributionV2
+from recongraph.plugins.provider_v2 import EvidenceContributionV2, EvidenceProviderV2
 
 @dataclass(frozen=True)
 class ReconciliationResult:
@@ -58,7 +58,7 @@ except Exception:
 class ReconGraphEngine:
     VERSION = VERSION
 
-    def __init__(self, config: ReconGraphConfig, providers: Sequence[EvidenceProvider]):
+    def __init__(self, config: ReconGraphConfig, providers: Sequence[EvidenceProvider | EvidenceProviderV2]):
         self.config = config
         self.providers = tuple(providers)
 

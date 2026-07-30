@@ -100,14 +100,14 @@ class ExplanationGenerator:
             identity_hash=hashlib.sha256(f"{action}_{self.fusion_result.coverage}".encode()).hexdigest(),
             dependencies=(trace_node.node_id, "FUSION_NODE"),
             action=self.decision.action,
-            rationale=decision_vars["rationale"],
-            coverage=decision_vars["coverage"],
+            rationale=str(decision_vars["rationale"]),
+            coverage=float(decision_vars["coverage"]),
             human_readable=self.template_registry.render("DECISION_NODE", decision_vars, "Decision: {action}. Rationale: {rationale}.")
         )
         audit_nodes[decision_node.node_id] = decision_node
         
         # 3. Fusion Node
-        fusion_vars = {
+        fusion_vars: dict[str, Any] = {
             "independent_support": len(self.fusion_result.independent_support),
             "derived_support": len(self.fusion_result.derived_support),
             "contradictions": len(self.fusion_result.contradictions),
@@ -117,10 +117,10 @@ class ExplanationGenerator:
             node_id="FUSION_NODE",
             identity_hash=hashlib.sha256(f"{len(self.fusion_result.independent_support)}_{len(self.fusion_result.contradictions)}".encode()).hexdigest(),
             dependencies=tuple(f"PROPAGATION_{n}" for n in self.fusion_result.propagation_status.keys()),
-            independent_support=fusion_vars["independent_support"],
-            derived_support=fusion_vars["derived_support"],
-            contradictions=fusion_vars["contradictions"],
-            missing_domains=fusion_vars["missing_domains"],
+            independent_support=int(fusion_vars["independent_support"]),
+            derived_support=int(fusion_vars["derived_support"]),
+            contradictions=int(fusion_vars["contradictions"]),
+            missing_domains=tuple(fusion_vars["missing_domains"]),
             human_readable=self.template_registry.render("FUSION_NODE", fusion_vars, "Fusion resulted in {independent_support} independent facts, {derived_support} derived, and {contradictions} contradictions.")
         )
         audit_nodes[fusion_node.node_id] = fusion_node
@@ -130,7 +130,7 @@ class ExplanationGenerator:
             prop_node_id = f"PROPAGATION_{node_id}"
             contrib_node_id = f"CONTRIBUTION_{node_id}"
             
-            prop_vars = {
+            prop_vars: dict[str, Any] = {
                 "status": status.value,
                 "node_id": node_id
             }
@@ -138,26 +138,26 @@ class ExplanationGenerator:
                 node_id=prop_node_id,
                 identity_hash=hashlib.sha256(f"{node_id}_{status.value}".encode()).hexdigest(),
                 dependencies=(contrib_node_id,),
-                status=prop_vars["status"],
+                status=str(prop_vars["status"]),
                 derived_from=(), # Can be enhanced by inspecting SemanticPropagator results
                 human_readable=self.template_registry.render(f"PROPAGATION_{status.name}", prop_vars, "Propagation status for {node_id} is {status}.")
             )
             audit_nodes[prop_node_id] = p_node
             
             orig_node = self.evidence_graph.nodes[node_id]
-            contrib_vars = {
+            contrib_vars: dict[str, Any] = {
                 "provider_name": orig_node.domain,
                 "score": orig_node.assertion.magnitude,
                 "interpretation": repr(orig_node.assertion.proposition.claim.claim_id.value),
-                "violations": list(frozenset(["CONFLICT"]) if orig_node.assertion.polarity.name == "CONFLICT" else frozenset())
+                "violations": list(["CONFLICT"]) if orig_node.assertion.polarity.name == "CONFLICT" else list()
             }
             c_node = ContributionExplanation(
                 node_id=contrib_node_id,
                 identity_hash=orig_node.node_id, # Reuses the semantic hash from the FusionNode
                 dependencies=(), # Would point to Projection/Interpretation nodes in a fully fleshed out graph
-                provider_name=contrib_vars["provider_name"],
-                score=contrib_vars["score"],
-                interpretation_repr=contrib_vars["interpretation"],
+                provider_name=str(contrib_vars["provider_name"]),
+                score=float(contrib_vars["score"]) if contrib_vars["score"] is not None else None,
+                interpretation_repr=str(contrib_vars["interpretation"]),
                 violations=frozenset(contrib_vars["violations"]),
                 human_readable=self.template_registry.render(f"CONTRIBUTION_{orig_node.domain}", contrib_vars, "Provider {provider_name} contributed evidence for {interpretation} with score {score}.")
             )

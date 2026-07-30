@@ -76,10 +76,12 @@ class ScoredPair:
     assertions: tuple[Any, ...] = ()
 
 
+from recongraph.plugins.provider_v2 import EvidenceProviderV2
+
 def score_purchase_to_gst(
     purchases: list[PurchaseRecord],
     gsts: list[GSTRecord],
-    providers: Iterable[EvidenceProvider],
+    providers: Iterable[EvidenceProvider | EvidenceProviderV2],
     policy: RelationshipPolicy
 ) -> ScoredPair:
     signals = {}
@@ -98,7 +100,9 @@ def score_purchase_to_gst(
             
     # 2. Evaluate Evidence Providers
     for provider in providers:
-        contrib = provider.evaluate(purchases, gsts)
+        if not hasattr(provider, "evaluate"):
+            continue
+        contrib = provider.evaluate(purchases, gsts) # type: ignore
         contributions[contrib.provider_name] = contrib
         signals[contrib.provider_name] = contrib.score
         violations.update(contrib.violations)

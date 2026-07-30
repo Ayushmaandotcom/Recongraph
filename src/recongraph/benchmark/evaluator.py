@@ -1,6 +1,6 @@
 from typing import Sequence
 import numpy as np
-from sklearn.metrics import precision_score, recall_score, f1_score, brier_score_loss
+from sklearn.metrics import precision_score, recall_score, f1_score, brier_score_loss # type: ignore
 
 from recongraph.graph.decision import DecisionAction
 from recongraph.engine import ReconciliationResult

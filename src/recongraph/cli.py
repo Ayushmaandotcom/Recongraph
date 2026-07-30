@@ -120,7 +120,9 @@ def _cmd_reconcile(args: argparse.Namespace) -> None:
     ref_ctx = ReferenceEvidenceContext(corpus, ReferenceEvidencePolicy())
     vendor_ctx = VendorIdentityContext(corpus_profile=None)
 
-    providers = [
+    from recongraph.plugins.provider import EvidenceProvider
+    from recongraph.plugins.provider_v2 import EvidenceProviderV2
+    providers: list[EvidenceProvider | EvidenceProviderV2] = [
         FinancialEvidenceProvider(),
         TemporalEvidenceProvider(),
         TaxEvidenceProvider(),

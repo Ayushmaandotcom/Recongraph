@@ -54,6 +54,7 @@ class PluginManager:
                 provider_instance = plugin_class
                 
             # Wrap in sandbox
+            sandboxed: EvidenceProvider | EvidenceProviderV2
             if hasattr(provider_instance, 'get_pipeline'):
                 sandboxed = SandboxedProviderV2(provider_instance)
             else:

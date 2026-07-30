@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 from typing import Iterator
 
+from typing import Any
 from recongraph.graph.fusion_explainability import ExplanationArtifact
 from recongraph.graph.explanation_templates import ExplanationTemplateRegistry
 
@@ -12,7 +13,7 @@ class ExplanationAnnotator:
     def __init__(self, template_registry: ExplanationTemplateRegistry):
         self.template_registry = template_registry
         
-    def generate_diff(self, artifact: ExplanationArtifact, annotated_layer1: str) -> dict[str, str]:
+    def generate_diff(self, artifact: ExplanationArtifact, annotated_layer1: str) -> dict[str, Any]:
         """
         Compare the generated Executive Summary human-readable string with the 
         annotated (ideal) string to help reviewers update templates.

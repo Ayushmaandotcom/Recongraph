@@ -13,12 +13,13 @@ from recongraph.matching.pair_scorers import PURCHASE_TO_GST_POLICY, PURCHASE_TO
 from recongraph.matching.scoring import RelationshipPolicy
 
 from recongraph.plugins.provider import EvidenceProvider
+from recongraph.plugins.provider_v2 import EvidenceProviderV2
 
 class HypothesisEvaluator:
     """
     Evaluates a structural hypothesis by delegating to EvidenceProviders.
     """
-    def __init__(self, evidence_providers: Iterable[EvidenceProvider], policy: RelationshipPolicy):
+    def __init__(self, evidence_providers: Iterable[EvidenceProvider | EvidenceProviderV2], policy: RelationshipPolicy):
         self.evidence_providers = tuple(evidence_providers)
         self.policy = policy
 

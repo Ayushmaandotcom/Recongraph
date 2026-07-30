@@ -172,7 +172,8 @@ def execute_reconbench(size: int = 1000) -> int:
     plugin_manager = PluginManager()
     
     # Load plugins via marketplace
-    providers: list[EvidenceProvider] = []
+    from recongraph.plugins.provider_v2 import EvidenceProviderV2
+    providers: list[EvidenceProvider | EvidenceProviderV2] = []
     
     fin = plugin_manager.load_plugin("financial")
     if fin: providers.append(fin)

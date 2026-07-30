@@ -41,8 +41,8 @@ class VendorAliasLearner(LearningAgent):
                 # If the human approved it but the model thought the vendor score was low,
                 # they might be aliases.
                 if assertion.magnitude < self.vendor_score_threshold:
-                    p_name = " ".join(p.vendor_name for p in packet.purchases if getattr(p, "vendor_name", None))
-                    g_name = " ".join(g.vendor_name for g in packet.gsts if getattr(g, "vendor_name", None))
+                    p_name = " ".join(str(getattr(p, "vendor_name")) for p in packet.purchases if getattr(p, "vendor_name", None))
+                    g_name = " ".join(str(getattr(g, "vendor_name")) for g in packet.gsts if getattr(g, "vendor_name", None))
                     if p_name and g_name and p_name != g_name:
                         self._insights.append(
                             AliasInsight(
