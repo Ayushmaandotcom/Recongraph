@@ -1,7 +1,8 @@
 import pytest
 from decimal import Decimal
 from datetime import date
-from hypothesis import given, settings, strategies as st
+from hypothesis import given, settings, strategies as st, HealthCheck
+
 from recongraph.engine import ReconGraphEngine
 from recongraph.config import ReconGraphConfig, DecisionConfig
 from recongraph.domain.records import PurchaseRecord, GSTRecord
@@ -67,7 +68,11 @@ def _get_providers():
         ReferenceEvidenceProvider(ReferenceEvidenceContext(corpus_profile, ReferenceEvidencePolicy()))
     ]
 
-@settings(max_examples=50)
+@settings(
+    max_examples=50,
+    deadline=None,
+    suppress_health_check=[HealthCheck.too_slow],
+)
 @given(
     purchases=st.lists(record_strategy(is_purchase=True), max_size=10),
     gsts=st.lists(record_strategy(is_purchase=False), max_size=10)

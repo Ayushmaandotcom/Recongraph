@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **Reconciliation Review Dashboard**: `recongraph-api` (FastAPI) exposes `/reconcile` (CSV upload), `/runs/{id}`, and `/demo` endpoints over the `ReconGraphEngine`. `recongraph-ui` (Next.js 15 + Tailwind) provides an Upload screen, Results dashboard, filterable Review Queue, and a Packet Detail view that renders the engine's `SemanticFindings` as evidence cards, with a pre-baked static demo fallback for instant load without a running backend.
+
 ## [2.0.0] - 2026-07-29
 
 ### Added

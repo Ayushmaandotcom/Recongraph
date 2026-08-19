@@ -1,0 +1,19 @@
+# Render.com Blueprint for the ReconGraph FastAPI backend.
+# Deploy: push this file to the repo root, then on render.com choose
+# "New +" -> "Blueprint" and point it at this repository.
+# Docs: https://render.com/docs/blueprint-spec
+#
+# Runs from the REPO ROOT (not recongraph-api/) so that:
+#   - `pip install -e .` can see pyproject.toml and install the `recongraph` package
+#   - demo_results.json (used by the /demo endpoint's fast path) is on disk at cwd
+
+services:
+  - type: web
+    name: recongraph-api
+    runtime: python
+    plan: free
+    buildCommand: "pip install -e . && pip install -r recongraph-api/requirements.txt"
+    startCommand: "uvicorn recongraph-api.app.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9

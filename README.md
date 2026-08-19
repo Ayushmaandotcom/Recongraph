@@ -2,7 +2,12 @@
 
 ReconGraph is a deterministic, graph-based reconciliation engine for Indian GST compliance. It processes Purchase Registers (PR) and GST Returns (GSTR-2B) to find exact matches and categorize mismatches into a human review queue based on a "missing vs contradictory" semantic paradigm.
 
+**Live demo:** _add your Vercel URL here after deploying (see [DEPLOYMENT.md](DEPLOYMENT.md))_
+
 ## V1 Certification Status
+"V1 Certified" refers to the engine core's correctness status (see below), tracked
+independently from the package's semantic version (`pyproject.toml`, currently
+`2.0.0` — see [CHANGELOG.md](CHANGELOG.md) for what shipped in each release).
 The engine core is officially **V1 Certified**.
 - All mathematical proofs pass.
 - Challenge Referee (Adversarial Negatives) is green with 0 False Positives.
