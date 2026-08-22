@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-fuzzy-1421",
+    "vendor_name": "Supplier Corp 1421",
+    "reference": "INV-11421",
+    "amount": "47642.73",
+    "record_date": "2023-03-19",
+    "tax_identity": "27AAAAA2421A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-fuzzy-1421",
+    "vendor_name": "Suplier Corp 1421",
+    "reference": "INV11421",
+    "amount": "47642.73",
+    "record_date": "2023-03-19",
+    "tax_identity": "27AAAAA2421A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

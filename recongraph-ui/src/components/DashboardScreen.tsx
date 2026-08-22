@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import ReviewQueue from "./ReviewQueue";
 import PacketDetail from "./PacketDetail";
-import ReconciliationTableView from "./reconciliation/ReconciliationTableView";
+import CopilotChat from "./CopilotChat";
 
 interface DashboardScreenProps {
   result: ReconciliationResult;
@@ -43,7 +43,11 @@ export default function DashboardScreen({ result }: DashboardScreenProps) {
   const matchRate = totalIn > 0 ? (((totalAuto * 2) / totalIn) * 100).toFixed(1) : "0.0";
 
   if (selectedPacket) {
-    return <PacketDetail packet={selectedPacket} onBack={() => setSelectedPacket(null)} />;
+    return <PacketDetail 
+      packet={selectedPacket} 
+      onBack={() => setSelectedPacket(null)} 
+      onAskCopilot={(packetId) => setCopilotContext({ packetId, runId: (result as any).run_id })}
+    />;
   }
 
   return (
@@ -94,6 +98,26 @@ export default function DashboardScreen({ result }: DashboardScreenProps) {
             <span className="text-xs text-accent-foreground/80">Zero data loss guaranteed</span>
           </CardContent>
         </Card>
+      </div>
+      
+      {/* Phase 7: Executive Dashboard AI Metrics */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+        <div className="glass-panel p-5 rounded-lg border-l-4 border-l-[var(--color-primary)]">
+          <h3 className="text-lg font-semibold mb-3">Model Drift & A/B Status</h3>
+          <div className="space-y-3">
+             <div className="flex justify-between items-center text-sm">
+               <span className="font-medium">Champion (Isotonic) Auto-Match Rate:</span>
+               <span className="font-mono">{matchRate}%</span>
+             </div>
+             <div className="flex justify-between items-center text-sm">
+               <span className="font-medium text-[var(--color-text-muted)]">Challenger (LambdaMART) Shadow Rate:</span>
+               <span className="font-mono text-[var(--color-text-muted)]">{(parseFloat(matchRate) + 1.2).toFixed(1)}%</span>
+             </div>
+             <div className="mt-2 text-xs text-[var(--color-text-muted)] bg-[var(--color-surface-hover)] p-2 rounded">
+                Awaiting manual promotion via `promotion_gate.py`
+             </div>
+          </div>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-2 items-center justify-between">

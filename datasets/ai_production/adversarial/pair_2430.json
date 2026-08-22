@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-adversarial-2430",
+    "vendor_name": "Supplier Inc 2430",
+    "reference": "INV-12430",
+    "amount": "16632.25",
+    "record_date": "2023-01-04",
+    "tax_identity": "27AAAAA3430A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-adversarial-2430",
+    "vendor_name": "Supplier Inc 2430",
+    "reference": "INV-12430",
+    "amount": "16632.25",
+    "record_date": "2023-01-04",
+    "tax_identity": "27AAAAA3430A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

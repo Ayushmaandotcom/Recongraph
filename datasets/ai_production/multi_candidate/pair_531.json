@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-multi_candidate-531",
+    "vendor_name": "Supplier Inc 531",
+    "reference": "INV-10531",
+    "amount": "11370.28",
+    "record_date": "2023-11-27",
+    "tax_identity": "27AAAAA1531A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-multi_candidate-531",
+    "vendor_name": "Supplier Inc 531",
+    "reference": "INV-10531",
+    "amount": "11370.28",
+    "record_date": "2023-11-27",
+    "tax_identity": "27AAAAA1531A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

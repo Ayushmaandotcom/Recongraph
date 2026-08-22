@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-tax_variations-718",
+    "vendor_name": "Supplier Ltd 718",
+    "reference": "INV-10718",
+    "amount": "45642.58",
+    "record_date": "2023-09-11",
+    "tax_identity": "27AAAAA1718A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-tax_variations-718",
+    "vendor_name": "Supplier Ltd 718",
+    "reference": "INV-10718",
+    "amount": "45643.08",
+    "record_date": "2023-09-11",
+    "tax_identity": "27AAAAA1718A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

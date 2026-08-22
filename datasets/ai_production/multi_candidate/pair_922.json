@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-multi_candidate-922",
+    "vendor_name": "Supplier Inc 922",
+    "reference": "INV-10922",
+    "amount": "41202.05",
+    "record_date": "2023-11-01",
+    "tax_identity": "27AAAAA1922A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-multi_candidate-922",
+    "vendor_name": "Supplier Inc 922",
+    "reference": "INV-10922",
+    "amount": "41202.05",
+    "record_date": "2023-11-01",
+    "tax_identity": "27AAAAA1922A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

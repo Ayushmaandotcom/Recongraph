@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-exact-1989",
+    "vendor_name": "Supplier LLC 1989",
+    "reference": "INV-11989",
+    "amount": "46507.84",
+    "record_date": "2023-07-23",
+    "tax_identity": "27AAAAA2989A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-exact-1989",
+    "vendor_name": "Supplier LLC 1989",
+    "reference": "INV-11989",
+    "amount": "46507.84",
+    "record_date": "2023-07-23",
+    "tax_identity": "27AAAAA2989A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

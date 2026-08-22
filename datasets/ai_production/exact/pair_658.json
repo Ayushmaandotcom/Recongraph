@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-exact-658",
+    "vendor_name": "Supplier Corp 658",
+    "reference": "INV-10658",
+    "amount": "29409.44",
+    "record_date": "2023-01-09",
+    "tax_identity": "27AAAAA1658A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-exact-658",
+    "vendor_name": "Supplier Corp 658",
+    "reference": "INV-10658",
+    "amount": "29409.44",
+    "record_date": "2023-01-09",
+    "tax_identity": "27AAAAA1658A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-ocr-747",
+    "vendor_name": "Supplier Corp 747",
+    "reference": "INV-10747",
+    "amount": "41457.47",
+    "record_date": "2023-10-21",
+    "tax_identity": "27AAAAA1747A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-ocr-747",
+    "vendor_name": "Supplier Corp 747",
+    "reference": "INV-IO747",
+    "amount": "41457.48",
+    "record_date": "2023-10-21",
+    "tax_identity": "27AAAAA1747A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-ocr-2015",
+    "vendor_name": "Supplier Ltd 2015",
+    "reference": "INV-12015",
+    "amount": "24946.46",
+    "record_date": "2023-02-10",
+    "tax_identity": "27AAAAA3015A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-ocr-2015",
+    "vendor_name": "Supplier Ltd 2015",
+    "reference": "INV-I2OI5",
+    "amount": "24946.47",
+    "record_date": "2023-02-10",
+    "tax_identity": "27AAAAA3015A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

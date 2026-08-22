@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-gstin_variations-6",
+    "vendor_name": "Supplier LLC 6",
+    "reference": "INV-10006",
+    "amount": "5200.29",
+    "record_date": "2023-07-04",
+    "tax_identity": "27AAAAA1006A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-gstin_variations-6",
+    "vendor_name": "Supplier LLC 6",
+    "reference": "INV-10006",
+    "amount": "5200.29",
+    "record_date": "2023-07-04",
+    "tax_identity": "27AAAAA1006A1ZX"
+  },
+  "label": "NO_MATCH"
+}

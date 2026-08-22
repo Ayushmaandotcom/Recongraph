@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-multi_candidate-1860",
+    "vendor_name": "Supplier Ltd 1860",
+    "reference": "INV-11860",
+    "amount": "18971.96",
+    "record_date": "2023-06-11",
+    "tax_identity": "27AAAAA2860A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-multi_candidate-1860",
+    "vendor_name": "Supplier Ltd 1860",
+    "reference": "INV-11860",
+    "amount": "18971.96",
+    "record_date": "2023-06-11",
+    "tax_identity": "27AAAAA2860A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

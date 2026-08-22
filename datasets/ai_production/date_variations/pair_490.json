@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-date_variations-490",
+    "vendor_name": "Supplier Inc 490",
+    "reference": "INV-10490",
+    "amount": "40492.96",
+    "record_date": "2023-07-20",
+    "tax_identity": "27AAAAA1490A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-date_variations-490",
+    "vendor_name": "Supplier Inc 490",
+    "reference": "INV-10490",
+    "amount": "40492.96",
+    "record_date": "2023-07-18",
+    "tax_identity": "27AAAAA1490A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

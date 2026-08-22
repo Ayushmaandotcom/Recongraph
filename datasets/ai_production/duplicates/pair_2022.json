@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-duplicates-2022",
+    "vendor_name": "Supplier LLC 2022",
+    "reference": "INV-12022",
+    "amount": "38340.24",
+    "record_date": "2023-10-03",
+    "tax_identity": "27AAAAA3022A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-duplicates-2022",
+    "vendor_name": "Supplier LLC 2022",
+    "reference": "INV-12022",
+    "amount": "38340.24",
+    "record_date": "2023-10-03",
+    "tax_identity": "27AAAAA3022A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

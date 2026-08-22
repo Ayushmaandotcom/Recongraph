@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-ocr-1392",
+    "vendor_name": "Supplier LLC 1392",
+    "reference": "INV-11392",
+    "amount": "8755.04",
+    "record_date": "2023-02-04",
+    "tax_identity": "27AAAAA2392A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-ocr-1392",
+    "vendor_name": "Supplier LLC 1392",
+    "reference": "INV-II392",
+    "amount": "8755.05",
+    "record_date": "2023-02-04",
+    "tax_identity": "27AAAAA2392A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

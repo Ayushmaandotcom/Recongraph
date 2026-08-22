@@ -6,10 +6,61 @@ import { Card, CardContent } from "@/components/ui/card";
 
 interface UploadScreenProps {
   onDemoLoad: () => void;
+  onUpload: (purchaseFile: File, gstFile: File) => void;
   isLoading: boolean;
+  error?: string | null;
 }
 
-export default function UploadScreen({ onDemoLoad, isLoading }: UploadScreenProps) {
+function FileDropSlot({
+  label,
+  file,
+  onSelect,
+  disabled,
+}: {
+  label: string;
+  file: File | null;
+  onSelect: (f: File) => void;
+  disabled: boolean;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={() => inputRef.current?.click()}
+      className={`border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center text-center transition-colors bg-[var(--color-surface)] ${
+        file
+          ? "border-[var(--color-primary)]"
+          : "border-[var(--color-border)] hover:border-[var(--color-primary)]"
+      } ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+    >
+      <input
+        ref={inputRef}
+        type="file"
+        accept=".csv"
+        className="hidden"
+        disabled={disabled}
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) onSelect(f);
+        }}
+      />
+      <svg className="w-8 h-8 text-[var(--color-text-muted)] mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+      </svg>
+      <span className="font-medium text-sm">{label}</span>
+      <span className="text-xs text-[var(--color-text-muted)] mt-1 truncate max-w-[180px]">
+        {file ? file.name : "Click to choose CSV"}
+      </span>
+    </button>
+  );
+}
+
+export default function UploadScreen({ onDemoLoad, onUpload, isLoading, error }: UploadScreenProps) {
+  const [purchaseFile, setPurchaseFile] = useState<File | null>(null);
+  const [gstFile, setGstFile] = useState<File | null>(null);
+  const canRun = purchaseFile && gstFile && !isLoading;
+
   return (
     <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-8 items-center mt-10 animate-in fade-in duration-300 min-h-[70vh]">
       {/* Left: Background image with overlay and content */}
@@ -53,21 +104,25 @@ export default function UploadScreen({ onDemoLoad, isLoading }: UploadScreenProp
         </div>
       </div>
 
-      {/* Right: action panel */}
-      <div className="lg:col-span-1 flex justify-center">
-        <Card className="w-full max-w-md bg-background/90 backdrop-blur-sm border-border/50">
-          <CardContent className="flex flex-col gap-5 pt-2">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div
-                aria-disabled="true"
-                className="border-2 border-dashed border-border rounded-lg p-6 flex flex-col items-center justify-center text-center opacity-50 bg-muted"
-              >
-                <svg aria-hidden="true" className="w-7 h-7 text-muted-foreground mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                </svg>
-                <span className="font-medium text-sm">Purchase Register (CSV)</span>
-                <span className="text-xs text-muted-foreground mt-1">Coming Soon</span>
-              </div>
+        {error && (
+          <div className="w-full text-sm text-red-500 bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-2">
+            {error}
+          </div>
+        )}
+
+        <button
+          onClick={() => canRun && onUpload(purchaseFile!, gstFile!)}
+          disabled={!canRun}
+          className="w-full py-4 rounded-lg bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white font-semibold tracking-wide transition-all shadow-lg disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          {isLoading ? "Executing Engine..." : "Run Reconciliation"}
+        </button>
+
+        <div className="w-full flex items-center gap-4">
+          <div className="h-px bg-[var(--color-border)] flex-1"></div>
+          <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">Or try it out</span>
+          <div className="h-px bg-[var(--color-border)] flex-1"></div>
+        </div>
 
               <div
                 aria-disabled="true"

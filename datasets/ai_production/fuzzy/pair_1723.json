@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-fuzzy-1723",
+    "vendor_name": "Supplier Inc 1723",
+    "reference": "INV-11723",
+    "amount": "38530.58",
+    "record_date": "2023-12-26",
+    "tax_identity": "27AAAAA2723A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-fuzzy-1723",
+    "vendor_name": "Suplier Inc 1723",
+    "reference": "INV11723",
+    "amount": "38530.58",
+    "record_date": "2023-12-26",
+    "tax_identity": "27AAAAA2723A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-date_variations-1939",
+    "vendor_name": "Supplier Corp 1939",
+    "reference": "INV-11939",
+    "amount": "19813.69",
+    "record_date": "2023-07-04",
+    "tax_identity": "27AAAAA2939A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-date_variations-1939",
+    "vendor_name": "Supplier Corp 1939",
+    "reference": "INV-11939",
+    "amount": "19813.69",
+    "record_date": "2023-06-30",
+    "tax_identity": "27AAAAA2939A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

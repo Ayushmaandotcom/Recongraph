@@ -24,6 +24,9 @@ from recongraph.graph.fusion import EvidenceGraph, FusionNode
 from recongraph.graph.propagation import SemanticPropagator
 from recongraph.graph.fusion_result import FusionResult
 from recongraph.plugins.provider_v2 import EvidenceContributionV2, EvidenceProviderV2
+import dataclasses
+from recongraph.learning.candidate_model import MLCandidateFilter
+from recongraph.learning.llm_explainer import LLMExplainer
 
 @dataclass(frozen=True)
 class ReconciliationResult:
@@ -61,6 +64,14 @@ class ReconGraphEngine:
     def __init__(self, config: ReconGraphConfig, providers: Sequence[EvidenceProvider | EvidenceProviderV2]):
         self.config = config
         self.providers = tuple(providers)
+        
+        from pathlib import Path
+        champion_path = Path("models/candidate_model.pkl")
+        challenger_path = Path("models/challenger_model.pkl")
+        
+        self.ml_filter = MLCandidateFilter(champion_path)
+        self.ml_challenger = MLCandidateFilter(challenger_path)
+        self.llm_explainer = LLMExplainer()
 
     @property
     def config_hash(self) -> str:
@@ -204,6 +215,83 @@ class ReconGraphEngine:
                     )
                     differential_results.append(diff_result)
         
+                # AI/ML Hackathon MVP Integration
+                target_hypothesis = decision.selected_hypothesis
+                if not target_hypothesis and decision.competitors:
+                    target_hypothesis = decision.competitors[0]
+                    
+                ml_confidence = None
+                llm_explanation = None
+                
+                ai_provenance = None
+                
+                if target_hypothesis:
+                    pr, gstr2b = None, None
+                    pr_urn, gst_urn = None, None
+                    for urn in target_hypothesis.hypothesis.matched_nodes:
+                        if urn.startswith("urn:recongraph:purchase:"):
+                            pr = graph.nodes[urn]
+                            pr_urn = urn
+                        elif urn.startswith("urn:recongraph:gst:"):
+                            gstr2b = graph.nodes[urn]
+                            gst_urn = urn
+                            
+                    if pr and gstr2b:
+                        graph_context = {
+                            "pr_node_degree": len(list(comp.graph.get_neighbors(pr_urn))),
+                            "gst_node_degree": len(list(comp.graph.get_neighbors(gst_urn))),
+                            "component_size": len(comp.graph.nodes),
+                            "candidate_count": len(target_hypothesis.hypothesis.matched_nodes)
+                        }
+                        
+                        from recongraph.learning.features import extract_features
+                        raw_features = extract_features(pr, gstr2b, graph_context)
+                        
+                        ml_confidence = self.ml_filter.predict_confidence(pr, gstr2b, graph_context)
+                        challenger_confidence = self.ml_challenger.predict_confidence(pr, gstr2b, graph_context)
+                        
+                        ai_provenance = {
+                            "model_version": "champion_v1.0",
+                            "confidence": ml_confidence,
+                            "challenger_confidence": challenger_confidence,
+                            "feature_values": raw_features,
+                            "timestamp": datetime.now(timezone.utc).isoformat()
+                        }
+                        
+                        # Check for explicit contradictions in evidence
+                        from recongraph.contrib.kernel.assertions import AssertionPolarity
+                        has_conflict = False
+                        if target_hypothesis and hasattr(target_hypothesis.hypothesis, 'evidence'):
+                            has_conflict = any(e.polarity in (AssertionPolarity.CONFLICT, AssertionPolarity.CONTRADICT) for e in target_hypothesis.hypothesis.evidence)
+                            
+                        if decision.action == DecisionAction.AUTO_MATCH:
+                            if 0.70 <= ml_confidence < 0.95:
+                                decision = dataclasses.replace(decision, action=DecisionAction.REVIEW_AMBIGUOUS)
+                                llm_explanation, llm_citation = self.llm_explainer.explain(pr, gstr2b, ml_confidence)
+                                ai_provenance["decision"] = "REVIEW"
+                            elif ml_confidence < 0.70:
+                                decision = dataclasses.replace(decision, action=DecisionAction.REVIEW_WEAK)
+                                llm_explanation, llm_citation = self.llm_explainer.explain(pr, gstr2b, ml_confidence)
+                                ai_provenance["decision"] = "REJECT"
+                            else:
+                                ai_provenance["decision"] = "AUTO_MATCH"
+                                
+                        elif decision.action == DecisionAction.REVIEW_AMBIGUOUS or decision.action == DecisionAction.REVIEW_WEAK:
+                            if ml_confidence >= 0.95 and not has_conflict:
+                                decision = dataclasses.replace(decision, action=DecisionAction.AUTO_MATCH)
+                                ai_provenance["decision"] = "AUTO_MATCH"
+                            elif ml_confidence < 0.70:
+                                decision = dataclasses.replace(decision, action=DecisionAction.REVIEW_WEAK)
+                                llm_explanation, llm_citation = self.llm_explainer.explain(pr, gstr2b, ml_confidence)
+                                ai_provenance["decision"] = "REJECT"
+                            else:
+                                decision = dataclasses.replace(decision, action=DecisionAction.REVIEW_AMBIGUOUS)
+                                ai_provenance["decision"] = "REVIEW"
+                                llm_explanation, llm_citation = self.llm_explainer.explain(pr, gstr2b, ml_confidence)
+                                
+                        elif decision.action == DecisionAction.NO_MATCH:
+                            ai_provenance["decision"] = "REJECT"
+
                 # Determine which nodes were "consumed" by the primary action
                 consumed_nodes: frozenset[str] = frozenset()
 
@@ -213,7 +301,7 @@ class ReconGraphEngine:
                     if decision.selected_hypothesis:
                         consumed_nodes = decision.selected_hypothesis.hypothesis.matched_nodes
                 elif self.config.review_config.enabled and decision.action in (DecisionAction.REVIEW_WEAK, DecisionAction.REVIEW_AMBIGUOUS):
-                    packet = packet_builder.build(decision, fusion_explanation, graph)
+                    packet = packet_builder.build(decision, fusion_explanation, graph, ml_confidence=ml_confidence, llm_explanation=llm_explanation, llm_citation=locals().get('llm_citation'), ai_provenance=ai_provenance)
                     if packet:
                         review_packets.append(packet)
                         

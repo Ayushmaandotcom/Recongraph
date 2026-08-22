@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-gstin_variations-1674",
+    "vendor_name": "Supplier LLC 1674",
+    "reference": "INV-11674",
+    "amount": "2358.41",
+    "record_date": "2023-07-23",
+    "tax_identity": "27AAAAA2674A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-gstin_variations-1674",
+    "vendor_name": "Supplier LLC 1674",
+    "reference": "INV-11674",
+    "amount": "2358.41",
+    "record_date": "2023-07-23",
+    "tax_identity": "27AAAAA2674A1ZX"
+  },
+  "label": "NO_MATCH"
+}

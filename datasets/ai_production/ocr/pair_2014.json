@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-ocr-2014",
+    "vendor_name": "Supplier Inc 2014",
+    "reference": "INV-12014",
+    "amount": "35625.9",
+    "record_date": "2023-09-19",
+    "tax_identity": "27AAAAA3014A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-ocr-2014",
+    "vendor_name": "Supplier Inc 2014",
+    "reference": "INV-I2OI4",
+    "amount": "35625.91",
+    "record_date": "2023-09-19",
+    "tax_identity": "27AAAAA3014A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

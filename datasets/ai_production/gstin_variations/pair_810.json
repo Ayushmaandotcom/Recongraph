@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-gstin_variations-810",
+    "vendor_name": "Supplier Corp 810",
+    "reference": "INV-10810",
+    "amount": "19474.92",
+    "record_date": "2023-01-19",
+    "tax_identity": "27AAAAA1810A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-gstin_variations-810",
+    "vendor_name": "Supplier Corp 810",
+    "reference": "INV-10810",
+    "amount": "19474.92",
+    "record_date": "2023-01-19",
+    "tax_identity": "27AAAAA1810A1ZX"
+  },
+  "label": "NO_MATCH"
+}

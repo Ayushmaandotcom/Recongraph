@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-exact-2265",
+    "vendor_name": "Supplier Corp 2265",
+    "reference": "INV-12265",
+    "amount": "48930.19",
+    "record_date": "2023-04-02",
+    "tax_identity": "27AAAAA3265A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-exact-2265",
+    "vendor_name": "Supplier Corp 2265",
+    "reference": "INV-12265",
+    "amount": "48930.19",
+    "record_date": "2023-04-02",
+    "tax_identity": "27AAAAA3265A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

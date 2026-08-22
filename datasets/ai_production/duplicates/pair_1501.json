@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-duplicates-1501",
+    "vendor_name": "Supplier Inc 1501",
+    "reference": "INV-11501",
+    "amount": "25218.81",
+    "record_date": "2023-04-26",
+    "tax_identity": "27AAAAA2501A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-duplicates-1501",
+    "vendor_name": "Supplier Inc 1501",
+    "reference": "INV-11501",
+    "amount": "25218.81",
+    "record_date": "2023-04-26",
+    "tax_identity": "27AAAAA2501A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

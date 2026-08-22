@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-contradictions-662",
+    "vendor_name": "Supplier Corp 662",
+    "reference": "INV-10662",
+    "amount": "15564.35",
+    "record_date": "2023-09-07",
+    "tax_identity": "27AAAAA1662A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-contradictions-662",
+    "vendor_name": "Supplier Corp 662",
+    "reference": "INV-10662",
+    "amount": "31128.700",
+    "record_date": "2023-09-07",
+    "tax_identity": "27AAAAA1662A1Z5"
+  },
+  "label": "CONTRADICTION"
+}

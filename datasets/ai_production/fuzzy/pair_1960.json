@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-fuzzy-1960",
+    "vendor_name": "Supplier Ltd 1960",
+    "reference": "INV-11960",
+    "amount": "31526.15",
+    "record_date": "2023-02-28",
+    "tax_identity": "27AAAAA2960A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-fuzzy-1960",
+    "vendor_name": "Suplier Ltd 1960",
+    "reference": "INV11960",
+    "amount": "31526.15",
+    "record_date": "2023-02-28",
+    "tax_identity": "27AAAAA2960A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

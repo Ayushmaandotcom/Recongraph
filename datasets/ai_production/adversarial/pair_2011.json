@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-adversarial-2011",
+    "vendor_name": "Supplier Ltd 2011",
+    "reference": "INV-12011",
+    "amount": "22270.88",
+    "record_date": "2023-10-16",
+    "tax_identity": "27AAAAA3011A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-adversarial-2011",
+    "vendor_name": "Supplier Ltd 2011",
+    "reference": "INV-12011",
+    "amount": "22270.88",
+    "record_date": "2023-10-16",
+    "tax_identity": "27AAAAA3011A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

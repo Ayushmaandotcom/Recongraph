@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-date_variations-629",
+    "vendor_name": "Supplier Ltd 629",
+    "reference": "INV-10629",
+    "amount": "39804.33",
+    "record_date": "2023-07-07",
+    "tax_identity": "27AAAAA1629A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-date_variations-629",
+    "vendor_name": "Supplier Ltd 629",
+    "reference": "INV-10629",
+    "amount": "39804.33",
+    "record_date": "2023-07-09",
+    "tax_identity": "27AAAAA1629A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

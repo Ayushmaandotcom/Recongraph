@@ -12,3 +12,7 @@ __pycache__/
 
 .vscode/
 .idea/
+datasets/training/production_dataset.csv
+mlruns/
+*.db
+upload_wiring.patch

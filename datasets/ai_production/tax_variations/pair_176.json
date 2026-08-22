@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-tax_variations-176",
+    "vendor_name": "Supplier Ltd 176",
+    "reference": "INV-10176",
+    "amount": "23488.03",
+    "record_date": "2023-05-23",
+    "tax_identity": "27AAAAA1176A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-tax_variations-176",
+    "vendor_name": "Supplier Ltd 176",
+    "reference": "INV-10176",
+    "amount": "23490.53",
+    "record_date": "2023-05-23",
+    "tax_identity": "27AAAAA1176A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

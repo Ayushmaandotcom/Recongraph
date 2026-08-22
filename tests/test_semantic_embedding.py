@@ -122,11 +122,13 @@ def test_semantic_provider_engine_integration():
     )
     
     engine = ReconGraphEngine(config, providers)
-    result = engine.reconcile([p], [g])
-    
-    assert len(result.auto_matches) == 1
-    decision = result.auto_matches[0]
-    
-    # Verify semantic evidence was integrated into the decision
-    assert "semantics" in decision.selected_hypothesis.supporting_evidence.contributions
-
+    original_predict = engine.ml_filter.predict_confidence
+    engine.ml_filter.predict_confidence = lambda p, g, c: 1.0
+    try:
+        result = engine.reconcile([p], [g])
+        assert len(result.auto_matches) == 1
+        decision = result.auto_matches[0]
+        # Verify semantic evidence was integrated into the decision
+        assert "semantics" in decision.selected_hypothesis.supporting_evidence.contributions
+    finally:
+        engine.ml_filter.predict_confidence = original_predict

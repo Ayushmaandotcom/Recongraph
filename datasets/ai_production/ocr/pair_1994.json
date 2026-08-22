@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-ocr-1994",
+    "vendor_name": "Supplier Corp 1994",
+    "reference": "INV-11994",
+    "amount": "25180.43",
+    "record_date": "2023-02-15",
+    "tax_identity": "27AAAAA2994A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-ocr-1994",
+    "vendor_name": "Supplier Corp 1994",
+    "reference": "INV-II994",
+    "amount": "25180.44",
+    "record_date": "2023-02-15",
+    "tax_identity": "27AAAAA2994A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-tax_variations-444",
+    "vendor_name": "Supplier Inc 444",
+    "reference": "INV-10444",
+    "amount": "47734.98",
+    "record_date": "2023-03-10",
+    "tax_identity": "27AAAAA1444A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-tax_variations-444",
+    "vendor_name": "Supplier Inc 444",
+    "reference": "INV-10444",
+    "amount": "47733.98",
+    "record_date": "2023-03-10",
+    "tax_identity": "27AAAAA1444A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

@@ -1,0 +1,12 @@
+{
+  "pr": {
+    "record_id": "PR-missing-1884",
+    "vendor_name": "Supplier Inc 1884",
+    "reference": "INV-11884",
+    "amount": "47296.17",
+    "record_date": "2023-10-25",
+    "tax_identity": "27AAAAA2884A1Z5"
+  },
+  "gst": null,
+  "label": "NO_MATCH"
+}

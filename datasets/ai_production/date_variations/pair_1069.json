@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-date_variations-1069",
+    "vendor_name": "Supplier Inc 1069",
+    "reference": "INV-11069",
+    "amount": "12657.19",
+    "record_date": "2023-12-23",
+    "tax_identity": "27AAAAA2069A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-date_variations-1069",
+    "vendor_name": "Supplier Inc 1069",
+    "reference": "INV-11069",
+    "amount": "12657.19",
+    "record_date": "2023-12-20",
+    "tax_identity": "27AAAAA2069A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

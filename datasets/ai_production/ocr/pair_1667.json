@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-ocr-1667",
+    "vendor_name": "Supplier Corp 1667",
+    "reference": "INV-11667",
+    "amount": "21924.04",
+    "record_date": "2023-08-10",
+    "tax_identity": "27AAAAA2667A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-ocr-1667",
+    "vendor_name": "Supplier Corp 1667",
+    "reference": "INV-II667",
+    "amount": "21924.05",
+    "record_date": "2023-08-10",
+    "tax_identity": "27AAAAA2667A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

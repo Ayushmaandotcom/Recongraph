@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-multi_candidate-621",
+    "vendor_name": "Supplier LLC 621",
+    "reference": "INV-10621",
+    "amount": "48142.32",
+    "record_date": "2023-07-02",
+    "tax_identity": "27AAAAA1621A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-multi_candidate-621",
+    "vendor_name": "Supplier LLC 621",
+    "reference": "INV-10621",
+    "amount": "48142.32",
+    "record_date": "2023-07-02",
+    "tax_identity": "27AAAAA1621A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

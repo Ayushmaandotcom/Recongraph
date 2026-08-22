@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-duplicates-1574",
+    "vendor_name": "Supplier Ltd 1574",
+    "reference": "INV-11574",
+    "amount": "37347.03",
+    "record_date": "2023-05-28",
+    "tax_identity": "27AAAAA2574A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-duplicates-1574",
+    "vendor_name": "Supplier Ltd 1574",
+    "reference": "INV-11574",
+    "amount": "37347.03",
+    "record_date": "2023-05-28",
+    "tax_identity": "27AAAAA2574A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

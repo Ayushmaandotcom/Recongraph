@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-ocr-33",
+    "vendor_name": "Supplier Corp 33",
+    "reference": "INV-10033",
+    "amount": "24350.92",
+    "record_date": "2023-02-25",
+    "tax_identity": "27AAAAA1033A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-ocr-33",
+    "vendor_name": "Supplier Corp 33",
+    "reference": "INV-IOO33",
+    "amount": "24350.93",
+    "record_date": "2023-02-25",
+    "tax_identity": "27AAAAA1033A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

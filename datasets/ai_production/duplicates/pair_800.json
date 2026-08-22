@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-duplicates-800",
+    "vendor_name": "Supplier LLC 800",
+    "reference": "INV-10800",
+    "amount": "30456.36",
+    "record_date": "2023-05-23",
+    "tax_identity": "27AAAAA1800A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-duplicates-800",
+    "vendor_name": "Supplier LLC 800",
+    "reference": "INV-10800",
+    "amount": "30456.36",
+    "record_date": "2023-05-23",
+    "tax_identity": "27AAAAA1800A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

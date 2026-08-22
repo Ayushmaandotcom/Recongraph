@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-duplicates-1984",
+    "vendor_name": "Supplier Corp 1984",
+    "reference": "INV-11984",
+    "amount": "35332.88",
+    "record_date": "2023-02-17",
+    "tax_identity": "27AAAAA2984A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-duplicates-1984",
+    "vendor_name": "Supplier Corp 1984",
+    "reference": "INV-11984",
+    "amount": "35332.88",
+    "record_date": "2023-02-17",
+    "tax_identity": "27AAAAA2984A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

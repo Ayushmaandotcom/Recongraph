@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-multi_candidate-1991",
+    "vendor_name": "Supplier Ltd 1991",
+    "reference": "INV-11991",
+    "amount": "38709.81",
+    "record_date": "2023-07-17",
+    "tax_identity": "27AAAAA2991A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-multi_candidate-1991",
+    "vendor_name": "Supplier Ltd 1991",
+    "reference": "INV-11991",
+    "amount": "38709.81",
+    "record_date": "2023-07-17",
+    "tax_identity": "27AAAAA2991A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

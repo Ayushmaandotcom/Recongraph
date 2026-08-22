@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-date_variations-806",
+    "vendor_name": "Supplier LLC 806",
+    "reference": "INV-10806",
+    "amount": "16324.34",
+    "record_date": "2023-05-09",
+    "tax_identity": "27AAAAA1806A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-date_variations-806",
+    "vendor_name": "Supplier LLC 806",
+    "reference": "INV-10806",
+    "amount": "16324.34",
+    "record_date": "2023-05-06",
+    "tax_identity": "27AAAAA1806A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

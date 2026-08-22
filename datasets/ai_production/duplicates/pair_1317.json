@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-duplicates-1317",
+    "vendor_name": "Supplier Ltd 1317",
+    "reference": "INV-11317",
+    "amount": "9071.89",
+    "record_date": "2023-09-14",
+    "tax_identity": "27AAAAA2317A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-duplicates-1317",
+    "vendor_name": "Supplier Ltd 1317",
+    "reference": "INV-11317",
+    "amount": "9071.89",
+    "record_date": "2023-09-14",
+    "tax_identity": "27AAAAA2317A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

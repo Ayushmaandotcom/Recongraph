@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-fuzzy-254",
+    "vendor_name": "Supplier Corp 254",
+    "reference": "INV-10254",
+    "amount": "49377.61",
+    "record_date": "2023-09-09",
+    "tax_identity": "27AAAAA1254A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-fuzzy-254",
+    "vendor_name": "Suplier Corp 254",
+    "reference": "INV10254",
+    "amount": "49377.61",
+    "record_date": "2023-09-09",
+    "tax_identity": "27AAAAA1254A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-date_variations-990",
+    "vendor_name": "Supplier Inc 990",
+    "reference": "INV-10990",
+    "amount": "36236.92",
+    "record_date": "2023-06-15",
+    "tax_identity": "27AAAAA1990A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-date_variations-990",
+    "vendor_name": "Supplier Inc 990",
+    "reference": "INV-10990",
+    "amount": "36236.92",
+    "record_date": "2023-06-16",
+    "tax_identity": "27AAAAA1990A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

@@ -1,0 +1,7 @@
+dataset:
+  total_examples: 10000
+  positive_ratio: 0.4
+  hard_negative_ratio: 0.3
+  missing_ratio: 0.15
+  contradiction_ratio: 0.15
+seed: 12345

@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-gstin_variations-740",
+    "vendor_name": "Supplier Corp 740",
+    "reference": "INV-10740",
+    "amount": "7118.1",
+    "record_date": "2023-12-03",
+    "tax_identity": "27AAAAA1740A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-gstin_variations-740",
+    "vendor_name": "Supplier Corp 740",
+    "reference": "INV-10740",
+    "amount": "7118.1",
+    "record_date": "2023-12-03",
+    "tax_identity": "27AAAAA1740A1ZX"
+  },
+  "label": "NO_MATCH"
+}

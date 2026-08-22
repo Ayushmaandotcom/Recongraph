@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-duplicates-469",
+    "vendor_name": "Supplier LLC 469",
+    "reference": "INV-10469",
+    "amount": "23961.28",
+    "record_date": "2023-08-24",
+    "tax_identity": "27AAAAA1469A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-duplicates-469",
+    "vendor_name": "Supplier LLC 469",
+    "reference": "INV-10469",
+    "amount": "23961.28",
+    "record_date": "2023-08-24",
+    "tax_identity": "27AAAAA1469A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

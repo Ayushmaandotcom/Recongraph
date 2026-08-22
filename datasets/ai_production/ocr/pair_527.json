@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-ocr-527",
+    "vendor_name": "Supplier Ltd 527",
+    "reference": "INV-10527",
+    "amount": "25160.58",
+    "record_date": "2023-12-22",
+    "tax_identity": "27AAAAA1527A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-ocr-527",
+    "vendor_name": "Supplier Ltd 527",
+    "reference": "INV-IO527",
+    "amount": "25160.59",
+    "record_date": "2023-12-22",
+    "tax_identity": "27AAAAA1527A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

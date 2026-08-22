@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-gstin_variations-443",
+    "vendor_name": "Supplier Ltd 443",
+    "reference": "INV-10443",
+    "amount": "28716.49",
+    "record_date": "2023-09-13",
+    "tax_identity": "27AAAAA1443A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-gstin_variations-443",
+    "vendor_name": "Supplier Ltd 443",
+    "reference": "INV-10443",
+    "amount": "28716.49",
+    "record_date": "2023-09-13",
+    "tax_identity": "27AAAAA1443A1ZX"
+  },
+  "label": "NO_MATCH"
+}

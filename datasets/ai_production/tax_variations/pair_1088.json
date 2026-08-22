@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-tax_variations-1088",
+    "vendor_name": "Supplier LLC 1088",
+    "reference": "INV-11088",
+    "amount": "38250.46",
+    "record_date": "2023-10-26",
+    "tax_identity": "27AAAAA2088A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-tax_variations-1088",
+    "vendor_name": "Supplier LLC 1088",
+    "reference": "INV-11088",
+    "amount": "38251.46",
+    "record_date": "2023-10-26",
+    "tax_identity": "27AAAAA2088A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

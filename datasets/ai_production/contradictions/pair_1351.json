@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-contradictions-1351",
+    "vendor_name": "Supplier LLC 1351",
+    "reference": "INV-11351",
+    "amount": "16936.59",
+    "record_date": "2023-12-06",
+    "tax_identity": "27AAAAA2351A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-contradictions-1351",
+    "vendor_name": "Supplier LLC 1351",
+    "reference": "INV-11351",
+    "amount": "33873.180",
+    "record_date": "2023-12-06",
+    "tax_identity": "27AAAAA2351A1Z5"
+  },
+  "label": "CONTRADICTION"
+}

@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-duplicates-418",
+    "vendor_name": "Supplier Inc 418",
+    "reference": "INV-10418",
+    "amount": "18352.3",
+    "record_date": "2023-07-12",
+    "tax_identity": "27AAAAA1418A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-duplicates-418",
+    "vendor_name": "Supplier Inc 418",
+    "reference": "INV-10418",
+    "amount": "18352.3",
+    "record_date": "2023-07-12",
+    "tax_identity": "27AAAAA1418A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

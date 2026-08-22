@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-ocr-329",
+    "vendor_name": "Supplier Ltd 329",
+    "reference": "INV-10329",
+    "amount": "16904.54",
+    "record_date": "2023-10-05",
+    "tax_identity": "27AAAAA1329A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-ocr-329",
+    "vendor_name": "Supplier Ltd 329",
+    "reference": "INV-IO329",
+    "amount": "16904.55",
+    "record_date": "2023-10-05",
+    "tax_identity": "27AAAAA1329A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}
