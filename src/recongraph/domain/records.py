@@ -31,8 +31,24 @@ class PurchaseRecord:
     layout_artifact: "Optional['DocumentLayoutArtifact']" = None
     ocr_confidence_report: "Optional['OcrConfidenceReport']" = None
     reliability_envelope: "Optional['ReliabilityEnvelope']" = None
+    place_of_supply: str | None = None
+    is_reverse_charge: bool | None = None
+    document_type: str | None = None
+    is_return: bool | None = None
+    amendment_type: str | None = None
+    fiscal_year: str | None = None
+    company_gstin: str | None = None
+    taxable_value: Decimal | None = None
+    cgst: Decimal | None = None
+    sgst: Decimal | None = None
+    igst: Decimal | None = None
+    cess: Decimal | None = None
+    irn_number: str | None = None
+    irn_source: str | None = None
+    classification: str | None = None
     def __post_init__(self):
-        for field in ("amount", "net_amount", "tax_amount", "tax_rate"):
+        for field in ("amount", "net_amount", "tax_amount", "tax_rate",
+                      "taxable_value", "cgst", "sgst", "igst", "cess"):
             val = getattr(self, field, None)
             if val is not None and isinstance(val, float):
                 raise TypeError(f"Financial field '{field}' must be initialized as Decimal, not float.")
@@ -58,8 +74,24 @@ class GSTRecord:
     layout_artifact: "Optional['DocumentLayoutArtifact']" = None
     ocr_confidence_report: "Optional['OcrConfidenceReport']" = None
     reliability_envelope: "Optional['ReliabilityEnvelope']" = None
+    place_of_supply: str | None = None
+    is_reverse_charge: bool | None = None
+    document_type: str | None = None
+    is_return: bool | None = None
+    amendment_type: str | None = None
+    fiscal_year: str | None = None
+    company_gstin: str | None = None
+    taxable_value: Decimal | None = None
+    cgst: Decimal | None = None
+    sgst: Decimal | None = None
+    igst: Decimal | None = None
+    cess: Decimal | None = None
+    irn_number: str | None = None
+    irn_source: str | None = None
+    classification: str | None = None
     def __post_init__(self):
-        for field in ("amount", "net_amount", "tax_amount", "tax_rate"):
+        for field in ("amount", "net_amount", "tax_amount", "tax_rate",
+                      "taxable_value", "cgst", "sgst", "igst", "cess"):
             val = getattr(self, field, None)
             if val is not None and isinstance(val, float):
                 raise TypeError(f"Financial field '{field}' must be initialized as Decimal, not float.")
