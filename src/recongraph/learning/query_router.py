@@ -2,7 +2,11 @@
 
 import re
 from enum import Enum
-from typing import List, Optional
+from typing import List, Optional, Any
+
+# We'll rely on the LLMProvider for decomposition
+# But avoiding strict type coupling if possible, so we use Any or a protocol
+class LLMProviderProtocol(Any): pass
 
 
 class QueryType(str, Enum):
@@ -93,12 +97,33 @@ def classify_query(
     # 3. Route based on scores
     if recon_score > 0 and gst_score > 0:
         return QueryType.COMPLEX  # Needs both RAG + tools
-    elif recon_score >= 2:
-        return QueryType.RECONCILIATION
-    elif gst_score >= 1:
-        return QueryType.GST_KNOWLEDGE
     elif recon_score == 1:
         return QueryType.RECONCILIATION
+    else:
+        return QueryType.SIMPLE
 
-    # Default: treat as GST knowledge query
-    return QueryType.GST_KNOWLEDGE
+def decompose_complex_query(query: str, llm_provider: Any) -> List[str]:
+    """
+    Agentic Routing: Uses an LLM to break down a COMPLEX query into 
+    distinct sub-queries (e.g., one for tool lookup, one for GST knowledge).
+    """
+    prompt = f"""You are a query decomposition agent for a GST reconciliation platform.
+The user asked a complex question that requires both specific invoice data and general GST law knowledge.
+Break this question down into exactly two or three simple sub-queries.
+Return ONLY a valid JSON list of strings representing the sub-queries.
+
+User Question: {query}
+"""
+    try:
+        from pydantic import BaseModel
+        class SubQueries(BaseModel):
+            queries: List[str]
+            
+        result = llm_provider.generate_structured(prompt, SubQueries)
+        return result.queries
+    except Exception:
+        # Fallback if LLM fails
+        return [
+            "What is the reconciliation status or data for the requested invoice?",
+            "What does the GST law say about this specific scenario?"
+        ]

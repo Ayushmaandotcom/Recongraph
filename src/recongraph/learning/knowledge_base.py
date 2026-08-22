@@ -19,6 +19,8 @@ class GSTDocument:
     version: str
     url: Optional[str]
     text: str
+    document_hash: Optional[str] = None
+    retrieval_date: Optional[str] = None
 
 class KnowledgeBaseBuilder:
     def __init__(self):
@@ -65,7 +67,9 @@ class KnowledgeBaseBuilder:
                     "authority": doc.authority,
                     "jurisdiction": doc.jurisdiction,
                     "financial_year": doc.financial_year,
-                    "version": doc.version
+                    "version": doc.version,
+                    "document_hash": doc.document_hash,
+                    "retrieval_date": doc.retrieval_date
                 }
             }
             for doc in self.documents

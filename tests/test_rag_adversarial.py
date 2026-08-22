@@ -14,6 +14,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 import pytest
 from recongraph.learning.confidence import compute_confidence, should_abstain
+from recongraph.learning.circuit_breaker import CircuitBreaker, CircuitBreakerOpenException
 from recongraph.learning.context_builder import sanitize_document_text, generate_deterministic_response
 
 
@@ -48,6 +49,53 @@ class TestAbstention:
             abstained=True,
         )
         assert "section 999" not in answer.lower()
+
+class TestCircuitBreaker:
+    def test_circuit_breaker_opens(self):
+        breaker = CircuitBreaker(failure_threshold=2, recovery_timeout=0.1)
+        
+        def failing_func():
+            raise ValueError("API Down")
+            
+        # First failure
+        with pytest.raises(ValueError):
+            breaker.execute(failing_func)
+            
+        assert breaker.state == "CLOSED"
+        
+        # Second failure -> Opens breaker
+        with pytest.raises(ValueError):
+            breaker.execute(failing_func)
+            
+        assert breaker.state == "OPEN"
+        
+        # Third call -> Fails fast
+        with pytest.raises(CircuitBreakerOpenException):
+            breaker.execute(failing_func)
+            
+    def test_circuit_breaker_recovers(self):
+        import time
+        breaker = CircuitBreaker(failure_threshold=1, recovery_timeout=0.1)
+        
+        def failing_func():
+            raise ValueError("API Down")
+            
+        def success_func():
+            return "OK"
+            
+        # First failure -> Opens breaker
+        with pytest.raises(ValueError):
+            breaker.execute(failing_func)
+            
+        assert breaker.state == "OPEN"
+        
+        # Wait for recovery
+        time.sleep(0.15)
+        
+        # Should succeed and reset to CLOSED
+        res = breaker.execute(success_func)
+        assert res == "OK"
+        assert breaker.state == "CLOSED"
 
 
 class TestPromptInjectionDefense:

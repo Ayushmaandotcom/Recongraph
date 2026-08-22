@@ -23,6 +23,9 @@ class CopilotAuditLog:
     abstained: bool = False
     confidence_level: str = ''
     error: str = ''
+    input_tokens: int = 0
+    output_tokens: int = 0
+    estimated_cost_usd: float = 0.0
     timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 def log_copilot_request(audit: CopilotAuditLog):

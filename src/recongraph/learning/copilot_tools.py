@@ -27,6 +27,10 @@ def get_invoice_details(
     run = _runs_store.get(run_id)
     if not run or run.get("status") != "success":
         return {"error": f"Run {run_id} not found or not completed."}
+        
+    run_tenant = run.get("tenant_id", "")
+    if tenant_id and run_tenant and tenant_id != run_tenant:
+        return {"error": "Access denied: Tenant mismatch."}
 
     result = run.get("result", {})
 
@@ -80,6 +84,10 @@ def get_decision_trace(
     run = _runs_store.get(run_id)
     if not run or run.get("status") != "success":
         return {"error": f"Run {run_id} not found or not completed."}
+
+    run_tenant = run.get("tenant_id", "")
+    if tenant_id and run_tenant and tenant_id != run_tenant:
+        return {"error": "Access denied: Tenant mismatch."}
 
     result = run.get("result", {})
 
