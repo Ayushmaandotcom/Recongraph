@@ -1,23 +1,59 @@
 "use client";
 
 import React, { useState } from "react";
-import { ReconciliationResult, ReviewPacket } from "@/lib/types";
+import { ImsAction, ReconciliationResult, ReviewPacket } from "@/lib/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import ReviewQueue from "./ReviewQueue";
 import PacketDetail from "./PacketDetail";
+import ReconciliationTableView from "./reconciliation/ReconciliationTableView";
+import ExportButton from "./ExportButton";
 import CopilotChat from "./CopilotChat";
+import { applyImsAction } from "@/lib/api";
 
 interface DashboardScreenProps {
   result: ReconciliationResult;
+  runId?: string | null;
+}
+
+interface ItcInfo {
+  availability: string;
+  claimPeriod?: string | null;
+}
+
+interface CopilotContext {
+  packetId?: string;
+  runId?: string;
 }
 
 type ViewMode = "sheet" | "queue";
 
-export default function DashboardScreen({ result }: DashboardScreenProps) {
+export default function DashboardScreen({ result, runId }: DashboardScreenProps) {
   const [selectedPacket, setSelectedPacket] = useState<ReviewPacket | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("sheet");
+  const [imsActions, setImsActions] = useState<Record<string, ImsAction>>({});
+  const [imsItc, setImsItc] = useState<Record<string, ItcInfo>>({});
+  const [copilotContext, setCopilotContext] = useState<CopilotContext | null>(null);
+
+  async function handleImsAction(packetId: string, action: ImsAction) {
+    setImsActions((prev) => ({ ...prev, [packetId]: action }));
+
+    if (!runId) return; // static demo — local-only
+
+    try {
+      const applied = await applyImsAction(runId, packetId, action);
+      setImsItc((prev) => ({
+        ...prev,
+        [packetId]: {
+          availability: applied.itc_availability ?? "Unknown",
+          claimPeriod: applied.itc_claim_period,
+        },
+      }));
+    } catch (e) {
+      console.warn("Action API call failed; keeping local state", e);
+    }
+  }
 
   // Derive stats
   const totalAuto = result.auto_matches.length;
@@ -43,11 +79,16 @@ export default function DashboardScreen({ result }: DashboardScreenProps) {
   const matchRate = totalIn > 0 ? (((totalAuto * 2) / totalIn) * 100).toFixed(1) : "0.0";
 
   if (selectedPacket) {
-    return <PacketDetail 
-      packet={selectedPacket} 
-      onBack={() => setSelectedPacket(null)} 
-      onAskCopilot={(packetId) => setCopilotContext({ packetId, runId: (result as any).run_id })}
-    />;
+    return (
+      <PacketDetail
+        packet={selectedPacket}
+        onBack={() => setSelectedPacket(null)}
+        onAskCopilot={(packetId) => setCopilotContext({ packetId, runId: runId ?? undefined })}
+        currentAction={imsActions[selectedPacket.packet_id]}
+        onAction={(action) => handleImsAction(selectedPacket.packet_id, action)}
+        itcInfo={imsItc[selectedPacket.packet_id]}
+      />
+    );
   }
 
   return (
@@ -99,70 +140,6 @@ export default function DashboardScreen({ result }: DashboardScreenProps) {
           </CardContent>
         </Card>
       </div>
-      
-      {/* Phase 7: Executive Dashboard AI Metrics */}
-      {userRole === "admin" && (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-        <div className="glass-panel p-5 rounded-lg border-l-4 border-l-[var(--color-primary)]">
-          <h3 className="text-lg font-semibold mb-3">Model Drift & A/B Status</h3>
-          <div className="space-y-3">
-             <div className="flex justify-between items-center text-sm">
-               <span className="font-medium">Champion (Isotonic) Auto-Match Rate:</span>
-               <span className="font-mono">{matchRate}%</span>
-             </div>
-             <div className="flex justify-between items-center text-sm">
-               <span className="font-medium text-[var(--color-text-muted)]">Challenger (LambdaMART) Shadow Rate:</span>
-               <span className="font-mono text-[var(--color-text-muted)]">{(parseFloat(matchRate) + 1.2).toFixed(1)}%</span>
-             </div>
-             <div className="mt-2 text-xs text-[var(--color-text-muted)] bg-[var(--color-surface-hover)] p-2 rounded">
-                Awaiting manual promotion via `promotion_gate.py`
-             </div>
-          </div>
-        </div>
-      </div>
-      
-      {/* Phase 13: Cryptographic Audit Trail (Admin/Auditor Only) */}
-      {userRole === "admin" && (
-        <div className="glass-panel p-5 rounded-lg border-l-4 border-l-indigo-500 mb-4">
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="text-lg font-semibold flex items-center gap-2">
-              <svg className="w-5 h-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Cryptographic Audit Log
-            </h3>
-            <button className="text-xs bg-indigo-500 text-white px-3 py-1.5 rounded hover:bg-indigo-600 transition-colors">
-              Verify Integrity
-            </button>
-          </div>
-          <div className="bg-slate-900 rounded p-3 text-slate-300 font-mono text-xs overflow-x-auto space-y-2">
-            <div className="flex justify-between border-b border-slate-700 pb-1">
-              <span>Timestamp</span>
-              <span>Event</span>
-              <span>Hash</span>
-            </div>
-            {result.auto_matches.slice(0, 3).map((match, idx) => (
-              <div key={idx} className="flex justify-between">
-                <span>{new Date().toISOString().split('T')[0]}</span>
-                <span className="text-green-400">AUTO_MATCH</span>
-                <span className="text-slate-500 truncate max-w-[150px]">sha256:8f43...{match.selected_hypothesis.edge_ids[0].substring(0, 4)}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-      
-      {/* Role Toggle for Testing */}
-      <div className="fixed top-4 right-4 z-50">
-        <select 
-          value={userRole} 
-          onChange={(e) => setUserRole(e.target.value as any)}
-          className="bg-white border border-gray-300 text-sm rounded-lg px-2 py-1 shadow-sm"
-        >
-          <option value="admin">Admin View</option>
-          <option value="viewer">Viewer View</option>
-        </select>
-      </div>
 
       <div className="flex flex-wrap gap-2 items-center justify-between">
         <div className="flex gap-2 items-center">
@@ -170,9 +147,12 @@ export default function DashboardScreen({ result }: DashboardScreenProps) {
           <Badge variant="neutral" className="font-mono normal-case max-w-xs truncate" >
             Config: {result.traces?.[0]?.config_hash}
           </Badge>
+          <Badge variant={runId ? "success" : "warning"}>
+            {runId ? "Backend run" : "Static demo"}
+          </Badge>
         </div>
 
-        <div className="flex gap-1.5" role="group" aria-label="Switch results view">
+        <div className="flex gap-1.5 flex-wrap" role="group" aria-label="Switch results view">
           <Button
             size="sm"
             variant={viewMode === "sheet" ? "secondary" : "ghost"}
@@ -189,6 +169,9 @@ export default function DashboardScreen({ result }: DashboardScreenProps) {
           >
             Queue View
           </Button>
+          <ExportButton result={result} runId={runId} report="match_summary" />
+          <ExportButton result={result} runId={runId} report="supplier" />
+          <ExportButton result={result} runId={runId} report="invoice" />
         </div>
       </div>
 
@@ -198,8 +181,14 @@ export default function DashboardScreen({ result }: DashboardScreenProps) {
           onSelectPacket={setSelectedPacket}
         />
       ) : (
-        <ReviewQueue packets={result.review_packets} onSelectPacket={setSelectedPacket} />
+        <ReviewQueue
+          packets={result.review_packets}
+          onSelectPacket={setSelectedPacket}
+          imsActions={imsActions}
+        />
       )}
+
+      {copilotContext && <CopilotChat context={copilotContext} />}
     </div>
   );
 }

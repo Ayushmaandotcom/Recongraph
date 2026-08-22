@@ -1,23 +1,16 @@
 "use client";
 
 import React, { useState } from "react";
-import { ReviewPacket } from "@/lib/types";
-import { Badge } from "@/components/ui/badge";
+import { ImsAction, ReviewPacket } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import StatusBadge from "./StatusBadge";
 
 interface ReviewQueueProps {
   packets: ReviewPacket[];
   onSelectPacket: (packet: ReviewPacket) => void;
+  imsActions?: Record<string, ImsAction>;
 }
-
-type BadgeVariant = "warning" | "info" | "danger" | "neutral";
-
-const ACTION_META: Record<string, { label: string; variant: BadgeVariant }> = {
-  review_ambiguous: { label: "Ambiguous", variant: "warning" },
-  review_weak: { label: "Weak Evidence", variant: "info" },
-  no_match: { label: "Leftover", variant: "danger" },
-};
 
 const FILTERS: { id: string; label: string }[] = [
   { id: "ALL", label: "All" },
@@ -26,7 +19,7 @@ const FILTERS: { id: string; label: string }[] = [
   { id: "no_match", label: "Leftovers" },
 ];
 
-export default function ReviewQueue({ packets, onSelectPacket }: ReviewQueueProps) {
+export default function ReviewQueue({ packets, onSelectPacket, imsActions }: ReviewQueueProps) {
   const [filter, setFilter] = useState<string>("ALL");
 
   const filteredPackets =
@@ -69,19 +62,20 @@ export default function ReviewQueue({ packets, onSelectPacket }: ReviewQueueProp
               <th scope="col" className="px-4 py-2.5 font-medium">Severity</th>
               <th scope="col" className="px-4 py-2.5 font-medium w-1/2">Headline</th>
               <th scope="col" className="px-4 py-2.5 font-medium">Shape (P:G)</th>
+              <th scope="col" className="px-4 py-2.5 font-medium">IMS</th>
               <th scope="col" className="px-4 py-2.5 font-medium text-right">Action</th>
             </tr>
           </thead>
           <tbody>
             {filteredPackets.map((pkt) => {
-              const meta = ACTION_META[pkt.action] ?? { label: pkt.action, variant: "neutral" as BadgeVariant };
+              const imsAction = imsActions?.[pkt.packet_id] ?? pkt.ims?.action ?? "No Action";
 
               return (
                 <tr
                   key={pkt.packet_id}
                   tabIndex={0}
                   role="button"
-                  aria-label={`Open review packet ${pkt.packet_id}: ${meta.label}`}
+                  aria-label={`Open review packet ${pkt.packet_id}`}
                   className="border-b border-border hover:bg-muted transition-colors cursor-pointer"
                   onClick={() => onSelectPacket(pkt)}
                   onKeyDown={(e) => {
@@ -93,7 +87,7 @@ export default function ReviewQueue({ packets, onSelectPacket }: ReviewQueueProp
                 >
                   <td className="px-4 py-3 font-mono text-sm">{pkt.packet_id}</td>
                   <td className="px-4 py-3">
-                    <Badge variant={meta.variant}>{meta.label}</Badge>
+                    <StatusBadge value={pkt.action} kind="action" />
                   </td>
                   <td className="px-4 py-3">
                     <span className="text-sm block truncate max-w-md" title={pkt.headline}>
@@ -123,6 +117,9 @@ export default function ReviewQueue({ packets, onSelectPacket }: ReviewQueueProp
                   <td className="px-4 py-3 text-sm font-mono text-muted-foreground">
                     {pkt.purchases.length}:{pkt.gsts.length}
                   </td>
+                  <td className="px-4 py-3">
+                    <StatusBadge value={imsAction} kind="ims" />
+                  </td>
                   <td className="px-4 py-3 text-right">
                     <span className="text-primary text-sm font-medium">
                       Open Review <span aria-hidden="true">→</span>
@@ -134,7 +131,7 @@ export default function ReviewQueue({ packets, onSelectPacket }: ReviewQueueProp
 
             {filteredPackets.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-10 text-center text-muted-foreground">
+                <td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
                   No packets match the selected filter.
                 </td>
               </tr>

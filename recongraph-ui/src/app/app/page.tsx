@@ -7,9 +7,11 @@ import { Button } from "@/components/ui/button";
 
 import UploadScreen from "@/components/UploadScreen";
 import DashboardScreen from "@/components/DashboardScreen";
+import { loadDemo } from "@/lib/api";
 
 export default function AppPage() {
   const [result, setResult] = useState<ReconciliationResult | null>(null);
+  const [runId, setRunId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -17,22 +19,23 @@ export default function AppPage() {
     setIsLoading(true);
     setError(null);
     try {
-      // 1. Try backend first (FastAPI)
+      // 1. Try backend first (FastAPI) — returns { run_id, result }
       try {
-        const res = await fetch("http://localhost:8000/demo");
-        if (res.ok) {
-          const data = await res.json();
-          setResult(data);
+        const data = await loadDemo();
+        if (data?.result) {
+          setRunId(data.run_id ?? null);
+          setResult(data.result);
           return;
         }
       } catch (e) {
         console.warn("Backend /demo failed, falling back to static JSON", e);
       }
 
-      // 2. Fallback to static JSON for instant load
+      // 2. Fallback to static JSON for instant load (no run_id)
       const res = await fetch("/demo_results.json");
       if (!res.ok) throw new Error("Failed to load static demo data");
       const data = await res.json();
+      setRunId(null);
       setResult(data);
     } catch (err) {
       console.error("Error loading demo:", err);
@@ -40,6 +43,11 @@ export default function AppPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const reset = () => {
+    setResult(null);
+    setRunId(null);
   };
 
   return (
@@ -55,7 +63,7 @@ export default function AppPage() {
         </Link>
 
         {result && (
-          <Button variant="outline" size="sm" onClick={() => setResult(null)}>
+          <Button variant="outline" size="sm" onClick={reset}>
             Start New Run
           </Button>
         )}
@@ -73,7 +81,7 @@ export default function AppPage() {
       {!result ? (
         <UploadScreen onDemoLoad={handleDemoLoad} isLoading={isLoading} />
       ) : (
-        <DashboardScreen result={result} />
+        <DashboardScreen result={result} runId={runId} />
       )}
     </main>
   );
