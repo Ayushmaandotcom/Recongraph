@@ -1,3 +1,6 @@
 fastapi==0.111.0
 uvicorn==0.29.0
 python-multipart==0.0.9
+mlflow==2.15.1
+qdrant-client==1.10.1
+sentence-transformers==3.0.1

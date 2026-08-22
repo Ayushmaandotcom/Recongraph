@@ -59,7 +59,8 @@ export default function ReviewQueue({ packets, onSelectPacket }: ReviewQueueProp
             <tr className="bg-[var(--color-surface)] border-b border-[var(--color-border)] text-[var(--color-text-muted)] text-sm">
               <th className="p-4 font-medium">Packet ID</th>
               <th className="p-4 font-medium">Severity</th>
-              <th className="p-4 font-medium w-1/2">Headline</th>
+              <th className="p-4 font-medium w-1/3">Headline</th>
+              <th className="p-4 font-medium">ML Confidence</th>
               <th className="p-4 font-medium">Shape (P:G)</th>
               <th className="p-4 font-medium text-right">Action</th>
             </tr>
@@ -97,6 +98,26 @@ export default function ReviewQueue({ packets, onSelectPacket }: ReviewQueueProp
                     <span className="text-sm block truncate max-w-md" title={pkt.headline}>
                       {pkt.headline}
                     </span>
+                    {pkt.llm_explanation && (
+                      <div className="mt-1">
+                        <p className="text-xs text-[var(--color-primary)] truncate max-w-md italic" title={pkt.llm_explanation}>
+                          ✨ AI: {pkt.llm_explanation}
+                        </p>
+                        {pkt.llm_citation && (
+                          <div className="mt-2 p-2 bg-[var(--color-surface-elevated)] border-l-2 border-[var(--color-primary)] rounded text-[10px] text-[var(--color-text-muted)] line-clamp-2" title={pkt.llm_citation}>
+                            <span className="font-semibold text-xs mb-1 block">🏛️ Grounding Law:</span>
+                            {pkt.llm_citation}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </td>
+                  <td className="p-4 text-sm font-medium">
+                    {pkt.ml_confidence !== null && pkt.ml_confidence !== undefined ? 
+                      <span className={`px-2 py-0.5 rounded text-xs ${(pkt.ml_confidence > 0.8) ? 'bg-[var(--color-success-muted)] text-[var(--color-success)] border border-[var(--color-success)]/30' : 'bg-[var(--color-surface-elevated)] text-[var(--color-text-muted)] border border-[var(--color-border)]'}`}>
+                        {(pkt.ml_confidence * 100).toFixed(1)}%
+                      </span> 
+                    : <span className="text-[var(--color-text-muted)] opacity-50">-</span>}
                   </td>
                   <td className="p-4 text-sm font-mono text-[var(--color-text-muted)]">
                     {pkt.purchases.length}:{pkt.gsts.length}

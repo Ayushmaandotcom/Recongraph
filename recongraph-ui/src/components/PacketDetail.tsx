@@ -1,7 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { ReviewPacket, ExplanationNode } from "@/lib/types";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 interface PacketDetailProps {
   packet: ReviewPacket;
@@ -26,6 +28,35 @@ export default function PacketDetail({ packet, onBack }: PacketDetailProps) {
     // For the UI rider: we must use actual fields.
   }
 
+  const [feedbackStatus, setFeedbackStatus] = useState<string | null>(null);
+
+  const handleFeedback = async (action: "Approve" | "Reject") => {
+    try {
+      const res = await fetch(`${API_URL}/feedback`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          packet_id: packet.packet_id,
+          action: action,
+          payload: {
+            purchases: packet.purchases,
+            gsts: packet.gsts,
+            hypothesis: hyp
+          }
+        }),
+      });
+      if (res.ok) {
+        setFeedbackStatus(`Successfully recorded: ${action}`);
+        setTimeout(onBack, 1500); // go back to queue after feedback
+      }
+    } catch (e) {
+      console.error("Feedback error", e);
+      setFeedbackStatus("Failed to record feedback.");
+    }
+  };
+
   return (
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-right-8 duration-300">
       <div className="flex items-center gap-4 border-b border-[var(--color-border)] pb-4">
@@ -45,6 +76,26 @@ export default function PacketDetail({ packet, onBack }: PacketDetailProps) {
             </span>
           </div>
           <p className="text-lg text-[var(--color-text-muted)] mt-1">{packet.headline}</p>
+        </div>
+        <div className="ml-auto flex items-center gap-3">
+          {feedbackStatus ? (
+            <span className="text-sm text-[var(--color-success)] font-medium">{feedbackStatus}</span>
+          ) : (
+            <>
+              <button 
+                onClick={() => handleFeedback("Reject")}
+                className="px-4 py-2 rounded bg-transparent border border-[var(--color-danger)] text-[var(--color-danger)] hover:bg-[var(--color-danger)] hover:text-white transition-colors text-sm font-semibold"
+              >
+                Reject as Contradiction
+              </button>
+              <button 
+                onClick={() => handleFeedback("Approve")}
+                className="px-4 py-2 rounded bg-[var(--color-primary)] text-white hover:opacity-90 transition-opacity text-sm font-semibold shadow-md"
+              >
+                Approve as Match
+              </button>
+            </>
+          )}
         </div>
       </div>
 

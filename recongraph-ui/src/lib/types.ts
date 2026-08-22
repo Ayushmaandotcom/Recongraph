@@ -33,6 +33,9 @@ export interface ReviewPacket {
   gsts: RecordData[];
   explanation: ExplanationNode | null;
   competitors: any[];
+  ml_confidence?: number | null;
+  llm_explanation?: string | null;
+  llm_citation?: string | null;
 }
 
 export interface AutoMatch {

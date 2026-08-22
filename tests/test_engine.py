@@ -72,6 +72,7 @@ def test_conservation_hole_auto_match_leftovers():
     ]
     
     engine = ReconGraphEngine(config, providers)
+    engine.ml_filter.predict_confidence = lambda pr, gst, ctx=None: 0.99 # Mock to ensure AUTO_MATCH
     result = engine.reconcile([p1, p2], [g1])
     
     # We expect p1 and g1 to AUTO_MATCH.

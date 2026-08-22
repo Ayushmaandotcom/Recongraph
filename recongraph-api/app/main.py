@@ -6,6 +6,8 @@ import io
 import csv
 from decimal import Decimal
 from datetime import date
+import sqlite3
+import json
 from typing import Dict, Any
 
 from recongraph.domain.records import PurchaseRecord, GSTRecord
@@ -33,6 +35,28 @@ app.add_middleware(
 # In-memory store for runs (keyed by UUID)
 # In a real system, this would be a database (PostgreSQL/Redis)
 _runs_store: Dict[str, dict] = {}
+
+# Setup SQLite for HITL Feedback
+def init_db():
+    conn = sqlite3.connect('hitl_feedback.db')
+    c = conn.cursor()
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS feedback
+        (id INTEGER PRIMARY KEY AUTOINCREMENT,
+         packet_id TEXT,
+         action TEXT,
+         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+         payload TEXT)
+    ''')
+    conn.commit()
+    conn.close()
+
+init_db()
+
+class FeedbackRequest(BaseModel):
+    packet_id: str
+    action: str
+    payload: dict
 
 class RunResponse(BaseModel):
     run_id: str
@@ -111,6 +135,21 @@ async def get_run(run_id: str):
     if run_id not in _runs_store:
         raise HTTPException(status_code=404, detail="Run not found")
     return _runs_store[run_id]
+
+@app.post("/feedback")
+async def submit_feedback(feedback: FeedbackRequest):
+    try:
+        conn = sqlite3.connect('hitl_feedback.db')
+        c = conn.cursor()
+        c.execute(
+            "INSERT INTO feedback (packet_id, action, payload) VALUES (?, ?, ?)",
+            (feedback.packet_id, feedback.action, json.dumps(feedback.payload))
+        )
+        conn.commit()
+        conn.close()
+        return {"status": "success"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/demo")
 async def get_demo():

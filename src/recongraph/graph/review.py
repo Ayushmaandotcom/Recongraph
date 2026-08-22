@@ -39,6 +39,9 @@ class ReviewPacket:
     headline: str = ""
     highlight_regions: "tuple[BoundingBox, ...]" = ()
     ocr_warnings: tuple[str, ...] = ()
+    ml_confidence: float | None = None
+    llm_explanation: str | None = None
+    llm_citation: str | None = None
 
 
 from recongraph.domain.reliability.dimensions import ExtractionQuality
@@ -139,7 +142,10 @@ class ReviewPacketBuilder:
         self,
         decision: ReconciliationDecision,
         explanation: ExplanationArtifact | None,
-        graph: CandidateGraph
+        graph: CandidateGraph,
+        ml_confidence: float | None = None,
+        llm_explanation: str | None = None,
+        llm_citation: str | None = None
     ) -> ReviewPacket | None:
 
         if decision.action == DecisionAction.AUTO_MATCH:
@@ -181,7 +187,10 @@ class ReviewPacketBuilder:
             checklist=checklist,
             headline=headline,
             highlight_regions=highlight_regions,
-            ocr_warnings=ocr_warnings,
+            ocr_warnings=tuple(sorted(ocr_warnings)),
+            ml_confidence=ml_confidence,
+            llm_explanation=llm_explanation,
+            llm_citation=llm_citation
         )
 
     def build_single_leftover(self, urn: str, graph: CandidateGraph) -> ReviewPacket | None:
@@ -211,4 +220,6 @@ class ReviewPacketBuilder:
             headline=headline,
             highlight_regions=(),
             ocr_warnings=(),
+            ml_confidence=None,
+            llm_explanation=None,
         )
