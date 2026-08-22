@@ -1,47 +1,72 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
 @theme {
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-sans: var(--font-fira-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-fira-code), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  /* Custom Color Palette */
-  --color-background: #0f1115; /* Deep slate */
-  --color-surface: #181b21;
-  --color-surface-hover: #1e2229;
-  --color-surface-elevated: #232730;
-  
-  --color-primary: #3b82f6; /* Vibrant electric blue */
-  --color-primary-hover: #60a5fa;
-  --color-primary-muted: rgba(59, 130, 246, 0.15);
-  
-  --color-success: #10b981; /* Matches */
-  --color-success-muted: rgba(16, 185, 129, 0.15);
-  
-  --color-warning: #f59e0b; /* Amber for reviews */
-  --color-warning-muted: rgba(245, 158, 11, 0.15);
-  
-  --color-danger: #ef4444; /* Conflict */
-  --color-danger-muted: rgba(239, 68, 68, 0.15);
-  
-  --color-unknown: #4b5563; /* Grey for unknown/missing */
-  
-  --color-text: #f3f4f6;
-  --color-text-muted: #9ca3af;
-  
-  --color-border: #2d323e;
+  /* Toko reference theme (strawberry + matcha), dark variant */
+  --color-background: oklch(0.17 0 0); /* #121212 */
+  --color-foreground: oklch(0.97 0 0);
+  --color-card: oklch(0.19 0 0);
+  --color-card-foreground: oklch(0.97 0 0);
+  --color-popover: oklch(0.21 0 0);
+  --color-popover-foreground: oklch(0.97 0 0);
+  --color-primary: oklch(0.7 0.2 18); /* Strawberry */
+  --color-primary-foreground: oklch(0.99 0.01 100);
+  --color-secondary: oklch(0.22 0 0);
+  --color-secondary-foreground: oklch(0.97 0 0);
+  --color-muted: oklch(0.22 0 0);
+  --color-muted-foreground: oklch(0.62 0 0);
+  --color-accent: oklch(0.3 0.08 145 / 28%); /* Matcha wash */
+  --color-accent-foreground: oklch(0.82 0.15 145); /* Matcha green */
+  --color-destructive: oklch(0.704 0.191 22.216);
+  --color-border: oklch(1 0 0 / 12%);
+  --color-input: oklch(1 0 0 / 14%);
+  --color-ring: oklch(0.7 0.2 18);
+
+  /* Reconciliation status semantics */
+  --color-success: oklch(0.82 0.15 145); /* matcha green */
+  --color-success-muted: oklch(0.3 0.08 145 / 28%);
+  --color-warning: oklch(0.83 0.15 85); /* amber */
+  --color-warning-muted: oklch(0.35 0.08 85 / 25%);
+  --color-info: oklch(0.75 0.13 250); /* periwinkle — distinct from strawberry */
+  --color-info-muted: oklch(0.32 0.07 250 / 28%);
+
+  --radius-lg: 0.7rem;
 }
 
 @layer base {
   body {
     background-color: var(--color-background);
-    color: var(--color-text);
+    color: var(--color-foreground);
     font-family: var(--font-sans);
+  }
+
+  /* Visible keyboard focus on every interactive control (WCAG 2.2) */
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: oklch(0.7 0.2 18 / 28%);
   }
 }
 
 /* Custom utilities */
 .glass-panel {
-  background: rgba(24, 27, 33, 0.7);
-  backdrop-filter: blur(12px);
+  background: var(--color-card);
   border: 1px solid var(--color-border);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
