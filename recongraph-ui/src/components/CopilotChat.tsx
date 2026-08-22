@@ -117,6 +117,23 @@ export default function CopilotChat({ context }: CopilotChatProps) {
     );
   };
 
+  const renderContentWithPII = (content: string) => {
+    if (!content) return null;
+    // Split by our PII tokens e.g., <GSTIN_a1b2c3>
+    const parts = content.split(/(<[A-Z]+_[a-f0-9]+>)/g);
+    return parts.map((part, i) => {
+      if (part.match(/^<[A-Z]+_[a-f0-9]+>$/)) {
+        const type = part.substring(1, part.indexOf("_"));
+        return (
+          <span key={i} className="inline-block px-1.5 py-0.5 mx-0.5 bg-indigo-100 text-indigo-800 border border-indigo-200 rounded text-[10px] font-mono font-bold whitespace-nowrap">
+            🔒 {type}
+          </span>
+        );
+      }
+      return <span key={i}>{part}</span>;
+    });
+  };
+
   return (
     <>
       <button 
@@ -177,7 +194,9 @@ export default function CopilotChat({ context }: CopilotChatProps) {
                         : "bg-[var(--color-surface-elevated)] border border-[var(--color-border)] rounded-bl-none text-[var(--color-text)]"
                   }`}>
                     {m.abstained && <div className="font-bold text-red-700 mb-1 text-xs uppercase">⚠️ Copilot Abstained</div>}
-                    <div className="whitespace-pre-wrap leading-relaxed">{m.content}</div>
+                    <div className="whitespace-pre-wrap leading-relaxed">
+                      {m.role === "copilot" ? renderContentWithPII(m.content) : m.content}
+                    </div>
                     
                     {m.role === "copilot" && !m.abstained && renderConfidenceBadge(m.confidence)}
                     

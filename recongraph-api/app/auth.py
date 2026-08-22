@@ -50,3 +50,9 @@ async def require_auditor(current_user: dict = Depends(get_current_user)):
     if role not in ["admin", "auditor"]:
         raise HTTPException(status_code=403, detail="Auditor access required")
     return current_user
+
+async def require_viewer(current_user: dict = Depends(get_current_user)):
+    role = current_user.get("role")
+    if role not in ["admin", "auditor", "viewer"]:
+        raise HTTPException(status_code=403, detail="Viewer access required")
+    return current_user

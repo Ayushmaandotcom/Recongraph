@@ -20,7 +20,8 @@ from typing import List, Dict, Any, Optional
 from recongraph.learning.rag import get_rag_pipeline
 from recongraph.learning.query_router import classify_query, QueryType
 from recongraph.learning.confidence import compute_confidence, should_abstain
-from recongraph.learning.context_builder import build_context, generate_deterministic_response
+from recongraph.learning.context_builder import build_context
+from recongraph.learning.llm_provider import get_llm_provider, StructuredResponse
 from recongraph.learning.copilot_tools import (
     get_decision_trace, get_invoice_details, get_run_summary, get_supplier_history
 )
@@ -148,12 +149,29 @@ async def ask_copilot(query: CopilotQuery):
                 for m in query.conversation_history[-5:]
             ]
 
-        answer = generate_deterministic_response(
+        prompt_context = build_context(
             query=query.query,
             retrieved_documents=results,
             recon_context=recon_context,
-            abstained=abstained,
+            supplier_context=supplier_context,
+            conversation_history=conversation_history,
         )
+
+        llm = get_llm_provider("gemini")
+        
+        if abstained:
+            answer = (
+                "I don't have sufficient authoritative information to answer this "
+                "question confidently. Please consult the official GST portal or a "
+                "qualified tax professional for guidance on this specific matter."
+            )
+        else:
+            structured_resp = llm.generate_structured(
+                prompt=prompt_context,
+                response_model=StructuredResponse,
+                temperature=0.1
+            )
+            answer = structured_resp.answer
 
         # 7. Build structured citations
         citations = []

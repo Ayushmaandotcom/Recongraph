@@ -1,0 +1,27 @@
+[
+    {
+        "query": "What are the conditions for claiming Input Tax Credit?",
+        "expected_documents": ["CGST_ACT_S16_2"],
+        "query_type": "GST_KNOWLEDGE"
+    },
+    {
+        "query": "What is the time limit for claiming ITC for a financial year?",
+        "expected_documents": ["CGST_ACT_S16_4"],
+        "query_type": "GST_KNOWLEDGE"
+    },
+    {
+        "query": "What are blocked credits under GST?",
+        "expected_documents": ["CGST_ACT_S17_5"],
+        "query_type": "GST_KNOWLEDGE"
+    },
+    {
+        "query": "If I haven't paid my supplier within 180 days, what happens to the ITC?",
+        "expected_documents": ["CGST_RULE_37"],
+        "query_type": "GST_KNOWLEDGE"
+    },
+    {
+        "query": "How is input tax defined?",
+        "expected_documents": ["CGST_ACT_S2_62"],
+        "query_type": "GST_KNOWLEDGE"
+    }
+]

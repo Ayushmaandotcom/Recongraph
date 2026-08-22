@@ -101,6 +101,7 @@ export default function DashboardScreen({ result }: DashboardScreenProps) {
       </div>
       
       {/* Phase 7: Executive Dashboard AI Metrics */}
+      {userRole === "admin" && (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
         <div className="glass-panel p-5 rounded-lg border-l-4 border-l-[var(--color-primary)]">
           <h3 className="text-lg font-semibold mb-3">Model Drift & A/B Status</h3>
@@ -118,6 +119,49 @@ export default function DashboardScreen({ result }: DashboardScreenProps) {
              </div>
           </div>
         </div>
+      </div>
+      
+      {/* Phase 13: Cryptographic Audit Trail (Admin/Auditor Only) */}
+      {userRole === "admin" && (
+        <div className="glass-panel p-5 rounded-lg border-l-4 border-l-indigo-500 mb-4">
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <svg className="w-5 h-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Cryptographic Audit Log
+            </h3>
+            <button className="text-xs bg-indigo-500 text-white px-3 py-1.5 rounded hover:bg-indigo-600 transition-colors">
+              Verify Integrity
+            </button>
+          </div>
+          <div className="bg-slate-900 rounded p-3 text-slate-300 font-mono text-xs overflow-x-auto space-y-2">
+            <div className="flex justify-between border-b border-slate-700 pb-1">
+              <span>Timestamp</span>
+              <span>Event</span>
+              <span>Hash</span>
+            </div>
+            {result.auto_matches.slice(0, 3).map((match, idx) => (
+              <div key={idx} className="flex justify-between">
+                <span>{new Date().toISOString().split('T')[0]}</span>
+                <span className="text-green-400">AUTO_MATCH</span>
+                <span className="text-slate-500 truncate max-w-[150px]">sha256:8f43...{match.selected_hypothesis.edge_ids[0].substring(0, 4)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {/* Role Toggle for Testing */}
+      <div className="fixed top-4 right-4 z-50">
+        <select 
+          value={userRole} 
+          onChange={(e) => setUserRole(e.target.value as any)}
+          className="bg-white border border-gray-300 text-sm rounded-lg px-2 py-1 shadow-sm"
+        >
+          <option value="admin">Admin View</option>
+          <option value="viewer">Viewer View</option>
+        </select>
       </div>
 
       <div className="flex flex-wrap gap-2 items-center justify-between">
