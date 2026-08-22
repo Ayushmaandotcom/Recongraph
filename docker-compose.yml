@@ -24,6 +24,13 @@ services:
     volumes:
       - redis_data:/data
 
+  qdrant:
+    image: qdrant/qdrant:latest
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+
   api:
     build: 
       context: ./recongraph-api
@@ -76,3 +83,4 @@ services:
 volumes:
   postgres_data:
   redis_data:
+  qdrant_data:

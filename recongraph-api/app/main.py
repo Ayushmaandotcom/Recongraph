@@ -25,8 +25,12 @@ from recongraph.domain.vendor.context import VendorIdentityContext
 from recongraph.matching.reference_evidence import (
     build_reference_corpus_profile, ReferenceEvidenceContext, ReferenceEvidencePolicy,
 )
+from recongraph.learning.candidate_model import MLCandidateFilter
 
-app = FastAPI(title="ReconGraph API")
+# App Components
+from . import auth, copilot
+
+app = FastAPI(title="ReconGraph API", version="2.0.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -35,6 +39,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(auth.router)
+app.include_router(copilot.router)
 
 from contextvars import ContextVar
 request_id_var: ContextVar[str] = ContextVar("request_id", default="unknown")

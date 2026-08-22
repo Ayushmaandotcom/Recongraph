@@ -7,7 +7,7 @@ from typing import Optional, List, Dict, Any
 from rapidfuzz import fuzz
 
 try:
-    from lightgbm import LGBMRanker
+    from lightgbm import LGBMClassifier
     from sklearn.calibration import CalibratedClassifierCV
     from sklearn.isotonic import IsotonicRegression
     from sklearn.linear_model import LogisticRegression
@@ -48,37 +48,17 @@ def train_model(dataset_csv: Path):
             features = extract_features(pr, gst)
             label = row.get("label", "")
             y_val = 1 if label in ("EXACT_MATCH", "FUZZY_MATCH") else 0
-            packet_id = row.get("packet_id", "default_packet")
-            data.append((packet_id, features, y_val))
+            data.append((features, y_val))
             
-    # Sort by packet_id to group queries for ranking
-    data.sort(key=lambda x: x[0])
+    # Shuffle data to avoid alphabetized category splitting issues
+    import random
+    random.seed(42)
+    random.shuffle(data)
     
-    X = []
-    y = []
-    groups = []
-    current_packet = None
-    current_group_size = 0
+    X = np.array([x[0] for x in data])
+    y = np.array([x[1] for x in data])
     
-    for packet_id, features, y_val in data:
-        if packet_id != current_packet:
-            if current_packet is not None:
-                groups.append(current_group_size)
-            current_packet = packet_id
-            current_group_size = 0
-            
-        X.append(features)
-        y.append(y_val)
-        current_group_size += 1
-        
-    if current_group_size > 0:
-        groups.append(current_group_size)
-        
-    X = np.array(X)
-    y = np.array(y)
-    
-    # Temporal Split (Phase 7C)
-    # For now we'll do a simple 80/20 split assuming data is somewhat ordered
+    # 80/20 split
     split_idx = int(len(X) * 0.8)
     X_train, X_test = X[:split_idx], X[split_idx:]
     y_train, y_test = y[:split_idx], y[split_idx:]
@@ -86,33 +66,30 @@ def train_model(dataset_csv: Path):
     # MLflow Tracking
     mlflow.set_experiment("ReconGraph_Candidate_Filter")
     with mlflow.start_run():
-        # Phase 7D: Learning-to-Rank using LambdaMART
-        ranker = LGBMRanker(n_estimators=100, max_depth=5, random_state=42, verbose=-1)
-        # Note: We aren't doing strict group split for the test set in this mock, but we'd need to in prod
-        # Just fitting on everything for the artifact
-        ranker.fit(X, y, group=groups)
+        # Use LGBMClassifier for pointwise binary classification
+        classifier = LGBMClassifier(n_estimators=100, max_depth=5, random_state=42, verbose=-1)
+        classifier.fit(X_train, y_train)
         
-        # Phase 7E: Calibration (Platt vs Isotonic)
-        scores = ranker.predict(X)
+        # Calibration (Platt vs Isotonic)
+        scores = classifier.predict_proba(X_train)[:, 1]
         
-        # Isotonic
         iso_calibrator = IsotonicRegression(out_of_bounds='clip')
-        iso_calibrator.fit(scores, y)
+        iso_calibrator.fit(scores, y_train)
         
         # Log params & metrics
-        preds_test = ranker.predict(X_test)
-        acc_test = np.mean((preds_test > 0) == y_test)
+        preds_test = classifier.predict(X_test)
+        acc_test = np.mean(preds_test == y_test)
         
         mlflow.log_param("n_estimators", 100)
         mlflow.log_param("max_depth", 5)
-        mlflow.log_param("model_type", "LGBMRanker")
+        mlflow.log_param("model_type", "LGBMClassifier")
         mlflow.log_param("calibration_method", "isotonic")
         mlflow.log_metric("test_accuracy", acc_test)
         
         MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
-        # Save both ranker and calibrator
+        # Save both classifier and calibrator
         model_artifact = {
-            "ranker": ranker,
+            "classifier": classifier,
             "calibrator": iso_calibrator
         }
         joblib.dump(model_artifact, MODEL_PATH)
@@ -125,7 +102,10 @@ class MLCandidateFilter:
         self.calibrator = None
         if model_path.exists():
             artifact = joblib.load(model_path)
-            if isinstance(artifact, dict) and "ranker" in artifact:
+            if isinstance(artifact, dict) and "classifier" in artifact:
+                self.model = artifact["classifier"]
+                self.calibrator = artifact["calibrator"]
+            elif isinstance(artifact, dict) and "ranker" in artifact:
                 self.model = artifact["ranker"]
                 self.calibrator = artifact["calibrator"]
             else:
@@ -137,13 +117,17 @@ class MLCandidateFilter:
             
         features = extract_features(pr, gstr2b, graph_context)
         
-        if hasattr(self.model, "predict_proba"): # Legacy LGBMClassifier
-            probs = self.model.predict_proba([features])
-            return float(probs[0][1])
-        else: # LGBMRanker
+        if hasattr(self.model, "predict_proba"):
+            score = self.model.predict_proba([features])[0][1]
+        else:
             score = self.model.predict([features])[0]
+            
+        if self.calibrator:
             prob = self.calibrator.transform([score])[0]
-            return float(prob)
+        else:
+            prob = score
+            
+        return float(prob)
             
     def rank_candidates(self, pr: PurchaseRecord, candidates: List[GSTRecord], graph_contexts: List[dict]) -> List[float]:
         if not self.model or not candidates:
@@ -152,12 +136,16 @@ class MLCandidateFilter:
         X = [extract_features(pr, c, ctx) for c, ctx in zip(candidates, graph_contexts)]
         
         if hasattr(self.model, "predict_proba"):
-            probs = self.model.predict_proba(X)
-            return [float(p[1]) for p in probs]
+            scores = self.model.predict_proba(X)[:, 1]
         else:
             scores = self.model.predict(X)
+            
+        if self.calibrator:
             probs = self.calibrator.transform(scores)
-            return [float(p) for p in probs]
+        else:
+            probs = scores
+            
+        return [float(p) for p in probs]
 
 if __name__ == "__main__":
     train_model(Path("datasets/ai_production/master_dataset.csv"))

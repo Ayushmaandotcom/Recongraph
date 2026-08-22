@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { ReconciliationResult, ReviewPacket } from "@/lib/types";
 import ReviewQueue from "./ReviewQueue";
 import PacketDetail from "./PacketDetail";
+import CopilotChat from "./CopilotChat";
 
 interface DashboardScreenProps {
   result: ReconciliationResult;
@@ -11,6 +12,7 @@ interface DashboardScreenProps {
 
 export default function DashboardScreen({ result }: DashboardScreenProps) {
   const [selectedPacket, setSelectedPacket] = useState<ReviewPacket | null>(null);
+  const [copilotContext, setCopilotContext] = useState<{ packetId?: string, runId?: string }>({});
 
   // Derive stats
   const totalAuto = result.auto_matches.length;
@@ -37,7 +39,11 @@ export default function DashboardScreen({ result }: DashboardScreenProps) {
   const matchRate = totalIn > 0 ? ((totalAuto * 2) / totalIn * 100).toFixed(1) : "0.0";
 
   if (selectedPacket) {
-    return <PacketDetail packet={selectedPacket} onBack={() => setSelectedPacket(null)} />;
+    return <PacketDetail 
+      packet={selectedPacket} 
+      onBack={() => setSelectedPacket(null)} 
+      onAskCopilot={(packetId) => setCopilotContext({ packetId, runId: (result as any).run_id })}
+    />;
   }
 
   return (
@@ -102,6 +108,8 @@ export default function DashboardScreen({ result }: DashboardScreenProps) {
       {/* Review Queue */}
       <ReviewQueue packets={result.review_packets} onSelectPacket={setSelectedPacket} />
       
+      {/* AI Copilot */}
+      <CopilotChat context={copilotContext} />
     </div>
   );
 }

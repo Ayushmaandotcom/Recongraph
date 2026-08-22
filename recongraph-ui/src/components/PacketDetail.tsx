@@ -9,9 +9,10 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 interface PacketDetailProps {
   packet: ReviewPacket;
   onBack: () => void;
+  onAskCopilot?: (packetId: string) => void;
 }
 
-export default function PacketDetail({ packet, onBack }: PacketDetailProps) {
+export default function PacketDetail({ packet, onBack, onAskCopilot }: PacketDetailProps) {
   // Try to find the leading hypothesis to display its signals
   const hyp = packet.competitors?.[0];
   const signals: Record<string, number | null> = {
@@ -79,6 +80,14 @@ export default function PacketDetail({ packet, onBack }: PacketDetailProps) {
           <p className="text-lg text-[var(--color-text-muted)] mt-1">{packet.headline}</p>
         </div>
         <div className="ml-auto flex items-center gap-3">
+          {onAskCopilot && (
+            <button
+              onClick={() => onAskCopilot(packet.packet_id)}
+              className="mr-2 px-3 py-1.5 rounded-full bg-[var(--color-primary)]/10 text-[var(--color-primary)] border border-[var(--color-primary)]/20 hover:bg-[var(--color-primary)]/20 transition-colors text-sm font-semibold flex items-center gap-2"
+            >
+              🤖 Ask Copilot
+            </button>
+          )}
           {typeof packet.ml_confidence === "number" && (
             <div className="flex items-center gap-4 mr-4">
               <div className="flex flex-col items-end">
