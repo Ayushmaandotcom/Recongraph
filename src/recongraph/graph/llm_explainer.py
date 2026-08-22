@@ -25,10 +25,11 @@ class DocumentRetriever:
             self.client = QdrantClient(":memory:")
             
             # Setup collection
-            self.client.recreate_collection(
-                collection_name="gst_rules",
-                vectors_config=VectorParams(size=384, distance=Distance.COSINE)
-            )
+            if not self.client.collection_exists(collection_name="gst_rules"):
+                self.client.create_collection(
+                    collection_name="gst_rules",
+                    vectors_config=VectorParams(size=384, distance=Distance.COSINE)
+                )
             
             # GST laws
             self.laws = [
@@ -73,11 +74,11 @@ class DocumentRetriever:
             return "Section 16(2) of CGST Act..."
             
         vector = self.model.encode(diffs).tolist()
-        hits = self.client.search(
+        hits = self.client.query_points(
             collection_name="gst_rules",
-            query_vector=vector,
+            query=vector,
             limit=1
-        )
+        ).points
         if hits:
             return hits[0].payload["text"]
         return "No specific rule found."

@@ -42,6 +42,7 @@ class ReviewPacket:
     ml_confidence: float | None = None
     llm_explanation: str | None = None
     llm_citation: str | None = None
+    ai_provenance: dict | None = None
 
 
 from recongraph.domain.reliability.dimensions import ExtractionQuality
@@ -145,7 +146,8 @@ class ReviewPacketBuilder:
         graph: CandidateGraph,
         ml_confidence: float | None = None,
         llm_explanation: str | None = None,
-        llm_citation: str | None = None
+        llm_citation: str | None = None,
+        ai_provenance: dict | None = None
     ) -> ReviewPacket | None:
 
         if decision.action == DecisionAction.AUTO_MATCH:
@@ -190,7 +192,8 @@ class ReviewPacketBuilder:
             ocr_warnings=tuple(sorted(ocr_warnings)),
             ml_confidence=ml_confidence,
             llm_explanation=llm_explanation,
-            llm_citation=llm_citation
+            llm_citation=llm_citation,
+            ai_provenance=ai_provenance
         )
 
     def build_single_leftover(self, urn: str, graph: CandidateGraph) -> ReviewPacket | None:

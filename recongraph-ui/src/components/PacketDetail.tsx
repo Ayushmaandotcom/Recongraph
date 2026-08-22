@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { ReviewPacket, ExplanationNode } from "@/lib/types";
+import ReactMarkdown from "react-markdown";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -78,6 +79,14 @@ export default function PacketDetail({ packet, onBack }: PacketDetailProps) {
           <p className="text-lg text-[var(--color-text-muted)] mt-1">{packet.headline}</p>
         </div>
         <div className="ml-auto flex items-center gap-3">
+          {typeof packet.ml_confidence === "number" && (
+            <div className="flex flex-col items-end mr-4">
+              <span className="text-xs uppercase tracking-wider text-[var(--color-text-muted)] font-semibold">AI Confidence</span>
+              <span className={`text-sm font-bold font-mono px-2 py-0.5 rounded mt-1 ${packet.ml_confidence >= 0.85 ? 'bg-green-100 text-green-800 border-green-300' : packet.ml_confidence >= 0.50 ? 'bg-yellow-100 text-yellow-800 border-yellow-300' : 'bg-red-100 text-red-800 border-red-300'} border`}>
+                {(packet.ml_confidence * 100).toFixed(1)}%
+              </span>
+            </div>
+          )}
           {feedbackStatus ? (
             <span className="text-sm text-[var(--color-success)] font-medium">{feedbackStatus}</span>
           ) : (
@@ -197,10 +206,26 @@ export default function PacketDetail({ packet, onBack }: PacketDetailProps) {
             </div>
             
             <div className="mt-6 pt-6 border-t border-[var(--color-border)]">
-              <h4 className="text-sm font-semibold uppercase tracking-wider text-[var(--color-text-muted)] mb-3">Explanation Trajectory</h4>
-              <div className="text-sm bg-[var(--color-surface-hover)] p-4 rounded border border-[var(--color-border)] whitespace-pre-wrap font-mono text-[var(--color-text-muted)] leading-relaxed">
+              <h4 className="text-sm font-semibold uppercase tracking-wider text-[var(--color-text-muted)] mb-3">AI Legal & Contextual Explanation</h4>
+              <div className="text-sm bg-[var(--color-surface-hover)] p-4 rounded border border-[var(--color-border)] text-[var(--color-text)] leading-relaxed prose prose-sm prose-invert max-w-none">
+                {packet.llm_explanation ? (
+                  <ReactMarkdown>{packet.llm_explanation}</ReactMarkdown>
+                ) : (
+                  <span className="text-[var(--color-text-muted)] italic">No AI explanation provided for this packet.</span>
+                )}
+              </div>
+              {packet.llm_citation && (
+                <div className="mt-3 p-3 bg-[var(--color-surface)] border border-[var(--color-border)] rounded text-xs text-[var(--color-text-muted)]">
+                  <span className="font-semibold text-[var(--color-text)] block mb-1">Citations & Retrieval Trace:</span>
+                  <div className="font-mono whitespace-pre-wrap">{packet.llm_citation}</div>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-6 pt-6 border-t border-[var(--color-border)]">
+              <h4 className="text-sm font-semibold uppercase tracking-wider text-[var(--color-text-muted)] mb-3">Deterministic Engine Trajectory</h4>
+              <div className="text-sm bg-[var(--color-surface-hover)] p-4 rounded border border-[var(--color-border)] whitespace-pre-wrap font-mono text-[var(--color-text-muted)] leading-relaxed h-48 overflow-y-auto">
                 {packet.explanation ? (
-                  // Deep traversal of the explanation tree for the demo
                   JSON.stringify(packet.explanation, null, 2)
                 ) : (
                   "Engine rationale is logged in the Trace."

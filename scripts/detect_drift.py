@@ -9,21 +9,15 @@ from recongraph.learning.candidate_model import extract_features
 from evidently import Report
 from evidently.presets import DataDriftPreset
 
+from recongraph.learning.features import extract_features
+
 def build_feature_df(dataset_csv: Path) -> pd.DataFrame:
     features_list = []
     with open(dataset_csv, "r") as f:
         reader = csv.DictReader(f)
         for row in reader:
             feats = extract_features(row, row)
-            features_list.append({
-                "invoice_similarity": feats[0],
-                "date_difference_days": feats[1],
-                "tax_difference": feats[2],
-                "gstin_exact_match": feats[3],
-                "pr_node_degree": feats[4],
-                "gst_node_degree": feats[5],
-                "component_size": feats[6]
-            })
+            features_list.append(feats)
     return pd.DataFrame(features_list)
 
 def detect_drift():
