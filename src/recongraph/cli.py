@@ -41,11 +41,6 @@ def main() -> None:
 
 def _cmd_reconcile(args: argparse.Namespace) -> None:
     """Run the engine against two CSVs and write results to JSON."""
-    import csv
-    from decimal import Decimal
-    from datetime import date
-
-    from recongraph.domain.records import PurchaseRecord, GSTRecord
     from recongraph.config import ReconGraphConfig
     from recongraph.engine import ReconGraphEngine
     from recongraph.plugins.core_providers import (
@@ -68,41 +63,11 @@ def _cmd_reconcile(args: argparse.Namespace) -> None:
         print(f"ERROR: GST file not found: {gst_path}", file=sys.stderr)
         sys.exit(1)
 
-    # Load purchases
-    purchases: list[PurchaseRecord] = []
-    with purchases_path.open(newline="", encoding="utf-8") as f:
-        for row in csv.DictReader(f):
-            try:
-                purchases.append(PurchaseRecord(
-                    record_id=row.get("record_id") or row.get("id", ""),
-                    vendor_name=row.get("vendor_name") or row.get("supplier_name") or None,
-                    reference=row.get("reference") or row.get("invoice_number") or None,
-                    amount=Decimal(str(row.get("amount", "0"))),
-                    record_date=date.fromisoformat(
-                        row.get("record_date") or row.get("invoice_date", "2000-01-01")
-                    ),
-                    tax_identity=row.get("gstin") or row.get("tax_identity") or None,
-                ))
-            except Exception as e:
-                print(f"WARNING: skipping purchase row {row}: {e}", file=sys.stderr)
+    # Load purchases and GST records (shared extended CSV parser)
+    from recongraph.compliance.csv_parsing import parse_purchase_csv, parse_gst_csv
 
-    # Load GST records
-    gsts: list[GSTRecord] = []
-    with gst_path.open(newline="", encoding="utf-8") as f:
-        for row in csv.DictReader(f):
-            try:
-                gsts.append(GSTRecord(
-                    record_id=row.get("record_id") or row.get("id", ""),
-                    vendor_name=row.get("supplier_name") or row.get("vendor_name") or None,
-                    reference=row.get("reference") or row.get("invoice_number") or None,
-                    amount=Decimal(str(row.get("amount", "0"))),
-                    record_date=date.fromisoformat(
-                        row.get("record_date") or row.get("invoice_date", "2000-01-01")
-                    ),
-                    tax_identity=row.get("gstin") or row.get("tax_identity") or None,
-                ))
-            except Exception as e:
-                print(f"WARNING: skipping GST row {row}: {e}", file=sys.stderr)
+    purchases = parse_purchase_csv(purchases_path.read_text(encoding="utf-8"))
+    gsts = parse_gst_csv(gst_path.read_text(encoding="utf-8"))
 
     if not purchases:
         print("ERROR: no purchase records loaded", file=sys.stderr)
