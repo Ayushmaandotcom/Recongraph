@@ -221,7 +221,7 @@ export default function PacketDetail({ packet, onBack }: PacketDetailProps) {
             
             <div className="mt-6 pt-6 border-t border-[var(--color-border)]">
               <h4 className="text-sm font-semibold uppercase tracking-wider text-[var(--color-text-muted)] mb-3">AI Legal & Contextual Explanation</h4>
-              <div className="text-sm bg-[var(--color-surface-hover)] p-4 rounded border border-[var(--color-border)] text-[var(--color-text)] leading-relaxed prose prose-sm prose-invert max-w-none">
+              <div className="text-sm bg-[var(--color-surface-hover)] p-4 rounded border border-[var(--color-border)] text-[var(--color-text)] leading-relaxed max-w-none">
                 {packet.llm_explanation ? (
                   <ReactMarkdown>{packet.llm_explanation}</ReactMarkdown>
                 ) : (

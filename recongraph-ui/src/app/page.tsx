@@ -14,12 +14,34 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
+  let _tokenCache: string | null = null;
+  const getAuthToken = async () => {
+    if (_tokenCache) return _tokenCache;
+    const form = new URLSearchParams();
+    form.append("username", "admin");
+    form.append("password", "admin");
+    try {
+      const res = await fetch(`${API_URL}/token`, { method: "POST", body: form });
+      if (res.ok) {
+        const data = await res.json();
+        _tokenCache = data.access_token;
+        return _tokenCache;
+      }
+    } catch (e) {
+      console.warn("Failed to get auth token", e);
+    }
+    return "";
+  };
+
   const handleDemoLoad = async () => {
     setIsLoading(true);
     try {
       // 1. Try backend first (FastAPI)
+      const token = await getAuthToken();
       try {
-        const res = await fetch(`${API_URL}/demo`);
+        const res = await fetch(`${API_URL}/demo`, {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
         if (res.ok) {
           const data = await res.json();
           setResult(data);
@@ -54,8 +76,11 @@ export default function Home() {
       form.append("purchases", purchaseFile);
       form.append("gsts", gstFile);
 
+      const token = await getAuthToken();
+      
       const reconcileRes = await fetch(`${API_URL}/reconcile`, {
         method: "POST",
+        headers: { "Authorization": `Bearer ${token}` },
         body: form,
       });
 
@@ -66,13 +91,26 @@ export default function Home() {
 
       const { run_id } = await reconcileRes.json();
 
-      // 2. Fetch the finished result.
-      const runRes = await fetch(`${API_URL}/runs/${run_id}`);
-      if (!runRes.ok) {
-        throw new Error(`Could not retrieve run ${run_id} (${runRes.status})`);
+      // 2. Poll the finished result.
+      let runData = null;
+      while (true) {
+        const runRes = await fetch(`${API_URL}/runs/${run_id}`, {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (!runRes.ok) {
+          throw new Error(`Could not retrieve run ${run_id} (${runRes.status})`);
+        }
+        runData = await runRes.json();
+        if (runData.status === "success") {
+          setResult(runData.result);
+          break;
+        } else if (runData.status === "failed") {
+          throw new Error(runData.message || "Reconciliation job failed internally.");
+        }
+        
+        // Wait 1 second before polling again
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
-      const data = await runRes.json();
-      setResult(data);
 
     } catch (error) {
       console.error("Error running reconciliation:", error);

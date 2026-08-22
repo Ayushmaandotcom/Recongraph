@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, File, UploadFile, HTTPException, BackgroundTasks, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uuid
@@ -174,6 +174,27 @@ def _parse_csv(content: str, is_purchase: bool) -> list:
             pass
     return records
 
+from fastapi.security import OAuth2PasswordRequestForm
+from app.auth import create_access_token, get_current_user, require_admin, require_auditor
+from datetime import timedelta
+
+@app.post("/token")
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+    # Mock user database for Phase 8 demonstration
+    if form_data.username == "admin" and form_data.password == "admin":
+        role = "admin"
+    elif form_data.username == "auditor" and form_data.password == "auditor":
+        role = "auditor"
+    else:
+        raise HTTPException(status_code=401, detail="Incorrect username or password")
+        
+    access_token_expires = timedelta(minutes=60*24)
+    access_token = create_access_token(
+        data={"sub": form_data.username, "role": role, "tenant_id": "tenant-001"},
+        expires_delta=access_token_expires
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
 @app.get("/health")
 async def health_check():
     return {"status": "ok"}
@@ -188,10 +209,43 @@ async def version_check():
     from recongraph.engine import ReconGraphEngine
     return {"version": ReconGraphEngine.VERSION}
 
+def _run_reconciliation_task(run_id: str, p_content: str, g_content: str):
+    try:
+        _runs_store[run_id] = {"status": "processing", "message": "Parsing CSV and generating graphs"}
+        P = _parse_csv(p_content, True)
+        G = _parse_csv(g_content, False)
+        
+        if not P or not G:
+            _runs_store[run_id] = {"status": "failed", "message": "One or both CSV files were empty or unparseable."}
+            return
+            
+        corpus = build_reference_corpus_profile([r.reference for r in P + G]) # type: ignore
+        ref_ctx = ReferenceEvidenceContext(corpus, ReferenceEvidencePolicy())
+        vendor_ctx = VendorIdentityContext(corpus_profile=None)
+        
+        providers = [
+            FinancialEvidenceProvider(),
+            TemporalEvidenceProvider(),
+            TaxEvidenceProvider(),
+            VendorEvidenceProvider(vendor_ctx),
+            ReferenceEvidenceProvider(ref_ctx),
+        ]
+        
+        _runs_store[run_id] = {"status": "processing", "message": "Engine running hypothesis search"}
+        engine = ReconGraphEngine(config=ReconGraphConfig(), providers=providers)
+        result = engine.reconcile(P, G)
+        
+        _runs_store[run_id] = {"status": "success", "result": result.to_dict()}
+    except Exception as e:
+        logger.error(f"Reconciliation task {run_id} failed: {e}")
+        _runs_store[run_id] = {"status": "failed", "message": str(e)}
+
 @app.post("/reconcile", response_model=RunResponse)
 async def reconcile(
     purchases: UploadFile = File(...),
-    gsts: UploadFile = File(...)
+    gsts: UploadFile = File(...),
+    background_tasks: BackgroundTasks = None,
+    current_user: dict = Depends(require_auditor)
 ):
     MAX_CSV_SIZE = 10 * 1024 * 1024 # 10 MB limit for security (7Q)
     
@@ -208,43 +262,79 @@ async def reconcile(
         p_content = p_content_bytes.decode("utf-8")
         g_content = g_content_bytes.decode("utf-8")
         
-        P = _parse_csv(p_content, True)
-        G = _parse_csv(g_content, False)
-        
-        if not P or not G:
-            raise HTTPException(status_code=400, detail="One or both CSV files were empty or unparseable.")
-            
-        corpus = build_reference_corpus_profile([r.reference for r in P + G]) # type: ignore
-        ref_ctx = ReferenceEvidenceContext(corpus, ReferenceEvidencePolicy())
-        vendor_ctx = VendorIdentityContext(corpus_profile=None)
-        
-        providers = [
-            FinancialEvidenceProvider(),
-            TemporalEvidenceProvider(),
-            TaxEvidenceProvider(),
-            VendorEvidenceProvider(vendor_ctx),
-            ReferenceEvidenceProvider(ref_ctx),
-        ]
-        
-        engine = ReconGraphEngine(config=ReconGraphConfig(), providers=providers)
-        result = engine.reconcile(P, G)
-        
         run_id = str(uuid.uuid4())
-        _runs_store[run_id] = result.to_dict()
+        _runs_store[run_id] = {"status": "queued", "message": "Job queued for background processing"}
         
-        return RunResponse(run_id=run_id, status="success", message="Reconciliation complete")
+        if background_tasks:
+            background_tasks.add_task(_run_reconciliation_task, run_id, p_content, g_content)
+        else:
+            # Fallback if somehow not provided
+            _run_reconciliation_task(run_id, p_content, g_content)
+        
+        return RunResponse(run_id=run_id, status="queued", message="Job dispatched successfully")
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/runs/{run_id}")
-async def get_run(run_id: str):
+async def get_run(run_id: str, current_user: dict = Depends(require_auditor)):
     if run_id not in _runs_store:
         raise HTTPException(status_code=404, detail="Run not found")
     return _runs_store[run_id]
 
+from fastapi.responses import StreamingResponse
+import io
+import csv
+
+@app.get("/export/{run_id}")
+async def export_run_csv(run_id: str, current_user: dict = Depends(require_auditor)):
+    if run_id not in _runs_store:
+        raise HTTPException(status_code=404, detail="Run not found")
+        
+    run_data = _runs_store[run_id]
+    if run_data.get("status") != "success":
+        raise HTTPException(status_code=400, detail="Run not completed yet")
+        
+    result = run_data.get("result", {})
+    packets = result.get("packets", [])
+    
+    output = io.StringIO()
+    writer = csv.writer(output)
+    
+    # Write header
+    writer.writerow([
+        "Packet ID", "Decision", "Polarity", "Missing PR Count", "Missing GST Count", 
+        "PR Total", "GST Total", "Champion Confidence", "Challenger Confidence"
+    ])
+    
+    # Write rows
+    for p in packets:
+        decision = p.get("decision", "UNKNOWN")
+        polarity = p.get("polarity", "NONE")
+        missing_pr = len(p.get("missing_evidence", {}).get("missing_in_pr", []))
+        missing_gst = len(p.get("missing_evidence", {}).get("missing_in_gstr2b", []))
+        
+        pr_total = sum(float(r.get("amount", 0)) for r in p.get("purchase_records", []))
+        gst_total = sum(float(r.get("amount", 0)) for r in p.get("gst_records", []))
+        
+        champ_conf = p.get("ai_provenance", {}).get("champion_confidence", 0)
+        chall_conf = p.get("ai_provenance", {}).get("challenger_confidence", 0)
+        
+        writer.writerow([
+            p.get("packet_id"), decision, polarity, missing_pr, missing_gst,
+            pr_total, gst_total, champ_conf, chall_conf
+        ])
+        
+    output.seek(0)
+    
+    return StreamingResponse(
+        iter([output.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename=recongraph_audit_{run_id}.csv"}
+    )
+
 @app.post("/feedback")
-async def submit_feedback(feedback: FeedbackRequest):
+async def submit_feedback(feedback: FeedbackRequest, current_user: dict = Depends(require_auditor)):
     try:
         conn = sqlite3.connect('hitl_feedback.db')
         c = conn.cursor()
