@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-contradictions-2301",
+    "vendor_name": "Supplier Corp 2301",
+    "reference": "INV-12301",
+    "amount": "8603.5",
+    "record_date": "2023-10-14",
+    "tax_identity": "27AAAAA3301A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-contradictions-2301",
+    "vendor_name": "Supplier Corp 2301",
+    "reference": "INV-12301",
+    "amount": "17207.00",
+    "record_date": "2023-10-14",
+    "tax_identity": "27AAAAA3301A1Z5"
+  },
+  "label": "CONTRADICTION"
+}

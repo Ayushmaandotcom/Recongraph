@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-duplicates-2335",
+    "vendor_name": "Supplier LLC 2335",
+    "reference": "INV-12335",
+    "amount": "1594.0",
+    "record_date": "2023-03-26",
+    "tax_identity": "27AAAAA3335A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-duplicates-2335",
+    "vendor_name": "Supplier LLC 2335",
+    "reference": "INV-12335",
+    "amount": "1594.0",
+    "record_date": "2023-03-26",
+    "tax_identity": "27AAAAA3335A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

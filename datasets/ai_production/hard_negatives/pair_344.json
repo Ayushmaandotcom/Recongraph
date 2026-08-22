@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-hard_negatives-344",
+    "vendor_name": "Supplier Ltd 344",
+    "reference": "INV-10344",
+    "amount": "41572.41",
+    "record_date": "2023-12-16",
+    "tax_identity": "27AAAAA1344A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-hard_negatives-344",
+    "vendor_name": "Different Supplier Inc",
+    "reference": "INV-10344",
+    "amount": "41572.41",
+    "record_date": "2023-12-16",
+    "tax_identity": "27BBBBB1234B1Z5"
+  },
+  "label": "NO_MATCH"
+}

@@ -1,0 +1,12 @@
+{
+  "pr": {
+    "record_id": "PR-missing-1600",
+    "vendor_name": "Supplier Ltd 1600",
+    "reference": "INV-11600",
+    "amount": "13774.42",
+    "record_date": "2023-02-27",
+    "tax_identity": "27AAAAA2600A1Z5"
+  },
+  "gst": null,
+  "label": "NO_MATCH"
+}

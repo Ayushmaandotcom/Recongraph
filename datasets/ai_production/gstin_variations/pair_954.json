@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-gstin_variations-954",
+    "vendor_name": "Supplier LLC 954",
+    "reference": "INV-10954",
+    "amount": "29250.08",
+    "record_date": "2023-10-19",
+    "tax_identity": "27AAAAA1954A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-gstin_variations-954",
+    "vendor_name": "Supplier LLC 954",
+    "reference": "INV-10954",
+    "amount": "29250.08",
+    "record_date": "2023-10-19",
+    "tax_identity": "27AAAAA1954A1ZX"
+  },
+  "label": "NO_MATCH"
+}

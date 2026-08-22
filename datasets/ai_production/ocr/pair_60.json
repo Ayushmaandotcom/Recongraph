@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-ocr-60",
+    "vendor_name": "Supplier Ltd 60",
+    "reference": "INV-10060",
+    "amount": "35837.97",
+    "record_date": "2023-04-09",
+    "tax_identity": "27AAAAA1060A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-ocr-60",
+    "vendor_name": "Supplier Ltd 60",
+    "reference": "INV-IOO6O",
+    "amount": "35837.98",
+    "record_date": "2023-04-09",
+    "tax_identity": "27AAAAA1060A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

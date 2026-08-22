@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-duplicates-1372",
+    "vendor_name": "Supplier LLC 1372",
+    "reference": "INV-11372",
+    "amount": "28405.47",
+    "record_date": "2023-06-11",
+    "tax_identity": "27AAAAA2372A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-duplicates-1372",
+    "vendor_name": "Supplier LLC 1372",
+    "reference": "INV-11372",
+    "amount": "28405.47",
+    "record_date": "2023-06-11",
+    "tax_identity": "27AAAAA2372A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-adversarial-2005",
+    "vendor_name": "Supplier Ltd 2005",
+    "reference": "INV-12005",
+    "amount": "43666.56",
+    "record_date": "2023-02-01",
+    "tax_identity": "27AAAAA3005A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-adversarial-2005",
+    "vendor_name": "Supplier Ltd 2005",
+    "reference": "INV-12005",
+    "amount": "43666.56",
+    "record_date": "2023-02-01",
+    "tax_identity": "27AAAAA3005A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

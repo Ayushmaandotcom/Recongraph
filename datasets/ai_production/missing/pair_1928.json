@@ -1,0 +1,12 @@
+{
+  "pr": {
+    "record_id": "PR-missing-1928",
+    "vendor_name": "Supplier Corp 1928",
+    "reference": "INV-11928",
+    "amount": "38203.09",
+    "record_date": "2023-11-09",
+    "tax_identity": "27AAAAA2928A1Z5"
+  },
+  "gst": null,
+  "label": "NO_MATCH"
+}

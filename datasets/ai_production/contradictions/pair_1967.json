@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-contradictions-1967",
+    "vendor_name": "Supplier Ltd 1967",
+    "reference": "INV-11967",
+    "amount": "18948.1",
+    "record_date": "2023-08-15",
+    "tax_identity": "27AAAAA2967A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-contradictions-1967",
+    "vendor_name": "Supplier Ltd 1967",
+    "reference": "INV-11967",
+    "amount": "37896.20",
+    "record_date": "2023-08-15",
+    "tax_identity": "27AAAAA2967A1Z5"
+  },
+  "label": "CONTRADICTION"
+}

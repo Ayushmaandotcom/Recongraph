@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-date_variations-2140",
+    "vendor_name": "Supplier LLC 2140",
+    "reference": "INV-12140",
+    "amount": "2140.37",
+    "record_date": "2023-01-22",
+    "tax_identity": "27AAAAA3140A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-date_variations-2140",
+    "vendor_name": "Supplier LLC 2140",
+    "reference": "INV-12140",
+    "amount": "2140.37",
+    "record_date": "2023-01-21",
+    "tax_identity": "27AAAAA3140A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

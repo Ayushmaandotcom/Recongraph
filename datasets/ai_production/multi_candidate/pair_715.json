@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-multi_candidate-715",
+    "vendor_name": "Supplier Corp 715",
+    "reference": "INV-10715",
+    "amount": "14060.82",
+    "record_date": "2023-03-14",
+    "tax_identity": "27AAAAA1715A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-multi_candidate-715",
+    "vendor_name": "Supplier Corp 715",
+    "reference": "INV-10715",
+    "amount": "14060.82",
+    "record_date": "2023-03-14",
+    "tax_identity": "27AAAAA1715A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

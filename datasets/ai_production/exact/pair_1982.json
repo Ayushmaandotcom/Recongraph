@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-exact-1982",
+    "vendor_name": "Supplier Corp 1982",
+    "reference": "INV-11982",
+    "amount": "28959.26",
+    "record_date": "2023-11-27",
+    "tax_identity": "27AAAAA2982A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-exact-1982",
+    "vendor_name": "Supplier Corp 1982",
+    "reference": "INV-11982",
+    "amount": "28959.26",
+    "record_date": "2023-11-27",
+    "tax_identity": "27AAAAA2982A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

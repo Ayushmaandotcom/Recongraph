@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-gstin_variations-2087",
+    "vendor_name": "Supplier Corp 2087",
+    "reference": "INV-12087",
+    "amount": "13625.59",
+    "record_date": "2023-02-02",
+    "tax_identity": "27AAAAA3087A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-gstin_variations-2087",
+    "vendor_name": "Supplier Corp 2087",
+    "reference": "INV-12087",
+    "amount": "13625.59",
+    "record_date": "2023-02-02",
+    "tax_identity": "27AAAAA3087A1ZX"
+  },
+  "label": "NO_MATCH"
+}

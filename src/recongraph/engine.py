@@ -26,7 +26,7 @@ from recongraph.graph.fusion_result import FusionResult
 from recongraph.plugins.provider_v2 import EvidenceContributionV2, EvidenceProviderV2
 import dataclasses
 from recongraph.learning.candidate_model import MLCandidateFilter
-from recongraph.graph.llm_explainer import LLMExplainer
+from recongraph.learning.llm_explainer import LLMExplainer
 
 @dataclass(frozen=True)
 class ReconciliationResult:
@@ -265,40 +265,32 @@ class ReconGraphEngine:
                             has_conflict = any(e.polarity in (AssertionPolarity.CONFLICT, AssertionPolarity.CONTRADICT) for e in target_hypothesis.hypothesis.evidence)
                             
                         if decision.action == DecisionAction.AUTO_MATCH:
-                            if ml_confidence < 0.85 and ml_confidence >= 0.50:
+                            if 0.70 <= ml_confidence < 0.95:
                                 decision = dataclasses.replace(decision, action=DecisionAction.REVIEW_AMBIGUOUS)
                                 llm_explanation, llm_citation = self.llm_explainer.explain(pr, gstr2b, ml_confidence)
-                                ai_provenance["decision"] = "REVIEW_AMBIGUOUS"
-                            elif ml_confidence < 0.50:
+                                ai_provenance["decision"] = "REVIEW"
+                            elif ml_confidence < 0.70:
                                 decision = dataclasses.replace(decision, action=DecisionAction.REVIEW_WEAK)
                                 llm_explanation, llm_citation = self.llm_explainer.explain(pr, gstr2b, ml_confidence)
-                                ai_provenance["decision"] = "REVIEW_WEAK"
+                                ai_provenance["decision"] = "REJECT"
                             else:
                                 ai_provenance["decision"] = "AUTO_MATCH"
                                 
-                        elif decision.action == DecisionAction.REVIEW_AMBIGUOUS:
-                            if ml_confidence >= 0.85 and not has_conflict:
+                        elif decision.action == DecisionAction.REVIEW_AMBIGUOUS or decision.action == DecisionAction.REVIEW_WEAK:
+                            if ml_confidence >= 0.95 and not has_conflict:
                                 decision = dataclasses.replace(decision, action=DecisionAction.AUTO_MATCH)
                                 ai_provenance["decision"] = "AUTO_MATCH"
-                            elif ml_confidence < 0.50:
+                            elif ml_confidence < 0.70:
                                 decision = dataclasses.replace(decision, action=DecisionAction.REVIEW_WEAK)
                                 llm_explanation, llm_citation = self.llm_explainer.explain(pr, gstr2b, ml_confidence)
-                                ai_provenance["decision"] = "REVIEW_WEAK"
+                                ai_provenance["decision"] = "REJECT"
                             else:
-                                ai_provenance["decision"] = "REVIEW_AMBIGUOUS"
-                                llm_explanation, llm_citation = self.llm_explainer.explain(pr, gstr2b, ml_confidence)
-                                
-                        elif decision.action == DecisionAction.REVIEW_WEAK:
-                            if ml_confidence >= 0.50 and not has_conflict:
                                 decision = dataclasses.replace(decision, action=DecisionAction.REVIEW_AMBIGUOUS)
-                                llm_explanation, llm_citation = self.llm_explainer.explain(pr, gstr2b, ml_confidence)
-                                ai_provenance["decision"] = "REVIEW_AMBIGUOUS"
-                            else:
-                                ai_provenance["decision"] = "REVIEW_WEAK"
+                                ai_provenance["decision"] = "REVIEW"
                                 llm_explanation, llm_citation = self.llm_explainer.explain(pr, gstr2b, ml_confidence)
                                 
                         elif decision.action == DecisionAction.NO_MATCH:
-                            ai_provenance["decision"] = "NO_MATCH"
+                            ai_provenance["decision"] = "REJECT"
 
                 # Determine which nodes were "consumed" by the primary action
                 consumed_nodes: frozenset[str] = frozenset()

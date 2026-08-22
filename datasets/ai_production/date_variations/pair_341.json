@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-date_variations-341",
+    "vendor_name": "Supplier LLC 341",
+    "reference": "INV-10341",
+    "amount": "18760.68",
+    "record_date": "2023-07-03",
+    "tax_identity": "27AAAAA1341A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-date_variations-341",
+    "vendor_name": "Supplier LLC 341",
+    "reference": "INV-10341",
+    "amount": "18760.68",
+    "record_date": "2023-06-28",
+    "tax_identity": "27AAAAA1341A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

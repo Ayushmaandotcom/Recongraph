@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-exact-1854",
+    "vendor_name": "Supplier Corp 1854",
+    "reference": "INV-11854",
+    "amount": "42391.96",
+    "record_date": "2023-04-06",
+    "tax_identity": "27AAAAA2854A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-exact-1854",
+    "vendor_name": "Supplier Corp 1854",
+    "reference": "INV-11854",
+    "amount": "42391.96",
+    "record_date": "2023-04-06",
+    "tax_identity": "27AAAAA2854A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

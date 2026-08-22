@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-fuzzy-1996",
+    "vendor_name": "Supplier Corp 1996",
+    "reference": "INV-11996",
+    "amount": "22092.45",
+    "record_date": "2023-10-04",
+    "tax_identity": "27AAAAA2996A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-fuzzy-1996",
+    "vendor_name": "Suplier Corp 1996",
+    "reference": "INV11996",
+    "amount": "22092.45",
+    "record_date": "2023-10-04",
+    "tax_identity": "27AAAAA2996A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-contradictions-2271",
+    "vendor_name": "Supplier Ltd 2271",
+    "reference": "INV-12271",
+    "amount": "10010.4",
+    "record_date": "2023-07-16",
+    "tax_identity": "27AAAAA3271A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-contradictions-2271",
+    "vendor_name": "Supplier Ltd 2271",
+    "reference": "INV-12271",
+    "amount": "20020.80",
+    "record_date": "2023-07-16",
+    "tax_identity": "27AAAAA3271A1Z5"
+  },
+  "label": "CONTRADICTION"
+}

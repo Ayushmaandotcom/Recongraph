@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-gstin_variations-2007",
+    "vendor_name": "Supplier Corp 2007",
+    "reference": "INV-12007",
+    "amount": "14045.43",
+    "record_date": "2023-12-25",
+    "tax_identity": "27AAAAA3007A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-gstin_variations-2007",
+    "vendor_name": "Supplier Corp 2007",
+    "reference": "INV-12007",
+    "amount": "14045.43",
+    "record_date": "2023-12-25",
+    "tax_identity": "27AAAAA3007A1ZX"
+  },
+  "label": "NO_MATCH"
+}

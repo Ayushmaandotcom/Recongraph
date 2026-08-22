@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-tax_variations-150",
+    "vendor_name": "Supplier Corp 150",
+    "reference": "INV-10150",
+    "amount": "4743.36",
+    "record_date": "2023-04-13",
+    "tax_identity": "27AAAAA1150A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-tax_variations-150",
+    "vendor_name": "Supplier Corp 150",
+    "reference": "INV-10150",
+    "amount": "4744.36",
+    "record_date": "2023-04-13",
+    "tax_identity": "27AAAAA1150A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

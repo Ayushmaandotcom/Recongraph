@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-ocr-131",
+    "vendor_name": "Supplier Inc 131",
+    "reference": "INV-10131",
+    "amount": "35003.3",
+    "record_date": "2023-06-06",
+    "tax_identity": "27AAAAA1131A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-ocr-131",
+    "vendor_name": "Supplier Inc 131",
+    "reference": "INV-IOI3I",
+    "amount": "35003.31",
+    "record_date": "2023-06-06",
+    "tax_identity": "27AAAAA1131A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-date_variations-1165",
+    "vendor_name": "Supplier LLC 1165",
+    "reference": "INV-11165",
+    "amount": "33620.2",
+    "record_date": "2023-07-12",
+    "tax_identity": "27AAAAA2165A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-date_variations-1165",
+    "vendor_name": "Supplier LLC 1165",
+    "reference": "INV-11165",
+    "amount": "33620.2",
+    "record_date": "2023-07-12",
+    "tax_identity": "27AAAAA2165A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

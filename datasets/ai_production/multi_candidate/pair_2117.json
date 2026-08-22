@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-multi_candidate-2117",
+    "vendor_name": "Supplier Ltd 2117",
+    "reference": "INV-12117",
+    "amount": "26867.73",
+    "record_date": "2023-05-04",
+    "tax_identity": "27AAAAA3117A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-multi_candidate-2117",
+    "vendor_name": "Supplier Ltd 2117",
+    "reference": "INV-12117",
+    "amount": "26867.73",
+    "record_date": "2023-05-04",
+    "tax_identity": "27AAAAA3117A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

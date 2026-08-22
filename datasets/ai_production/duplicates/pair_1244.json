@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-duplicates-1244",
+    "vendor_name": "Supplier LLC 1244",
+    "reference": "INV-11244",
+    "amount": "36231.3",
+    "record_date": "2023-10-26",
+    "tax_identity": "27AAAAA2244A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-duplicates-1244",
+    "vendor_name": "Supplier LLC 1244",
+    "reference": "INV-11244",
+    "amount": "36231.3",
+    "record_date": "2023-10-26",
+    "tax_identity": "27AAAAA2244A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

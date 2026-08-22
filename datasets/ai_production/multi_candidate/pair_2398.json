@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-multi_candidate-2398",
+    "vendor_name": "Supplier Corp 2398",
+    "reference": "INV-12398",
+    "amount": "7480.23",
+    "record_date": "2023-07-28",
+    "tax_identity": "27AAAAA3398A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-multi_candidate-2398",
+    "vendor_name": "Supplier Corp 2398",
+    "reference": "INV-12398",
+    "amount": "7480.23",
+    "record_date": "2023-07-28",
+    "tax_identity": "27AAAAA3398A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

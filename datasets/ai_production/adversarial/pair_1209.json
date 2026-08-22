@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-adversarial-1209",
+    "vendor_name": "Supplier Ltd 1209",
+    "reference": "INV-11209",
+    "amount": "38833.11",
+    "record_date": "2023-10-24",
+    "tax_identity": "27AAAAA2209A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-adversarial-1209",
+    "vendor_name": "Supplier Ltd 1209",
+    "reference": "INV-11209",
+    "amount": "38833.11",
+    "record_date": "2023-10-24",
+    "tax_identity": "27AAAAA2209A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

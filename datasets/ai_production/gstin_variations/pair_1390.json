@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-gstin_variations-1390",
+    "vendor_name": "Supplier Corp 1390",
+    "reference": "INV-11390",
+    "amount": "6128.04",
+    "record_date": "2023-11-19",
+    "tax_identity": "27AAAAA2390A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-gstin_variations-1390",
+    "vendor_name": "Supplier Corp 1390",
+    "reference": "INV-11390",
+    "amount": "6128.04",
+    "record_date": "2023-11-19",
+    "tax_identity": "27AAAAA2390A1ZX"
+  },
+  "label": "NO_MATCH"
+}

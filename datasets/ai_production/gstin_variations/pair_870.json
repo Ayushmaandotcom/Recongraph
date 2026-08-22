@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-gstin_variations-870",
+    "vendor_name": "Supplier Ltd 870",
+    "reference": "INV-10870",
+    "amount": "43483.84",
+    "record_date": "2023-02-25",
+    "tax_identity": "27AAAAA1870A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-gstin_variations-870",
+    "vendor_name": "Supplier Ltd 870",
+    "reference": "INV-10870",
+    "amount": "43483.84",
+    "record_date": "2023-02-25",
+    "tax_identity": "27AAAAA1870A1ZX"
+  },
+  "label": "NO_MATCH"
+}

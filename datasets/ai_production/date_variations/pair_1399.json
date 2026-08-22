@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-date_variations-1399",
+    "vendor_name": "Supplier Ltd 1399",
+    "reference": "INV-11399",
+    "amount": "32027.3",
+    "record_date": "2023-09-15",
+    "tax_identity": "27AAAAA2399A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-date_variations-1399",
+    "vendor_name": "Supplier Ltd 1399",
+    "reference": "INV-11399",
+    "amount": "32027.3",
+    "record_date": "2023-09-12",
+    "tax_identity": "27AAAAA2399A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

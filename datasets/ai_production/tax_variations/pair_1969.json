@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-tax_variations-1969",
+    "vendor_name": "Supplier Inc 1969",
+    "reference": "INV-11969",
+    "amount": "1088.57",
+    "record_date": "2023-07-14",
+    "tax_identity": "27AAAAA2969A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-tax_variations-1969",
+    "vendor_name": "Supplier Inc 1969",
+    "reference": "INV-11969",
+    "amount": "1089.07",
+    "record_date": "2023-07-14",
+    "tax_identity": "27AAAAA2969A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

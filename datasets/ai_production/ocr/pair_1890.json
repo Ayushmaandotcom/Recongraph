@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-ocr-1890",
+    "vendor_name": "Supplier LLC 1890",
+    "reference": "INV-11890",
+    "amount": "22553.6",
+    "record_date": "2023-09-01",
+    "tax_identity": "27AAAAA2890A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-ocr-1890",
+    "vendor_name": "Supplier LLC 1890",
+    "reference": "INV-II89O",
+    "amount": "22553.61",
+    "record_date": "2023-09-01",
+    "tax_identity": "27AAAAA2890A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

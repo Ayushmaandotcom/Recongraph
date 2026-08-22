@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-ocr-2246",
+    "vendor_name": "Supplier LLC 2246",
+    "reference": "INV-12246",
+    "amount": "4796.29",
+    "record_date": "2023-06-06",
+    "tax_identity": "27AAAAA3246A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-ocr-2246",
+    "vendor_name": "Supplier LLC 2246",
+    "reference": "INV-I2246",
+    "amount": "4796.30",
+    "record_date": "2023-06-06",
+    "tax_identity": "27AAAAA3246A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-gstin_variations-1871",
+    "vendor_name": "Supplier Corp 1871",
+    "reference": "INV-11871",
+    "amount": "11007.83",
+    "record_date": "2023-07-13",
+    "tax_identity": "27AAAAA2871A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-gstin_variations-1871",
+    "vendor_name": "Supplier Corp 1871",
+    "reference": "INV-11871",
+    "amount": "11007.83",
+    "record_date": "2023-07-13",
+    "tax_identity": "27AAAAA2871A1ZX"
+  },
+  "label": "NO_MATCH"
+}

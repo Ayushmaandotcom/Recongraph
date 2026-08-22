@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-multi_candidate-911",
+    "vendor_name": "Supplier Corp 911",
+    "reference": "INV-10911",
+    "amount": "48218.06",
+    "record_date": "2023-05-15",
+    "tax_identity": "27AAAAA1911A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-multi_candidate-911",
+    "vendor_name": "Supplier Corp 911",
+    "reference": "INV-10911",
+    "amount": "48218.06",
+    "record_date": "2023-05-15",
+    "tax_identity": "27AAAAA1911A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

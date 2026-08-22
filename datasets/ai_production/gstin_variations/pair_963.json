@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-gstin_variations-963",
+    "vendor_name": "Supplier Corp 963",
+    "reference": "INV-10963",
+    "amount": "13104.75",
+    "record_date": "2023-09-16",
+    "tax_identity": "27AAAAA1963A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-gstin_variations-963",
+    "vendor_name": "Supplier Corp 963",
+    "reference": "INV-10963",
+    "amount": "13104.75",
+    "record_date": "2023-09-16",
+    "tax_identity": "27AAAAA1963A1ZX"
+  },
+  "label": "NO_MATCH"
+}

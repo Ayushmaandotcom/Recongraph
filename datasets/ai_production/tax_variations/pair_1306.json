@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-tax_variations-1306",
+    "vendor_name": "Supplier Corp 1306",
+    "reference": "INV-11306",
+    "amount": "49322.44",
+    "record_date": "2023-07-28",
+    "tax_identity": "27AAAAA2306A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-tax_variations-1306",
+    "vendor_name": "Supplier Corp 1306",
+    "reference": "INV-11306",
+    "amount": "49321.44",
+    "record_date": "2023-07-28",
+    "tax_identity": "27AAAAA2306A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

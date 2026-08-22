@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-gstin_variations-355",
+    "vendor_name": "Supplier Inc 355",
+    "reference": "INV-10355",
+    "amount": "12757.15",
+    "record_date": "2023-01-12",
+    "tax_identity": "27AAAAA1355A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-gstin_variations-355",
+    "vendor_name": "Supplier Inc 355",
+    "reference": "INV-10355",
+    "amount": "12757.15",
+    "record_date": "2023-01-12",
+    "tax_identity": "27AAAAA1355A1ZX"
+  },
+  "label": "NO_MATCH"
+}

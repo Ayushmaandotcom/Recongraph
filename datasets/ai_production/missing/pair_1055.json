@@ -1,0 +1,12 @@
+{
+  "pr": {
+    "record_id": "PR-missing-1055",
+    "vendor_name": "Supplier LLC 1055",
+    "reference": "INV-11055",
+    "amount": "8912.7",
+    "record_date": "2023-08-05",
+    "tax_identity": "27AAAAA2055A1Z5"
+  },
+  "gst": null,
+  "label": "NO_MATCH"
+}

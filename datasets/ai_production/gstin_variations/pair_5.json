@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-gstin_variations-5",
+    "vendor_name": "Supplier Corp 5",
+    "reference": "INV-10005",
+    "amount": "21188.46",
+    "record_date": "2023-05-05",
+    "tax_identity": "27AAAAA1005A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-gstin_variations-5",
+    "vendor_name": "Supplier Corp 5",
+    "reference": "INV-10005",
+    "amount": "21188.46",
+    "record_date": "2023-05-05",
+    "tax_identity": "27AAAAA1005A1ZX"
+  },
+  "label": "NO_MATCH"
+}

@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-adversarial-367",
+    "vendor_name": "Supplier Inc 367",
+    "reference": "INV-10367",
+    "amount": "46223.09",
+    "record_date": "2023-09-09",
+    "tax_identity": "27AAAAA1367A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-adversarial-367",
+    "vendor_name": "Supplier Inc 367",
+    "reference": "INV-10367",
+    "amount": "46223.09",
+    "record_date": "2023-09-09",
+    "tax_identity": "27AAAAA1367A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

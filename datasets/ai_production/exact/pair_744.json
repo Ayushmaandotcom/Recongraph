@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-exact-744",
+    "vendor_name": "Supplier Inc 744",
+    "reference": "INV-10744",
+    "amount": "12907.23",
+    "record_date": "2023-02-24",
+    "tax_identity": "27AAAAA1744A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-exact-744",
+    "vendor_name": "Supplier Inc 744",
+    "reference": "INV-10744",
+    "amount": "12907.23",
+    "record_date": "2023-02-24",
+    "tax_identity": "27AAAAA1744A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-fuzzy-2145",
+    "vendor_name": "Supplier Inc 2145",
+    "reference": "INV-12145",
+    "amount": "13869.75",
+    "record_date": "2023-10-13",
+    "tax_identity": "27AAAAA3145A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-fuzzy-2145",
+    "vendor_name": "Suplier Inc 2145",
+    "reference": "INV12145",
+    "amount": "13869.75",
+    "record_date": "2023-10-13",
+    "tax_identity": "27AAAAA3145A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

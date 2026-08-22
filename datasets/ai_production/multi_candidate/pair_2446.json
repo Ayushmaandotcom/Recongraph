@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-multi_candidate-2446",
+    "vendor_name": "Supplier Inc 2446",
+    "reference": "INV-12446",
+    "amount": "19532.53",
+    "record_date": "2023-10-10",
+    "tax_identity": "27AAAAA3446A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-multi_candidate-2446",
+    "vendor_name": "Supplier Inc 2446",
+    "reference": "INV-12446",
+    "amount": "19532.53",
+    "record_date": "2023-10-10",
+    "tax_identity": "27AAAAA3446A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

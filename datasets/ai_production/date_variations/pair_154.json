@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-date_variations-154",
+    "vendor_name": "Supplier Corp 154",
+    "reference": "INV-10154",
+    "amount": "6065.78",
+    "record_date": "2023-09-25",
+    "tax_identity": "27AAAAA1154A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-date_variations-154",
+    "vendor_name": "Supplier Corp 154",
+    "reference": "INV-10154",
+    "amount": "6065.78",
+    "record_date": "2023-09-23",
+    "tax_identity": "27AAAAA1154A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

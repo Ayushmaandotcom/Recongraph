@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-gstin_variations-717",
+    "vendor_name": "Supplier Ltd 717",
+    "reference": "INV-10717",
+    "amount": "39117.6",
+    "record_date": "2023-06-16",
+    "tax_identity": "27AAAAA1717A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-gstin_variations-717",
+    "vendor_name": "Supplier Ltd 717",
+    "reference": "INV-10717",
+    "amount": "39117.6",
+    "record_date": "2023-06-16",
+    "tax_identity": "27AAAAA1717A1ZX"
+  },
+  "label": "NO_MATCH"
+}

@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-contradictions-2008",
+    "vendor_name": "Supplier Ltd 2008",
+    "reference": "INV-12008",
+    "amount": "22650.71",
+    "record_date": "2023-11-22",
+    "tax_identity": "27AAAAA3008A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-contradictions-2008",
+    "vendor_name": "Supplier Ltd 2008",
+    "reference": "INV-12008",
+    "amount": "45301.420",
+    "record_date": "2023-11-22",
+    "tax_identity": "27AAAAA3008A1Z5"
+  },
+  "label": "CONTRADICTION"
+}

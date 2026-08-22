@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-gstin_variations-2002",
+    "vendor_name": "Supplier Ltd 2002",
+    "reference": "INV-12002",
+    "amount": "23714.27",
+    "record_date": "2023-06-20",
+    "tax_identity": "27AAAAA3002A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-gstin_variations-2002",
+    "vendor_name": "Supplier Ltd 2002",
+    "reference": "INV-12002",
+    "amount": "23714.27",
+    "record_date": "2023-06-20",
+    "tax_identity": "27AAAAA3002A1ZX"
+  },
+  "label": "NO_MATCH"
+}

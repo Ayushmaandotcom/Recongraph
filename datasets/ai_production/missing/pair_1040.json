@@ -1,0 +1,12 @@
+{
+  "pr": {
+    "record_id": "PR-missing-1040",
+    "vendor_name": "Supplier LLC 1040",
+    "reference": "INV-11040",
+    "amount": "47903.86",
+    "record_date": "2023-08-12",
+    "tax_identity": "27AAAAA2040A1Z5"
+  },
+  "gst": null,
+  "label": "NO_MATCH"
+}

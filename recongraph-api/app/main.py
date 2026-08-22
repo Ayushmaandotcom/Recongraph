@@ -304,7 +304,8 @@ async def export_run_csv(run_id: str, current_user: dict = Depends(require_audit
     # Write header
     writer.writerow([
         "Packet ID", "Decision", "Polarity", "Missing PR Count", "Missing GST Count", 
-        "PR Total", "GST Total", "Champion Confidence", "Challenger Confidence"
+        "PR Total", "GST Total", "Champion Confidence", "Challenger Confidence",
+        "AI Decision", "Reason Codes", "Dataset Version"
     ])
     
     # Write rows
@@ -317,12 +318,25 @@ async def export_run_csv(run_id: str, current_user: dict = Depends(require_audit
         pr_total = sum(float(r.get("amount", 0)) for r in p.get("purchase_records", []))
         gst_total = sum(float(r.get("amount", 0)) for r in p.get("gst_records", []))
         
-        champ_conf = p.get("ai_provenance", {}).get("champion_confidence", 0)
-        chall_conf = p.get("ai_provenance", {}).get("challenger_confidence", 0)
+        ai_prov = p.get("ai_provenance", {})
+        champ_conf = ai_prov.get("confidence", 0)
+        chall_conf = ai_prov.get("challenger_confidence", 0)
+        ai_decision = ai_prov.get("decision", "UNKNOWN")
+        
+        reason_codes = []
+        if champ_conf >= 0.95:
+            reason_codes.append("HIGH_CONFIDENCE_MATCH")
+        elif champ_conf < 0.70:
+            reason_codes.append("LOW_CONFIDENCE_REJECT")
+        else:
+            reason_codes.append("AMBIGUOUS_SCORE_REVIEW")
+            
+        dataset_version = "v1-ai-prod"
         
         writer.writerow([
             p.get("packet_id"), decision, polarity, missing_pr, missing_gst,
-            pr_total, gst_total, champ_conf, chall_conf
+            pr_total, gst_total, champ_conf, chall_conf,
+            ai_decision, "|".join(reason_codes), dataset_version
         ])
         
     output.seek(0)

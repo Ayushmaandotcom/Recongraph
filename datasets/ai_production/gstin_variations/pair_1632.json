@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-gstin_variations-1632",
+    "vendor_name": "Supplier Inc 1632",
+    "reference": "INV-11632",
+    "amount": "26568.15",
+    "record_date": "2023-03-09",
+    "tax_identity": "27AAAAA2632A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-gstin_variations-1632",
+    "vendor_name": "Supplier Inc 1632",
+    "reference": "INV-11632",
+    "amount": "26568.15",
+    "record_date": "2023-03-09",
+    "tax_identity": "27AAAAA2632A1ZX"
+  },
+  "label": "NO_MATCH"
+}

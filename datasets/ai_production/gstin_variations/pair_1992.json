@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-gstin_variations-1992",
+    "vendor_name": "Supplier Corp 1992",
+    "reference": "INV-11992",
+    "amount": "14488.18",
+    "record_date": "2023-07-06",
+    "tax_identity": "27AAAAA2992A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-gstin_variations-1992",
+    "vendor_name": "Supplier Corp 1992",
+    "reference": "INV-11992",
+    "amount": "14488.18",
+    "record_date": "2023-07-06",
+    "tax_identity": "27AAAAA2992A1ZX"
+  },
+  "label": "NO_MATCH"
+}

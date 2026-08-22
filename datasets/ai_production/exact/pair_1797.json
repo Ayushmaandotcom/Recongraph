@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-exact-1797",
+    "vendor_name": "Supplier Inc 1797",
+    "reference": "INV-11797",
+    "amount": "46120.66",
+    "record_date": "2023-10-16",
+    "tax_identity": "27AAAAA2797A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-exact-1797",
+    "vendor_name": "Supplier Inc 1797",
+    "reference": "INV-11797",
+    "amount": "46120.66",
+    "record_date": "2023-10-16",
+    "tax_identity": "27AAAAA2797A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

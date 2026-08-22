@@ -31,7 +31,21 @@ def train_model(dataset_csv: Path):
     with open(dataset_csv, "r") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            features = extract_features(row, row)
+            pr = {
+                "reference": row.get("pr_ref"),
+                "supplier_name": row.get("pr_vendor"),
+                "amount": row.get("pr_amount"),
+                "record_date": row.get("pr_date"),
+                "tax_identity": row.get("pr_gstin")
+            }
+            gst = {
+                "reference": row.get("gst_ref"),
+                "supplier_name": row.get("gst_vendor"),
+                "amount": row.get("gst_amount"),
+                "record_date": row.get("gst_date"),
+                "tax_identity": row.get("gst_gstin")
+            }
+            features = extract_features(pr, gst)
             label = row.get("label", "")
             y_val = 1 if label in ("EXACT_MATCH", "FUZZY_MATCH") else 0
             packet_id = row.get("packet_id", "default_packet")
@@ -146,4 +160,4 @@ class MLCandidateFilter:
             return [float(p) for p in probs]
 
 if __name__ == "__main__":
-    train_model(Path("datasets/training/production_dataset.csv"))
+    train_model(Path("datasets/ai_production/master_dataset.csv"))

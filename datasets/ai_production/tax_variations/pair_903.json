@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-tax_variations-903",
+    "vendor_name": "Supplier Corp 903",
+    "reference": "INV-10903",
+    "amount": "33545.68",
+    "record_date": "2023-04-09",
+    "tax_identity": "27AAAAA1903A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-tax_variations-903",
+    "vendor_name": "Supplier Corp 903",
+    "reference": "INV-10903",
+    "amount": "33546.68",
+    "record_date": "2023-04-09",
+    "tax_identity": "27AAAAA1903A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}

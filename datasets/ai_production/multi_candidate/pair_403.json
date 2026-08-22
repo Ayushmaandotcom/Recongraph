@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-multi_candidate-403",
+    "vendor_name": "Supplier Ltd 403",
+    "reference": "INV-10403",
+    "amount": "20887.68",
+    "record_date": "2023-11-01",
+    "tax_identity": "27AAAAA1403A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-multi_candidate-403",
+    "vendor_name": "Supplier Ltd 403",
+    "reference": "INV-10403",
+    "amount": "20887.68",
+    "record_date": "2023-11-01",
+    "tax_identity": "27AAAAA1403A1Z5"
+  },
+  "label": "EXACT_MATCH"
+}

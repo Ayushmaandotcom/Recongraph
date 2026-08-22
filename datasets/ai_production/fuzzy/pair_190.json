@@ -1,0 +1,19 @@
+{
+  "pr": {
+    "record_id": "PR-fuzzy-190",
+    "vendor_name": "Supplier Ltd 190",
+    "reference": "INV-10190",
+    "amount": "6637.56",
+    "record_date": "2023-05-15",
+    "tax_identity": "27AAAAA1190A1Z5"
+  },
+  "gst": {
+    "record_id": "GST-fuzzy-190",
+    "vendor_name": "Suplier Ltd 190",
+    "reference": "INV10190",
+    "amount": "6637.56",
+    "record_date": "2023-05-15",
+    "tax_identity": "27AAAAA1190A1Z5"
+  },
+  "label": "FUZZY_MATCH"
+}
