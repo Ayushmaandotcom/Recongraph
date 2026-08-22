@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
-import { ReviewPacket, ExplanationNode } from "@/lib/types";
-import ReactMarkdown from "react-markdown";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+import React from "react";
+import { ReviewPacket } from "@/lib/types";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface PacketDetailProps {
   packet: ReviewPacket;
@@ -12,23 +12,46 @@ interface PacketDetailProps {
   onAskCopilot?: (packetId: string) => void;
 }
 
-export default function PacketDetail({ packet, onBack, onAskCopilot }: PacketDetailProps) {
-  // Try to find the leading hypothesis to display its signals
+function RecordRow({
+  record,
+  highlighted,
+}: {
+  record: ReviewPacket["purchases"][number];
+  highlighted?: boolean;
+}) {
+  return (
+    <div
+      className={`p-4 bg-secondary border rounded-md flex flex-wrap justify-between items-center gap-3 ${
+        highlighted ? "border-l-4 border-l-primary border-border" : "border-border"
+      }`}
+    >
+      <div className="flex flex-col gap-1 min-w-0">
+        <span className="font-mono text-xs text-muted-foreground break-all">{record.record_id}</span>
+        <span className="font-medium">
+          {record.vendor_name || <span className="text-muted-foreground italic">Unknown Vendor</span>}
+        </span>
+        <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm mt-1">
+          <span className="text-muted-foreground">
+            Ref: <span className="text-foreground font-mono">{record.reference || "N/A"}</span>
+          </span>
+          <span className="text-muted-foreground">
+            GSTIN: <span className="text-foreground font-mono">{record.tax_identity || "N/A"}</span>
+          </span>
+          <span className="text-muted-foreground">
+            Date: <span className="text-foreground">{record.record_date}</span>
+          </span>
+        </div>
+      </div>
+      <div className="text-lg font-semibold font-mono whitespace-nowrap tabular-nums">
+        ₹{parseFloat(record.amount).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+      </div>
+    </div>
+  );
+}
+
+export default function PacketDetail({ packet, onBack }: PacketDetailProps) {
+  // Leading hypothesis carries the semantic findings
   const hyp = packet.competitors?.[0];
-  const signals: Record<string, number | null> = {
-    entity: null,
-    reference: null,
-    amount: null,
-    temporal: null,
-    tax_identity: null
-  };
-  
-  if (hyp?.supporting_evidence?.metadata) {
-    const meta = hyp.supporting_evidence.metadata;
-    // Extract signals if available in the metadata (or we mock them based on base_score for the demo)
-    // In actual implementation, we'd pull from provider_projection_identities or trace
-    // For the UI rider: we must use actual fields.
-  }
 
   const [feedbackStatus, setFeedbackStatus] = useState<string | null>(null);
 
@@ -60,24 +83,25 @@ export default function PacketDetail({ packet, onBack, onAskCopilot }: PacketDet
   };
 
   return (
-    <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-right-8 duration-300">
-      <div className="flex items-center gap-4 border-b border-[var(--color-border)] pb-4">
-        <button 
+    <div className="flex flex-col gap-6 animate-in fade-in duration-300">
+      <div className="flex items-start gap-4 border-b border-border pb-4">
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={onBack}
-          className="p-2 rounded-full hover:bg-[var(--color-surface-hover)] transition-colors text-[var(--color-text-muted)]"
+          aria-label="Back to review queue"
+          className="mt-1"
         >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
-        </button>
+        </Button>
         <div>
-          <div className="flex items-center gap-3">
-            <h2 className="text-2xl font-bold font-mono text-[var(--color-text)]">{packet.packet_id}</h2>
-            <span className="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-[var(--color-surface-elevated)] border border-[var(--color-border)]">
-              {packet.action}
-            </span>
+          <div className="flex flex-wrap items-center gap-3">
+            <h2 className="text-xl font-bold font-mono text-foreground">{packet.packet_id}</h2>
+            <Badge variant="neutral">{packet.action}</Badge>
           </div>
-          <p className="text-lg text-[var(--color-text-muted)] mt-1">{packet.headline}</p>
+          <p className="text-base text-muted-foreground mt-1">{packet.headline}</p>
         </div>
         <div className="ml-auto flex items-center gap-3">
           {onAskCopilot && (
@@ -132,72 +156,54 @@ export default function PacketDetail({ packet, onBack, onAskCopilot }: PacketDet
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
         {/* Left Col: The Records */}
         <div className="lg:col-span-2 flex flex-col gap-6">
-          <div className="glass-panel p-6 rounded-lg">
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <svg className="w-5 h-5 text-[var(--color-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              Record Comparison
-            </h3>
-            
-            {/* Purchase Records */}
-            <div className="mb-6">
-              <h4 className="text-sm font-semibold uppercase tracking-wider text-[var(--color-text-muted)] mb-3">Internal Purchases</h4>
-              {packet.purchases.length === 0 ? (
-                <div className="p-4 bg-[var(--color-surface)] border border-[var(--color-border)] rounded text-sm text-[var(--color-text-muted)]">No purchase records in this packet.</div>
-              ) : (
-                <div className="space-y-3">
-                  {packet.purchases.map(p => (
-                    <div key={p.record_id} className="p-4 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-md flex justify-between items-center group">
-                      <div className="flex flex-col gap-1">
-                        <span className="font-mono text-xs text-[var(--color-text-muted)]">{p.record_id}</span>
-                        <span className="font-medium">{p.vendor_name || <span className="text-[var(--color-unknown)] italic">Unknown Vendor</span>}</span>
-                        <div className="flex gap-3 text-sm mt-1">
-                          <span className="text-[var(--color-text-muted)]">Ref: <span className="text-[var(--color-text)] font-mono">{p.reference || "N/A"}</span></span>
-                          <span className="text-[var(--color-text-muted)]">GSTIN: <span className="text-[var(--color-text)] font-mono">{p.tax_identity || "N/A"}</span></span>
-                          <span className="text-[var(--color-text-muted)]">Date: <span className="text-[var(--color-text)]">{p.record_date}</span></span>
-                        </div>
-                      </div>
-                      <div className="text-xl font-semibold font-mono">
-                        ₹{parseFloat(p.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+          <Card aria-labelledby="record-comparison-heading">
+            <CardContent className="pt-1">
+              <h3 id="record-comparison-heading" className="text-base font-semibold mb-4 flex items-center gap-2">
+                <svg aria-hidden="true" className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Record Comparison
+              </h3>
 
-            {/* GST Records */}
-            <div>
-              <h4 className="text-sm font-semibold uppercase tracking-wider text-[var(--color-text-muted)] mb-3">Counterparty GST</h4>
-              {packet.gsts.length === 0 ? (
-                <div className="p-4 bg-[var(--color-surface)] border border-[var(--color-border)] rounded text-sm text-[var(--color-text-muted)]">No GST records in this packet.</div>
-              ) : (
-                <div className="space-y-3">
-                  {packet.gsts.map(g => (
-                    <div key={g.record_id} className="p-4 bg-[var(--color-surface)] border border-l-4 border-l-[var(--color-primary)] border-[var(--color-border)] rounded-md flex justify-between items-center group">
-                      <div className="flex flex-col gap-1">
-                        <span className="font-mono text-xs text-[var(--color-text-muted)]">{g.record_id}</span>
-                        <span className="font-medium">{g.vendor_name || <span className="text-[var(--color-unknown)] italic">Unknown Vendor</span>}</span>
-                        <div className="flex gap-3 text-sm mt-1">
-                          <span className="text-[var(--color-text-muted)]">Ref: <span className="text-[var(--color-text)] font-mono">{g.reference || "N/A"}</span></span>
-                          <span className="text-[var(--color-text-muted)]">GSTIN: <span className="text-[var(--color-text)] font-mono">{g.tax_identity || "N/A"}</span></span>
-                          <span className="text-[var(--color-text-muted)]">Date: <span className="text-[var(--color-text)]">{g.record_date}</span></span>
-                        </div>
-                      </div>
-                      <div className="text-xl font-semibold font-mono">
-                        ₹{parseFloat(g.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-            
-          </div>
+              {/* Purchase Records */}
+              <div className="mb-6">
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                  Internal Purchases
+                </h4>
+                {packet.purchases.length === 0 ? (
+                  <div className="p-4 bg-muted border border-border rounded text-sm text-muted-foreground">
+                    No purchase records in this packet.
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {packet.purchases.map((p) => (
+                      <RecordRow key={p.record_id} record={p} />
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* GST Records */}
+              <div>
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                  Counterparty GST
+                </h4>
+                {packet.gsts.length === 0 ? (
+                  <div className="p-4 bg-muted border border-border rounded text-sm text-muted-foreground">
+                    No GST records in this packet.
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {packet.gsts.map((g) => (
+                      <RecordRow key={g.record_id} record={g} highlighted />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Right Col: Signals & Explanation */}
@@ -251,13 +257,25 @@ export default function PacketDetail({ packet, onBack, onAskCopilot }: PacketDet
                 {packet.explanation ? (
                   JSON.stringify(packet.explanation, null, 2)
                 ) : (
-                  "Engine rationale is logged in the Trace."
+                  <div className="p-3 bg-muted border border-border rounded text-sm text-muted-foreground text-center italic">
+                    No blocking semantic findings detected.
+                  </div>
                 )}
               </div>
-            </div>
-          </div>
-        </div>
 
+              <div className="mt-6 pt-6 border-t border-border">
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                  Explanation Trajectory
+                </h4>
+                <div className="text-xs bg-muted p-4 rounded border border-border whitespace-pre-wrap font-mono text-muted-foreground leading-relaxed overflow-x-auto max-h-96">
+                  {packet.explanation
+                    ? JSON.stringify(packet.explanation, null, 2)
+                    : "Engine rationale is logged in the Trace."}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
