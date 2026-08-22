@@ -148,16 +148,49 @@ ML Model Calibrated Match Confidence: {ml_confidence*100:.1f}%
 {citation}
 </RAG_CONTEXT>
 
-Write exactly 2 sentences explaining why this was flagged for human review and whether it appears to be a genuine match (e.g. an OCR error or timing difference) or a contradiction. You may reference the RAG context if it explains the discrepancy (e.g. claiming ITC within the time limit). Do not output anything else.
+You must output a strictly valid JSON object with the following schema:
+{{
+  "explanation": "Exactly 2 sentences explaining why this was flagged, whether it's a genuine match or a contradiction, referencing the RAG context if applicable.",
+  "cited_sources": ["List of specific substrings from the RAG context that you relied upon. Leave empty if none."],
+  "genuine_match": true or false
+}}
+Do not output any markdown formatting, just the raw JSON object.
 """
 
         try:
             response = self.client.messages.create(
                 model="claude-3-haiku-20240307",
-                max_tokens=150,
+                max_tokens=250,
                 temperature=0.0,
                 messages=[{"role": "user", "content": prompt}]
             )
-            return response.content[0].text.strip(), citation
+            raw_text = response.content[0].text.strip()
+            
+            # Phase 7I: Enforce JSON Structure
+            import json
+            try:
+                parsed = json.loads(raw_text)
+            except json.JSONDecodeError:
+                # Attempt to extract JSON if wrapped in markdown
+                if "```json" in raw_text:
+                    json_str = raw_text.split("```json")[1].split("```")[0].strip()
+                    parsed = json.loads(json_str)
+                else:
+                    return f"Error: LLM returned invalid JSON. Raw output: {raw_text}", citation
+                    
+            explanation = parsed.get("explanation", "No explanation provided.")
+            cited_sources = parsed.get("cited_sources", [])
+            
+            # Phase 7H: Citation Verification
+            for source in cited_sources:
+                if source.lower() not in citation.lower():
+                    # Hallucinated citation detected
+                    explanation += f"\n\n> [!WARNING]\n> Hallucinated Citation Detected: The LLM cited '{source}' which is not present in the RAG context."
+                    break
+            
+            # Phase 7G: Hallucination mitigation prefix
+            prefix = "**Verified Genuine Match:** " if parsed.get("genuine_match") else "**Flagged as Contradiction:** "
+            
+            return prefix + explanation, citation
         except Exception as e:
             return f"Error reaching LLM API: {str(e)}", citation

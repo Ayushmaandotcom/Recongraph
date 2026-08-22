@@ -64,7 +64,13 @@ class ReconGraphEngine:
     def __init__(self, config: ReconGraphConfig, providers: Sequence[EvidenceProvider | EvidenceProviderV2]):
         self.config = config
         self.providers = tuple(providers)
-        self.ml_filter = MLCandidateFilter()
+        
+        from pathlib import Path
+        champion_path = Path("models/candidate_model.pkl")
+        challenger_path = Path("models/challenger_model.pkl")
+        
+        self.ml_filter = MLCandidateFilter(champion_path)
+        self.ml_challenger = MLCandidateFilter(challenger_path)
         self.llm_explainer = LLMExplainer()
 
     @property
@@ -242,10 +248,12 @@ class ReconGraphEngine:
                         raw_features = extract_features(pr, gstr2b, graph_context)
                         
                         ml_confidence = self.ml_filter.predict_confidence(pr, gstr2b, graph_context)
+                        challenger_confidence = self.ml_challenger.predict_confidence(pr, gstr2b, graph_context)
                         
                         ai_provenance = {
-                            "model_version": "candidate_model_v1.0",
+                            "model_version": "champion_v1.0",
                             "confidence": ml_confidence,
+                            "challenger_confidence": challenger_confidence,
                             "feature_values": raw_features,
                             "timestamp": datetime.now(timezone.utc).isoformat()
                         }

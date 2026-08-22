@@ -80,11 +80,25 @@ export default function PacketDetail({ packet, onBack }: PacketDetailProps) {
         </div>
         <div className="ml-auto flex items-center gap-3">
           {typeof packet.ml_confidence === "number" && (
-            <div className="flex flex-col items-end mr-4">
-              <span className="text-xs uppercase tracking-wider text-[var(--color-text-muted)] font-semibold">AI Confidence</span>
-              <span className={`text-sm font-bold font-mono px-2 py-0.5 rounded mt-1 ${packet.ml_confidence >= 0.85 ? 'bg-green-100 text-green-800 border-green-300' : packet.ml_confidence >= 0.50 ? 'bg-yellow-100 text-yellow-800 border-yellow-300' : 'bg-red-100 text-red-800 border-red-300'} border`}>
-                {(packet.ml_confidence * 100).toFixed(1)}%
-              </span>
+            <div className="flex items-center gap-4 mr-4">
+              <div className="flex flex-col items-end">
+                <span className="text-xs uppercase tracking-wider text-[var(--color-text-muted)] font-semibold">Champion (LGBM)</span>
+                <span className={`text-sm font-bold font-mono px-2 py-0.5 rounded mt-1 ${packet.ml_confidence >= 0.85 ? 'bg-green-100 text-green-800 border-green-300' : packet.ml_confidence >= 0.50 ? 'bg-yellow-100 text-yellow-800 border-yellow-300' : 'bg-red-100 text-red-800 border-red-300'} border`}>
+                  {(packet.ml_confidence * 100).toFixed(1)}%
+                </span>
+              </div>
+              
+              {packet.ai_provenance && packet.ai_provenance.challenger_confidence !== undefined && (
+                <div className="flex flex-col items-end border-l border-[var(--color-border)] pl-4">
+                  <span className="text-xs uppercase tracking-wider text-[var(--color-text-muted)] font-semibold flex items-center gap-1">
+                    <svg className="w-3 h-3 text-[var(--color-warning)]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                    Challenger
+                  </span>
+                  <span className="text-sm font-bold font-mono px-2 py-0.5 rounded mt-1 bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-text-muted)]">
+                    {(packet.ai_provenance.challenger_confidence * 100).toFixed(1)}%
+                  </span>
+                </div>
+              )}
             </div>
           )}
           {feedbackStatus ? (
